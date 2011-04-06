@@ -171,12 +171,12 @@ function book_proposal_form($form_state)
         return;
         break;
       case 1:
-        drupal_set_message(t('Your proposal has been accepted. Please go to ' . l('Code Submission', 'upload') . ' to upload your code'), 'status');
+        drupal_set_message(t('Your proposal has been approved. Please go to ' . l('Code Submission', 'upload') . ' to upload your code'), 'status');
         drupal_goto('');
         return;
         break;
       case 2:
-        drupal_set_message(t('Your proposal has been rejected. Please create another proposal below.'), 'error');
+        drupal_set_message(t('Your proposal has been dis-approved. Please create another proposal below.'), 'error');
         break;
       case 3:
         drupal_set_message(t('Congratulations! You have completed your last book proposal. You can create another proposal below.'), 'status');
@@ -597,8 +597,8 @@ function _proposal_all()
     switch ($proposal_data->proposal_status)
     {
     case 0: $proposal_status = 'Pending'; break;
-    case 1: $proposal_status = 'Accepted'; break;
-    case 2: $proposal_status = 'Rejected'; break;
+    case 1: $proposal_status = 'Approved'; break;
+    case 2: $proposal_status = 'Dis-approved'; break;
     case 3: $proposal_status = 'Completed'; break;
     default: $proposal_status = 'Unknown'; break;
     }
