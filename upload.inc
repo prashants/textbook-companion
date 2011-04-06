@@ -11,7 +11,7 @@ function upload_examples_form($form_state)
   global $user;
 
   /* get approved book details */
-  $result = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book, pro.full_name as pro_full_name FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pro.uid = %d", $user->uid);
+  $result = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book, pro.full_name as pro_full_name FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pre.approval_status = 1 AND pro.uid = %d", $user->uid);
   $row = db_fetch_object($result);
   if (!$row)
   {
@@ -172,7 +172,7 @@ function upload_examples_form_submit($form, &$form_state) {
   $dest_path = $_SERVER['DOCUMENT_ROOT'] . base_path() . 'uploads/';
 
   /* get book details */
-  $book_result = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pro.uid = %d", $user->uid);
+  $book_result = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pre.approval_status = 1 AND pro.uid = %d", $user->uid);
   $book_row = db_fetch_object($book_result);
   $preference_id = $book_row->pre_id;
   $dest_path .= $preference_id . '/';
