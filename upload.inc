@@ -257,6 +257,6 @@ function upload_examples_form_submit($form, &$form_state) {
     }
   }
   drupal_set_message('Example uploaded successfully.', 'status');
-  drupal_goto('textbook_companion/list_chapters');
+  drupal_goto('textbook_companion/code');
 }
 

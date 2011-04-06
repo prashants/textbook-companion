@@ -569,7 +569,7 @@ function _proposal_pending()
     return '';
   }
 
-  $pending_header = array('Date', 'Contributor Name', 'Completion', 'Action');
+  $pending_header = array('Date of Submission', 'Contributor Name', 'Date of Completion', 'Action');
   $output = theme_table($pending_header, $pending_rows);
   return $output; 
 }
@@ -581,6 +581,10 @@ function _proposal_all()
   $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} ORDER BY id DESC");
   while ($proposal_data = db_fetch_object($proposal_q))
   {
+    /* get preference */
+    $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND approval_status = 1 LIMIT 1", $proposal_data->id);
+    $preference_data = db_fetch_object($preference_q);
+
     $proposal_status = '';
     switch ($proposal_data->proposal_status)
     {
@@ -590,7 +594,7 @@ function _proposal_all()
     case 3: $proposal_status = 'Completed'; break;
     default: $proposal_status = 'Unknown'; break;
     }
-    $proposal_rows[] = array(date('d-m-Y', $proposal_data->creation_date), $proposal_data->full_name, date('d-m-Y', $proposal_data->completion_date), $proposal_status);
+    $proposal_rows[] = array(date('d-m-Y', $proposal_data->creation_date), $preference_data->book, $preference_data->author, $proposal_data->full_name, date('d-m-Y', $proposal_data->completion_date), $proposal_status);
   }
 
   /* check if there are any pending proposals */
@@ -600,7 +604,7 @@ function _proposal_all()
     return '';
   }
 
-  $proposal_header = array('Date', 'Contributor Name', 'Completion', 'Status');
+  $proposal_header = array('Date of Submission', 'Book Name', 'Author', 'Contributor Name', 'Date of Completion', 'Status');
   $output = theme_table($proposal_header, $proposal_rows);
   return $output; 
 }
@@ -681,10 +685,10 @@ function proposal_approval_form($form_state)
 
   /* get book preference */
   $preference_rows = array();
-  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d ORDER BY pref_number DESC", $proposal_id);
+  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d ORDER BY pref_number ASC", $proposal_id);
   while ($preference_data = db_fetch_object($preference_q))
   {
-    $preference_rows[$preference_data->pref_number] = $preference_data->book . ' (' . $preference_data->author . ')';
+    $preference_rows[$preference_data->id] = $preference_data->book . ' (' . $preference_data->author . ')';
   }
 
   $form['book_preference'] = array(
@@ -763,15 +767,9 @@ function proposal_approval_form_submit($form, &$form_state)
   }
 
   /* get book preference and set the status */
-  $book_pref = $form_state['values']['book_preference'];
-  if (($book_pref < 1) or ($book_pref > 3))
-  {
-    drupal_set_message('Invalid book preference selected.', 'error');
-    drupal_goto('manage_proposal');
-    return;
-  }
+  $preference_id = $form_state['values']['book_preference'];
   db_query("UPDATE {textbook_companion_proposal} SET approver_uid = %d, approval_date = %d, proposal_status = 1 WHERE id = %d", $user->uid, time(), $proposal_id);
-  db_query("UPDATE {textbook_companion_preference} SET approval_status = 1 WHERE proposal_id = %d and pref_number = %d", $proposal_id, $book_pref);
+  db_query("UPDATE {textbook_companion_preference} SET approval_status = 1 WHERE id = %d", $preference_id);
 
   /* sending email */
   $book_user = user_load($row->uid);
