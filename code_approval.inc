@@ -141,9 +141,9 @@ function code_approval_form_submit($form, &$form_state)
   {
     if ($ex_data['approved'] == "0")
     {
-      db_query("UPDATE {textbook_companion_example} SET approval_status = 2 WHERE id = %d", $ex_data['example_id']);
-    } else if ($ex_data['approved'] == "1") {
       db_query("UPDATE {textbook_companion_example} SET approval_status = 1 WHERE id = %d", $ex_data['example_id']);
+    } else if ($ex_data['approved'] == "1") {
+      db_query("UPDATE {textbook_companion_example} SET approval_status = 2 WHERE id = %d", $ex_data['example_id']);
     }
   }
   drupal_set_message('Approval status updated.', 'status');

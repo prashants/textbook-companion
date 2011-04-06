@@ -15,8 +15,9 @@ function list_chapters()
     return;
   }
 
-  $return_html = '';
-  $return_html .= '<strong>Book Name : </strong>' . $book_data->pre_book . '<br />';
+  $return_html = '<br />';
+  $return_html .= '<strong>Book Name:</strong><br />' . $book_data->pre_book . '<br /><br />';
+  $return_html .= '<strong>Contributor Name:</strong><br />' .$book_data->pro_full_name . '<br />';
 
   /* get chapter list */
   $chapter_rows = array();
@@ -26,7 +27,7 @@ function list_chapters()
     /* get example list */
     $example_q = db_query("SELECT count(*) as example_count FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
     $example_data = db_fetch_object($example_q);
-    $chapter_rows[] = array($chapter_data->number, $chapter_data->name, $example_data->example_count, l('View', 'textbook_companion/list_examples/' . $chapter_data->id));
+    $chapter_rows[] = array($chapter_data->number, $chapter_data->name, $example_data->example_count, l('View', 'textbook_companion/code/list_examples/' . $chapter_data->id));
   }
 
   /* check if there are any chapters */                                   
@@ -43,7 +44,32 @@ function list_chapters()
 
 function list_examples()
 {
-  $chapter_id = arg(2);
+  global $user;
+
+  /* get approved book details */
+  $book_q = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book, pro.full_name as pro_full_name, pre.book as pre_book FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pro.uid = %d", $user->uid);
+  $book_data = db_fetch_object($book_q);
+  if (!$book_data)
+  {
+    drupal_set_message("Your book proposal has not been approved yet. You will receive a email from us when your proposal is approved.", 'error');
+    drupal_goto('');
+    return;
+  }
+
+  $return_html = '<br />';
+  $return_html .= '<strong>Book Name:</strong><br />' . $book_data->pre_book . '<br /><br />';
+  $return_html .= '<strong>Contributor Name:</strong><br />' .$book_data->pro_full_name . '<br /><br />';
+
+  /* get chapter details */
+  $chapter_id = arg(3);
+  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d LIMIT 1", $chapter_id);
+  if ($chapter_data = db_fetch_object($chapter_q))
+  {
+    $return_html .= '<strong>Chapter Number:</strong><br />' .$chapter_data->number . '<br /><br />';
+    $return_html .= '<strong>Chapter Name:</strong><br />' .$chapter_data->name . '<br />';
+  }
+
+  $return_html .= '<br />' . l('Back to Chapter List', 'textbook_companion/code');
 
   /* get example list */
   $example_rows = array();
@@ -56,7 +82,7 @@ function list_examples()
     {
     case 0: $approval_status = 'Pending'; break;
     case 1: $approval_status = 'Approved'; break;
-    case 1: $approval_status = 'Rejected'; break;
+    case 2: $approval_status = 'Rejected'; break;
     }
 
     /* example files */
@@ -66,7 +92,7 @@ function list_examples()
     {
       $example_files .= $example_files_data->filename . ' (' . $example_files_data->filetype . ')<br />';
     }
-    $example_rows[] = array($example_data->number, $example_data->caption, $approval_status, $example_files);
+    $example_rows[] = array('data' => array($example_data->number, $example_data->caption, $approval_status, $example_files), 'valign' => 'top');
   }
   $example_header = array('Example No.', 'Caption', 'Status', 'Files');
   $return_html .= theme_table($example_header, $example_rows);

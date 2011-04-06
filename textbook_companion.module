@@ -18,14 +18,6 @@ function textbook_companion_menu()
     'access arguments' => array('create book proposal'),
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['upload'] = array(
-    'title' => 'Code Submission',
-    'description' => 'Code Submission', 
-    'page callback' => 'upload_examples',
-    'access arguments' => array('upload code'),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'upload.inc',
-  );
 
   /* for reviewers */
   $items['manage_proposal'] = array(
@@ -80,21 +72,40 @@ function textbook_companion_menu()
     'file' => 'code_approval.inc',
   );
 
-  $items['textbook_companion/list_chapters'] = array(
+  $items['textbook_companion/code'] = array(
+    'title' => 'Code Submission',
+    'description' => 'Code Submission',
+    'page callback' => 'list_chapters',
+    'access callback' => 'user_access',
+    'access arguments' => array('upload code'),
+    'file' => 'general.inc',
+  );
+  $items['textbook_companion/code/list_chapters'] = array(
     'title' => 'List Chapters',
     'description' => 'List Chapters', 
     'page callback' => 'list_chapters',
     'access arguments' => array('upload code'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'general.inc',
+    'weight' => 1,
   );
-  $items['textbook_companion/list_examples'] = array(
+  $items['textbook_companion/code/upload'] = array(
+    'title' => 'Code Submission',
+    'description' => 'Code Submission',
+    'page callback' => 'upload_examples',
+    'access arguments' => array('upload code'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'upload.inc',
+    'weight' => 2,
+  );
+  $items['textbook_companion/code/list_examples'] = array(
     'title' => 'List Examples',
     'description' => 'List Examples', 
     'page callback' => 'list_examples',
     'access arguments' => array('upload code'),
     'type' => MENU_CALLBACK,
     'file' => 'general.inc',
+    'weight' => 3,
   );
 
   /* general purpose callbacks */

@@ -15,16 +15,16 @@ function upload_examples_form($form_state)
   $row = db_fetch_object($result);
   if (!$row)
   {
-    drupal_set_message("Your book proposal has not been approved yet. You will receive a email from us when your proposal is approved.", 'error');
+    drupal_set_message("Your book proposal has not been approved. You will receive a email from us when your proposal is approved.", 'error');
     drupal_goto('');
     return;
   }
 
   /* add javascript for book title */
   $chapter_name_js = " $(document).ready(function() {
-    $('#edit-chapter-number').change(function() {
-      $.get('" . base_path() . "textbook_companion/ajax/chapter_title/' + $('#edit-chapter-number').val(), function(data) {
-        $('#edit-chapter-name').val(data);
+    $('#edit-number').change(function() {
+      $.get('" . base_path() . "textbook_companion/ajax/chapter_title/' + $('#edit-number').val(), function(data) {
+        $('#edit-name').val(data);
       });
     });
   });";
@@ -157,7 +157,7 @@ function upload_examples_form($form_state)
 
   $form['cancel'] = array(
     '#type' => 'markup',
-    '#value' => l(t('Cancel'), ''),
+    '#value' => l(t('Cancel'), 'textbook_companion/code'),
   );
   return $form;
 }
@@ -257,5 +257,6 @@ function upload_examples_form_submit($form, &$form_state) {
     }
   }
   drupal_set_message('Example uploaded successfully.', 'status');
+  drupal_goto('textbook_companion/list_chapters');
 }
 
