@@ -259,8 +259,24 @@ function upload_examples_form_submit($form, &$form_state) {
   $cur_example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d and number = %d", $chapter_id, $form_state['values']['example_number']);
   if ($cur_example_d = db_fetch_object($cur_example_q))
   {
-    drupal_set_message(t("Example already uploaded."), 'error');
-    return;
+    if ($cur_example_d->approval_status == 1)
+    {
+      drupal_set_message(t("Example already approved. Cannot overwrite it."), 'error');
+      drupal_goto('textbook_companion/code');
+      return;
+    } else {
+      /* deleting old example files */
+      $cur_examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $cur_example_d->id);
+      while ($cur_examples_files_data = db_fetch_object($cur_examples_files_q))
+      {
+        if (!unlink($cur_examples_files_data->filepath))
+          drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
+      }
+      /* deleting old example database entries */
+      db_query("DELETE FROM {textbook_companion_example_files} WHERE example_id = %d", $cur_example_d->id);
+      db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $cur_example_d->id);
+      drupal_set_message(t("Example overwritten."), 'status');
+    }
   }
 
   /* creating directories */
@@ -294,6 +310,8 @@ function upload_examples_form_submit($form, &$form_state) {
         $file_type = 'S';
       else if (strstr($file_form_name, 'result'))
         $file_type = 'R';
+      else if (strstr($file_form_name, 'xcos'))
+        $file_type = 'X';
       else
         $file_type = 'U';
 
