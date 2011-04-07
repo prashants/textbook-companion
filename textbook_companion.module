@@ -218,10 +218,14 @@ function book_proposal_form($form_state)
     '#required' => TRUE,
   );
   $form['how_project'] = array(
-    '#type' => 'textfield',
+    '#type' => 'select',
     '#title' => t('How did you come to know about this project'),
-    '#size' => 30,
-    '#maxlength' => 64,
+    '#options' => array('Scilab Website' => 'Scilab Website',
+                        'Friend' => 'Friend',
+                        'Professor/Teacher' => 'Professor/Teacher',
+                        'Mailing List' => 'Mailing List',
+                        'Poster in my/other college' => 'Poster in my/other college',
+                        'Others' => 'Others'),
     '#required' => TRUE,
   );
   $form['course'] = array(
@@ -232,10 +236,18 @@ function book_proposal_form($form_state)
     '#required' => TRUE,
   );
   $form['branch'] = array(
-    '#type' => 'textfield',
+    '#type' => 'select',
     '#title' => t('Department/Branch'),
-    '#size' => 30,
-    '#maxlength' => 64,
+    '#options' => array('Electrical Engineering' => 'Electrical Engineering',
+                        'Electronics Engineering' => 'Electronics Engineering',
+                        'Computer Engineering' => 'Computer Engineering',
+                        'Chemical Engineering' => 'Chemical Engineering',
+                        'Instrumentation Engineering' => 'Instrumentation Engineering',
+                        'Mechanical Engineering' => 'Mechanical Engineering',
+                        'Civil Engineering' => 'Civil Engineering',
+                        'Physics' => 'Physics',
+                        'Mathematics' => 'Mathematics',
+                        'Others' => 'Others'),
     '#required' => TRUE,
   );
   $form['university'] = array(
