@@ -19,9 +19,12 @@ function textbook_companion_download_example()
   $dest_path .= 'CH' . $chapter_data->number . '/';
   $dest_path .= 'EX' . $example_data->number . '/';
 
+  /* temporary zip filename */
+  $temp_zip_filename = 'uploads/zip-' . time() . '-' . rand(0, 999999) . '.zip';
+
   /* creating zip archive on the server */
   $zip = new ZipArchive;
-  $zip->open('uploads/tempfile.zip', ZipArchive::CREATE);
+  $zip->open($temp_zip_filename, ZipArchive::CREATE);
   if (false !== ($dir = opendir($dest_path)))
   {
     while (false !== ($file = readdir($dir)))
@@ -34,16 +37,17 @@ function textbook_companion_download_example()
   } else {
      die('Can\'t read dir');
   }
+  $zip->close();
 
   /* zip file name */
-  $zip_filename = $_SERVER['DOCUMENT_ROOT'] . base_path() . 'uploads/tempfile.zip';
+  $zip_filename = $_SERVER['DOCUMENT_ROOT'] . base_path() . $temp_zip_filename;
 
   /* download zip file */
   header('Content-Type: application/zip');
   header('Content-disposition: attachment; filename="example.zip"');
   header('Content-Length: ' . filesize($zip_filename));
   readfile($zip_filename);
-  $zip->close();
+  unlink($zip_filename);
 
 /* $zip = new ZipArchive;
 $zip->open('uploads/myzip.zip', ZipArchive::CREATE);
