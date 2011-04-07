@@ -20,7 +20,7 @@ function code_approval()
     $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d", $preference_data->proposal_id);
     $proposal_data = db_fetch_object($proposal_q);
     /* setting table row information */
-    $rows[] = array($preference_data->book, $proposal_data->full_name, $row->c_number, $row->c_name, l('Edit', 'code_approval/approve/' . $row->c_id));
+    $rows[] = array($preference_data->book, $row->c_number, $row->c_name, $proposal_data->full_name, l('Edit', 'code_approval/approve/' . $row->c_id));
   }
 
   /* check if there are any pending proposals */                                   
@@ -30,7 +30,7 @@ function code_approval()
     return '';
   }
 
-  $header = array('Book', 'User Name', 'Chapter Number', 'Chapter Name', 'Actions');
+  $header = array('Title of the Book', 'Chapter Number', 'Title of the Chapter', 'Contributor Name', 'Actions');
   $output = theme_table($header, $rows);
   return $output; 
 }
@@ -65,7 +65,7 @@ function code_approval_form($form_state)
   $form['book_details']['book'] = array(
     '#type' => 'item',
     '#value' => $preference_data->book,
-    '#title' => t('Book Name'),
+    '#title' => t('Title of the Book'),
   );
 
   $form['book_details']['number'] = array(
@@ -77,13 +77,7 @@ function code_approval_form($form_state)
   $form['book_details']['name'] = array(
     '#type' => 'item',
     '#value' => $pending_chapter_data->name,
-    '#title' => t('Chapter Name'),
-  );
-
-  $form['book_details']['name'] = array(
-    '#type' => 'item',
-    '#value' => $pending_chapter_data->name,
-    '#title' => t('Chapter Name'),
+    '#title' => t('Title of the Chapter'),
   );
 
   /* get example data */

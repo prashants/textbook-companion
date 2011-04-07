@@ -27,6 +27,13 @@ function upload_examples_form($form_state)
         $('#edit-name').val(data);
       });
     });
+    $('#edit-example-number').change(function() {
+      $.get('" . base_path() . "textbook_companion/ajax/example_exists/' + $('#edit-number').val() + '/' + $('#edit-example-number').val(), function(data) {
+        if (data) {
+          alert(data);
+        }
+      });
+    });
   });";
   drupal_add_js($chapter_name_js, 'inline', 'header');
 
@@ -35,7 +42,7 @@ function upload_examples_form($form_state)
   $form['book_details']['book'] = array(
     '#type' => 'item',
     '#value' => $row->pre_book,
-    '#title' => t('Book Name'),
+    '#title' => t('Title of the Book'),
   );
   $form['contributor_name'] = array(
     '#type' => 'item',
@@ -55,7 +62,7 @@ function upload_examples_form($form_state)
   );
   $form['name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Chapter Name'),
+    '#title' => t('Title of the Chapter'),
     '#size' => 40,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -73,6 +80,41 @@ function upload_examples_form($form_state)
     '#size' => 40,
     '#maxlength' => 100,
     '#required' => TRUE,
+  );
+  $form['example_warning'] = array(
+    '#type' => 'item',
+    '#title' => t('You should upload all the files (main or source files, dependencies, result files, executable file if any)'),
+    '#prefix' => '<div style="color:red">',
+    '#suffix' => '</div>',
+  );
+
+  /* dummy */
+  $form['depfilex'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Use already existing dependency files'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+  $form['depfilex']['dummy1'] = array(
+      '#type' => 'select',
+      '#title' => t('Title of the Book'),
+      '#options' => array('Ubuntu Guide (Written by Mr. Allex)', 'Introduction to Scilab (Written by Mr. Brown)', 'Drupal Development (Written by Mr. Smal)'),
+  );
+  $form['depfilex']['dummy2'] = array(
+      '#type' => 'select',
+      '#title' => t('Title of the Chapter'),
+      '#options' => array('1. Introduction', '2. Installation', '3. Configuration'),
+  );
+  $form['depfilex']['dummy3'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Dependency Files'),
+      '#options' => array(l('one.dep', ''), l('two.dep', ''), l('three.dep', ''), l('four.dep', '')),
+      '#multiple' => TRUE,
+      '#size' => 5,
+  );
+  $form['depfilex']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Upload')
   );
 
   $form['depfile'] = array(
@@ -108,27 +150,27 @@ function upload_examples_form($form_state)
 
   $form['sourcefile'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Source Files'),
+    '#title' => t('Main or Source Files'),
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
   $form['sourcefile']['sourcefile1'] = array(
       '#type' => 'file',
-      '#title' => t('Upload source file'),
+      '#title' => t('Upload main or source file'),
       '#size' => 48,
-      '#description' => t('Upload source file of the example.'),
+      '#description' => t('Upload main or source file of the example.'),
   );
   $form['sourcefile']['sourcefile2'] = array(
       '#type' => 'file',
-      '#title' => t('Upload source file'),
+      '#title' => t('Upload main or source file'),
       '#size' => 48,
-      '#description' => t('Upload source file of the example.'),
+      '#description' => t('Upload main or source file of the example.'),
   );
   $form['sourcefile']['sourcefile3'] = array(
       '#type' => 'file',
-      '#title' => t('Upload source file'),
+      '#title' => t('Upload main or source file'),
       '#size' => 48,
-      '#description' => t('Upload source file of the example.'),
+      '#description' => t('Upload main or source file of the example.'),
   );
 
   $form['result'] = array(
@@ -148,6 +190,25 @@ function upload_examples_form($form_state)
       '#title' => t('Upload result file'),
       '#size' => 48,
       '#description' => t('Upload result file of the example.'),
+  );
+
+  $form['xcos'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('XCOS Files'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+  $form['xcos']['xcos1'] = array(
+      '#type' => 'file',
+      '#title' => t('Upload xcos file'),
+      '#size' => 48,
+      '#description' => t('Upload xcos file of the example.'),
+  );
+  $form['xcos']['xcos2'] = array(
+      '#type' => 'file',
+      '#title' => t('Upload xcos file'),
+      '#size' => 48,
+      '#description' => t('Upload xcos file of the example.'),
   );
 
   $form['submit'] = array(

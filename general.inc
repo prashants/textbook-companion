@@ -16,7 +16,7 @@ function list_chapters()
   }
 
   $return_html = '<br />';
-  $return_html .= '<strong>Book Name:</strong><br />' . $book_data->pre_book . '<br /><br />';
+  $return_html .= '<strong>Title of the Book:</strong><br />' . $book_data->pre_book . '<br /><br />';
   $return_html .= '<strong>Contributor Name:</strong><br />' .$book_data->pro_full_name . '<br />';
 
   /* get chapter list */
@@ -37,7 +37,7 @@ function list_chapters()
     return $return_html;
   }
 
-  $chapter_header = array('Chapter No.', 'Chapter Title', 'No. Of Examples', 'Actions');
+  $chapter_header = array('Chapter No.', 'Title of the Chapter', 'Uploaded Examples', 'Actions');
   $return_html .= theme_table($chapter_header, $chapter_rows);
   return $return_html; 
 }
@@ -57,7 +57,7 @@ function list_examples()
   }
 
   $return_html = '<br />';
-  $return_html .= '<strong>Book Name:</strong><br />' . $book_data->pre_book . '<br /><br />';
+  $return_html .= '<strong>Title of the Book:</strong><br />' . $book_data->pre_book . '<br /><br />';
   $return_html .= '<strong>Contributor Name:</strong><br />' .$book_data->pro_full_name . '<br /><br />';
 
   /* get chapter details */
@@ -66,7 +66,7 @@ function list_examples()
   if ($chapter_data = db_fetch_object($chapter_q))
   {
     $return_html .= '<strong>Chapter Number:</strong><br />' .$chapter_data->number . '<br /><br />';
-    $return_html .= '<strong>Chapter Name:</strong><br />' .$chapter_data->name . '<br />';
+    $return_html .= '<strong>Title of the Chapter:</strong><br />' .$chapter_data->name . '<br />';
   }
 
   $return_html .= '<br />' . l('Back to Chapter List', 'textbook_companion/code');
@@ -92,9 +92,12 @@ function list_examples()
     {
       $example_files .= $example_files_data->filename . ' (' . $example_files_data->filetype . ')<br />';
     }
-    $example_rows[] = array('data' => array($example_data->number, $example_data->caption, $approval_status, $example_files), 'valign' => 'top');
+    if ($example_data->approval_status == 0)
+      $example_rows[] = array('data' => array($example_data->number, $example_data->caption, $approval_status, $example_files, l('Edit', '') . ' | ' . l('Delete', '')), 'valign' => 'top');
+    else
+      $example_rows[] = array('data' => array($example_data->number, $example_data->caption, $approval_status, $example_files, ''), 'valign' => 'top');
   }
-  $example_header = array('Example No.', 'Caption', 'Status', 'Files');
+  $example_header = array('Example No.', 'Caption', 'Status', 'Files', 'Action');
   $return_html .= theme_table($example_header, $example_rows);
   return $return_html;
 }                                                       

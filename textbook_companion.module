@@ -612,7 +612,7 @@ function _proposal_all()
     return '';
   }
 
-  $proposal_header = array('Date of Submission', 'Book Name', 'Author', 'Contributor Name', 'Date of Completion', 'Status');
+  $proposal_header = array('Date of Submission', 'Title of the Book', 'Author', 'Contributor Name', 'Expected Date of Completion', 'Status');
   $output = theme_table($proposal_header, $proposal_rows);
   return $output; 
 }
@@ -643,7 +643,7 @@ function proposal_approval_form($form_state)
   $form['full_name'] = array(
     '#type' => 'item',
     '#value' => $row->full_name,
-    '#title' => t('Username'),
+    '#title' => t('Contributor Name'),
   );
   $form['email'] = array(
     '#type' => 'item',
@@ -696,7 +696,7 @@ function proposal_approval_form($form_state)
   $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d ORDER BY pref_number ASC", $proposal_id);
   while ($preference_data = db_fetch_object($preference_q))
   {
-    $preference_rows[$preference_data->id] = $preference_data->book . ' (' . $preference_data->author . ')';
+    $preference_rows[$preference_data->id] = $preference_data->book . ' (Written by ' . $preference_data->author . ')';
   }
 
   $form['book_preference'] = array(
@@ -809,7 +809,7 @@ function proposal_edit_form($form_state)
   $form['full_name'] = array(
     '#type' => 'item',
     '#value' => $proposal_data->full_name,
-    '#title' => t('Username'),
+    '#title' => t('Contributor Name'),
   );
   $form['email'] = array(
     '#type' => 'item',
@@ -863,9 +863,9 @@ function proposal_edit_form($form_state)
   while ($preference_data = db_fetch_object($preference_q))
   {
     if ($preference_data->approval_status == 1)
-      $preference_html .= '<li><strong>' . $preference_data->book . ' (' . $preference_data->author . ') *</strong></li>';
+      $preference_html .= '<li><strong>' . $preference_data->book . ' (Written by ' . $preference_data->author . ')  - Approved Book</strong></li>';
     else
-      $preference_html .= '<li>' . $preference_data->book . ' (' . $preference_data->author . ')</li>';
+      $preference_html .= '<li>' . $preference_data->book . ' (Written by ' . $preference_data->author . ')</li>';
   }
   $preference_html .= '</ul>';
 
@@ -1122,15 +1122,36 @@ function textbook_companion_mail($key, &$message, $params)
 function textbook_companion_ajax()
 {
   $query_type = arg(2);
-  $id = arg(3);
   if ($query_type == 'chapter_title')
   {
-    $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d LIMIT 1", $id);
+    $chapter_number = arg(3);
+    $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE number = %d LIMIT 1", $chapter_number);
     if ($chapter_data = db_fetch_object($chapter_q))
     {
       echo $chapter_data->name;
+      return;
+    }
+  } else if ($query_type == 'example_exists') {
+    $chapter_number = arg(3);
+    $example_number = arg(4);
+
+    $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE number = %d LIMIT 1", $chapter_number);
+    if (!$chapter_data = db_fetch_object($chapter_q))
+    {
+      echo '';
+      return;
+    } else {
+      $chapter_id = $chapter_data->id;
+    }
+
+    $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d AND number = '%s' LIMIT 1", $chapter_id, $example_number);
+    if ($example_data = db_fetch_object($example_q))
+    {
+      echo 'Warning! Example already uploaded. Uploading the example again will be overwritten.';
+      return;
     }
   }
   echo '';
 }
+
 
