@@ -108,7 +108,7 @@ function textbook_companion_menu()
     'page callback' => 'upload_examples',
     'access arguments' => array('upload code'),
     'type' => MENU_LOCAL_TASK,
-    'file' => 'upload.inc',
+    'file' => 'code.inc',
     'weight' => 2,
   );
   $items['textbook_companion/code/list_examples'] = array(
