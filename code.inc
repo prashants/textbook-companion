@@ -183,6 +183,35 @@ function upload_examples_form($form_state)
         ),
       ),
     );
+          switch ($dep_chapter_title_default_value)
+          {
+          case 1:
+            $form['existing_depfile']['dep_chapter_examples'] = array(
+                '#type' => 'checkboxes',
+                '#title' => t('Dependency Files'),
+                '#options' => array(l('gnome.deb', ''), l('flash.deb', ''), l('firefox.deb', ''), l('gnome.deb', '')),
+                '#multiple' => TRUE,
+                '#size' => 5,
+            );
+            $form['existing_depfile']['add_existing_dependency'] = array(
+              '#type' => 'submit',
+              '#value' => t('Add')
+            );
+            break;
+          case 2:
+            $form['existing_depfile']['dep_chapter_examples'] = array(
+                '#type' => 'checkboxes',
+                '#title' => t('Dependency Files'),
+                '#options' => array(l('cos.sci', ''), l('sin.sci', ''), l('graph.sci', ''), l('dependency.sci', '')),
+                '#multiple' => TRUE,
+                '#size' => 5,
+            );
+            $form['existing_depfile']['add_existing_dependency'] = array(
+              '#type' => 'submit',
+              '#value' => t('Add')
+            );
+            break;
+          }
     break;
   case 2:
     $form['existing_depfile']['dep_chapter_title'] = array(
@@ -202,36 +231,35 @@ function upload_examples_form($form_state)
         ),
       ),
     );
-    break;
-  }
-
-  switch ($dep_chapter_title_default_value)
-  {
-  case 1:
-    $form['existing_depfile']['dep_chapter_examples'] = array(
-        '#type' => 'checkboxes',
-        '#title' => t('Dependency Files'),
-        '#options' => array(l('gnome.deb', ''), l('flash.deb', ''), l('firefox.deb', ''), l('gnome.deb', '')),
-        '#multiple' => TRUE,
-        '#size' => 5,
-    );
-    $form['existing_depfile']['add_existing_dependency'] = array(
-      '#type' => 'submit',
-      '#value' => t('Add')
-    );
-    break;
-  case 2:
-    $form['existing_depfile']['dep_chapter_examples'] = array(
-        '#type' => 'checkboxes',
-        '#title' => t('Dependency Files'),
-        '#options' => array(l('cos.sci', ''), l('sin.sci', ''), l('graph.sci', ''), l('dependency.sci', '')),
-        '#multiple' => TRUE,
-        '#size' => 5,
-    );
-    $form['existing_depfile']['add_existing_dependency'] = array(
-      '#type' => 'submit',
-      '#value' => t('Add')
-    );
+          switch ($dep_chapter_title_default_value)
+          {
+          case 1:
+            $form['existing_depfile']['dep_chapter_examples'] = array(
+                '#type' => 'checkboxes',
+                '#title' => t('Dependency Files'),
+                '#options' => array(l('gnome.deb', ''), l('flash.deb', ''), l('firefox.deb', ''), l('gnome.deb', '')),
+                '#multiple' => TRUE,
+                '#size' => 5,
+            );
+            $form['existing_depfile']['add_existing_dependency'] = array(
+              '#type' => 'submit',
+              '#value' => t('Add')
+            );
+            break;
+          case 2:
+            $form['existing_depfile']['dep_chapter_examples'] = array(
+                '#type' => 'checkboxes',
+                '#title' => t('Dependency Files'),
+                '#options' => array(l('cos.sci', ''), l('sin.sci', ''), l('graph.sci', ''), l('dependency.sci', '')),
+                '#multiple' => TRUE,
+                '#size' => 5,
+            );
+            $form['existing_depfile']['add_existing_dependency'] = array(
+              '#type' => 'submit',
+              '#value' => t('Add')
+            );
+            break;
+          }
     break;
   }
 
