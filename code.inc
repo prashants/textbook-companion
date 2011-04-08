@@ -88,10 +88,33 @@ function upload_examples_form($form_state)
     '#suffix' => '</div>',
   );
 
+  $form['sourcefile'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Main or Source Files'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+  $form['sourcefile']['sourcefile1'] = array(
+      '#type' => 'file',
+      '#title' => t('Upload main or source file'),
+      '#size' => 48,
+      '#description' => t('Upload main or source file of the example.'),
+  );
+  $form['sourcefile']['sourcefile2'] = array(
+      '#type' => 'file',
+      '#title' => t('Upload main or source file'),
+      '#size' => 48,
+      '#description' => t('Upload main or source file of the example.'),
+  );
+
+  $form['dep_files'] = array(
+    '#type' => 'item',
+    '#title' => t('Dependency Files'),
+  );
   /* dummy */
   $form['depfilex'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Use already existing dependency files'),
+    '#title' => t('Use Already Existing Dependency Files'),
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
@@ -119,7 +142,7 @@ function upload_examples_form($form_state)
 
   $form['depfile'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Dependency Files'),
+    '#title' => t('New Dependency Files'),
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
@@ -147,30 +170,11 @@ function upload_examples_form($form_state)
       '#size' => 48,
       '#description' => t('Upload dependency file of the example.'),
   );
-
-  $form['sourcefile'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Main or Source Files'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-  );
-  $form['sourcefile']['sourcefile1'] = array(
+  $form['depfile']['depfile5'] = array(
       '#type' => 'file',
-      '#title' => t('Upload main or source file'),
+      '#title' => t('Upload dependency file'),
       '#size' => 48,
-      '#description' => t('Upload main or source file of the example.'),
-  );
-  $form['sourcefile']['sourcefile2'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload main or source file'),
-      '#size' => 48,
-      '#description' => t('Upload main or source file of the example.'),
-  );
-  $form['sourcefile']['sourcefile3'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload main or source file'),
-      '#size' => 48,
-      '#description' => t('Upload main or source file of the example.'),
+      '#description' => t('Upload dependency file of the example.'),
   );
 
   $form['result'] = array(
