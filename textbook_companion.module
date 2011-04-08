@@ -111,6 +111,23 @@ function textbook_companion_menu()
     'file' => 'code.inc',
     'weight' => 2,
   );
+  $items['textbook_companion/code/edit'] = array(
+    'title' => 'Edit Example',
+    'description' => 'Edit Example', 
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('upload_examples_edit_form'),
+    'access arguments' => array('upload code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'code.inc',
+  );
+  $items['textbook_companion/code/delete'] = array(
+    'title' => 'Delete Example',
+    'description' => 'Delete Example', 
+    'page callback' => '_upload_examples_delete',
+    'access arguments' => array('upload code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'code.inc',
+  );
   $items['textbook_companion/code/list_examples'] = array(
     'title' => 'List Examples',
     'description' => 'List Examples', 

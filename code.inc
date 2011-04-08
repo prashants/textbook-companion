@@ -339,3 +339,80 @@ function upload_examples_form_submit($form, &$form_state) {
   drupal_goto('textbook_companion/code');
 }
 
+function upload_examples_edit_form($form_state)
+{
+  global $user;
+  $example_id = arg(3);
+
+  /* check if example exists */
+  if (!$preference_data = db_fetch_object(db_query("SELECT preference.id as preference_id FROM {textbook_companion_proposal} proposal JOIN {textbook_companion_preference} preference ON proposal.id = preference.proposal_id WHERE proposal.uid = %d AND preference.approval_status = 1 ORDER BY preference.id DESC LIMIT 1", $user->uid)))
+  {
+    drupal_set_message('You do not have permission to edit this example.', 'error');
+    drupal_goto('textbook_companion/code');
+    return;
+  }
+  if (!$example_data = db_fetch_object(db_query("SELECT example.approval_status as example_approval_status FROM {textbook_companion_chapter} chapter JOIN {textbook_companion_example} example ON chapter.id = example.chapter_id WHERE chapter.preference_id = %d AND example.id = %d ORDER BY example.id DESC LIMIT 1", $preference_data->preference_id, $example_id)))
+  {
+    drupal_set_message('You do not have permission to edit this example.', 'error');
+    drupal_goto('textbook_companion/code');
+    return;
+  }
+  if ($example_data->example_approval_status != 0)
+  {
+    drupal_set_message('You cannnot edit an example after it has been approved.', 'error');
+    drupal_goto('textbook_companion/code');
+    return;
+  }
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit')
+  );
+
+  $form['cancel'] = array(
+    '#type' => 'markup',
+    '#value' => l(t('Cancel'), 'textbook_companion/code'),
+  );
+  return $form;
+}
+
+function _upload_examples_delete()
+{
+  global $user;
+  $example_id = arg(3);
+
+  /* check if example exists */
+  if (!$preference_data = db_fetch_object(db_query("SELECT preference.id as preference_id FROM {textbook_companion_proposal} proposal JOIN {textbook_companion_preference} preference ON proposal.id = preference.proposal_id WHERE proposal.uid = %d AND preference.approval_status = 1 ORDER BY preference.id DESC LIMIT 1", $user->uid)))
+  {
+    drupal_set_message('You do not have permission to delete this example.', 'error');
+    drupal_goto('textbook_companion/code');
+    return;
+  }
+  if (!$example_data = db_fetch_object(db_query("SELECT example.approval_status as example_approval_status FROM {textbook_companion_chapter} chapter JOIN {textbook_companion_example} example ON chapter.id = example.chapter_id WHERE chapter.preference_id = %d AND example.id = %d ORDER BY example.id DESC LIMIT 1", $preference_data->preference_id, $example_id)))
+  {
+    drupal_set_message('You do not have permission to delete this example.', 'error');
+    drupal_goto('textbook_companion/code');
+    return;
+  }
+  if ($example_data->example_approval_status != 0)
+  {
+    drupal_set_message('You cannnot delete an example after it has been approved.', 'error');
+    drupal_goto('textbook_companion/code');
+    return;
+  }
+
+  /* deleting old example files */
+  $cur_examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
+  while ($cur_examples_files_data = db_fetch_object($cur_examples_files_q))
+  {
+    if (!unlink($cur_examples_files_data->filepath))
+      drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
+  }
+  /* deleting old example database entries */
+  db_query("DELETE FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
+  db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $example_id);
+
+  drupal_set_message('Example deleted.', 'status');
+  drupal_goto('textbook_companion/code');
+  return;
+}
