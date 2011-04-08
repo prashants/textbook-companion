@@ -129,6 +129,13 @@ function upload_examples_form($form_state)
     $dep_book_title_default_value =  $form_state['storage']['existing_depfile']['dep_book_title'];
   }
 
+  if (!isset($form_state['storage']['existing_depfile']['dep_chapter_title']))
+  {
+    $dep_chapter_title_default_value = 0;
+  } else {
+    $dep_chapter_title_default_value =  $form_state['storage']['existing_depfile']['dep_chapter_title'];
+  }
+
   /* existing dependencies */
   $form['existing_depfile'] = array(
     '#type' => 'fieldset',
@@ -162,28 +169,81 @@ function upload_examples_form($form_state)
     $form['existing_depfile']['dep_chapter_title'] = array(
       '#type' => 'select',
       '#title' => t('Title of the Chapter'),
-      '#options' => array('1. Introduction', '2. Installation', '3. Configuration'),
+      '#options' => array('0' => 'Please Select...', '1. Introduction to Ubuntu', '2. Ubuntu Installation', '3. Ubuntu Configuration'),
+      '#default_value' => $dep_chapter_title_default_value,
+      '#tree' => TRUE,
+      '#ahah' => array(
+        'event'   => 'change',
+        'effect' => 'none',
+        'path'    => ahah_helper_path(array('existing_depfile')),
+        'wrapper' => 'existing-depfile-wrapper',
+        'progress' => array(
+          'type' => 'throbber',
+          'message' => t(''),
+        ),
+      ),
     );
     break;
   case 2:
     $form['existing_depfile']['dep_chapter_title'] = array(
       '#type' => 'select',
       '#title' => t('Title of the Chapter'),
-      '#options' => array('1. Download', '2. Run', '3. Close'),
+      '#options' => array('0' => 'Please Select...', '1. Get Scilab', '2. Run Scilab', '3. Close Scilab'),
+      '#default_value' => $dep_chapter_title_default_value,
+      '#tree' => TRUE,
+      '#ahah' => array(
+        'event'   => 'change',
+        'effect' => 'none',
+        'path'    => ahah_helper_path(array('existing_depfile')),
+        'wrapper' => 'existing-depfile-wrapper',
+        'progress' => array(
+          'type' => 'throbber',
+          'message' => t(''),
+        ),
+      ),
     );
     break;
   }
-/*
-  $form['existing_depfile']['dep_chapter_examples'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Dependency Files'),
-      '#options' => array(l('one.dep', ''), l('two.dep', ''), l('three.dep', ''), l('four.dep', '')),
-      '#multiple' => TRUE,
-      '#size' => 5,
-  );
-*/
+
+  switch ($dep_chapter_title_default_value)
+  {
+  case 1:
+    $form['existing_depfile']['dep_chapter_examples'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Dependency Files'),
+        '#options' => array(l('gnome.deb', ''), l('flash.deb', ''), l('firefox.deb', ''), l('gnome.deb', '')),
+        '#multiple' => TRUE,
+        '#size' => 5,
+    );
+    $form['existing_depfile']['add_existing_dependency'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add')
+    );
+    break;
+  case 2:
+    $form['existing_depfile']['dep_chapter_examples'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Dependency Files'),
+        '#options' => array(l('cos.sci', ''), l('sin.sci', ''), l('graph.sci', ''), l('dependency.sci', '')),
+        '#multiple' => TRUE,
+        '#size' => 5,
+    );
+    $form['existing_depfile']['add_existing_dependency'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add')
+    );
+    break;
+  }
+
   /* hidden form elements */
   $form['existing_depfile']['update_dep_book_title'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Update'),
+    '#submit' => array('ahah_helper_generic_submit'),
+    '#attributes' => array('class' => 'no-js'),
+  );
+
+  $form['existing_depfile']['update_dep_chapter_title'] = array(
     '#type'  => 'submit',
     '#value' => t('Update'),
     '#submit' => array('ahah_helper_generic_submit'),
