@@ -37,6 +37,13 @@ function upload_examples_form($form_state)
   });";
   drupal_add_js($chapter_name_js, 'inline', 'header');
 
+  // Register the form with ahah_helper so we can use it. Also updates
+  // $form_state['storage'] to ensure it contains the latest values that have
+  // been entered, even when the form item has temporarily been removed from
+  // the form. So if a form item *once* had a value, you *always* can retrieve
+  // it.
+  ahah_helper_register($form, $form_state);
+
   $form['#attributes'] = array('enctype' => "multipart/form-data");
 
   $form['book_details']['book'] = array(
@@ -111,34 +118,79 @@ function upload_examples_form($form_state)
     '#type' => 'item',
     '#title' => t('Dependency Files'),
   );
-  /* dummy */
-  $form['depfilex'] = array(
+
+  /************ START OF EXISTING DEPENDENCIES **************/
+
+  /* default value for ahah fields */
+  if (!isset($form_state['storage']['existing_depfile']['dep_book_title']))
+  {
+    $dep_book_title_default_value = 0;
+  } else {
+    $dep_book_title_default_value =  $form_state['storage']['existing_depfile']['dep_book_title'];
+  }
+
+  /* existing dependencies */
+  $form['existing_depfile'] = array(
     '#type' => 'fieldset',
     '#title' => t('Use Already Existing Dependency Files'),
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
+    '#prefix' => '<div id="existing-depfile-wrapper">',
+    '#suffix' => '</div>',
+    '#tree' => TRUE,
   );
-  $form['depfilex']['dummy1'] = array(
+  $form['existing_depfile']['dep_book_title'] = array(
       '#type' => 'select',
       '#title' => t('Title of the Book'),
-      '#options' => array('Ubuntu Guide (Written by Mr. Allex)', 'Introduction to Scilab (Written by Mr. Brown)', 'Drupal Development (Written by Mr. Smal)'),
+      '#options' => array('0' => 'Please Select...', '1' => 'Ubuntu Guide (Written by Mr. Allex)', '2' => 'Introduction to Scilab (Written by Mr. Brown)', '3' => 'Drupal Development (Written by Mr. Smal)'),
+      '#default_value' => $dep_book_title_default_value,
+      '#ahah' => array(
+        'event'   => 'change',
+        'effect' => 'none',
+        'path'    => ahah_helper_path(array('existing_depfile')),
+        'wrapper' => 'existing-depfile-wrapper',
+        'progress' => array(
+          'type' => 'throbber',
+          'message' => t(''),
+        ),
+      ),
   );
-  $form['depfilex']['dummy2'] = array(
+
+  switch ($dep_book_title_default_value)
+  {
+  case 1:
+    $form['existing_depfile']['dep_chapter_title'] = array(
       '#type' => 'select',
       '#title' => t('Title of the Chapter'),
       '#options' => array('1. Introduction', '2. Installation', '3. Configuration'),
-  );
-  $form['depfilex']['dummy3'] = array(
+    );
+    break;
+  case 2:
+    $form['existing_depfile']['dep_chapter_title'] = array(
+      '#type' => 'select',
+      '#title' => t('Title of the Chapter'),
+      '#options' => array('1. Download', '2. Run', '3. Close'),
+    );
+    break;
+  }
+/*
+  $form['existing_depfile']['dep_chapter_examples'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Dependency Files'),
       '#options' => array(l('one.dep', ''), l('two.dep', ''), l('three.dep', ''), l('four.dep', '')),
       '#multiple' => TRUE,
       '#size' => 5,
   );
-  $form['depfilex']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Upload')
+*/
+  /* hidden form elements */
+  $form['existing_depfile']['update_dep_book_title'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Update'),
+    '#submit' => array('ahah_helper_generic_submit'),
+    '#attributes' => array('class' => 'no-js'),
   );
+
+  /************ END OF EXISTING DEPENDENCIES **************/
 
   $form['depfile'] = array(
     '#type' => 'fieldset',
