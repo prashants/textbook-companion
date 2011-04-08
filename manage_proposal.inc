@@ -8,7 +8,7 @@ function _proposal_pending()
   $pending_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE proposal_status = 0 ORDER BY id DESC");
   while ($pending_data = db_fetch_object($pending_q))
   {
-    $pending_rows[$row->id] = array(date('d-m-Y', $pending_data->creation_date), $pending_data->full_name, date('d-m-Y', $pending_data->completion_date), l('Edit', 'manage_proposal/approve/' . $pending_data->id));
+    $pending_rows[$pending_data->id] = array(date('d-m-Y', $pending_data->creation_date), $pending_data->full_name, date('d-m-Y', $pending_data->completion_date), l('Edit', 'manage_proposal/approve/' . $pending_data->id));
   }
 
   /* check if there are any pending proposals */

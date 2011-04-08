@@ -149,7 +149,7 @@ function upload_examples_form($form_state)
   $form['existing_depfile']['dep_book_title'] = array(
       '#type' => 'select',
       '#title' => t('Title of the Book'),
-      '#options' => array('0' => 'Please Select...', '1' => 'Ubuntu Guide (Written by Mr. Allex)', '2' => 'Introduction to Scilab (Written by Mr. Brown)', '3' => 'Drupal Development (Written by Mr. Smal)'),
+      '#options' => _list_of_book_titles(), //array('0' => 'Please Select...', '1' => 'Ubuntu Guide (Written by Mr. Allex)', '2' => 'Introduction to Scilab (Written by Mr. Brown)', '3' => 'Drupal Development (Written by Mr. Smal)'),
       '#default_value' => $dep_book_title_default_value,
       '#ahah' => array(
         'event'   => 'change',
@@ -559,4 +559,20 @@ function _upload_examples_delete()
   drupal_set_message('Example deleted.', 'status');
   drupal_goto('textbook_companion/code');
   return;
+}
+
+function _list_of_book_titles()
+{
+  $book_titles = array('0' => 'Please select...');
+  $book_titles_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE approval_status = 1 OR approval_status = 3 ORDER BY book ASC");
+  while ($book_titles_data = db_fetch_object($book_titles_q))
+  {
+    $book_titles[$book_titles_data->id] = $book_titles_data->book;
+  }
+  return $book_titles;
+}
+
+function _list_of_book_chapters($book_title = 0)
+{
+  
 }
