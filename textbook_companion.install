@@ -322,6 +322,12 @@ function textbook_companion_schema() {
         'length' => '1',
         'not null' => TRUE,
       ),
+      'caption' => array(
+        'description' => t('TODO: please describe this field!'),
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
       'timestamp' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
