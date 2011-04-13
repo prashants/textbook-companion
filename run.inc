@@ -1,11 +1,5 @@
 <?php
 
-function textbook_companion_run_page()
-{
-  $output .= drupal_get_form('textbook_companion_run_form');
-  return $output;
-}
-
 function textbook_companion_run_form($form_state)
 {
   $form['#redirect'] = FALSE;
@@ -84,9 +78,13 @@ function textbook_companion_run_form($form_state)
 
   if ($book_default_value > 0)
   {
-    $form['run']['chapter_item'] = array(
+    $form['run']['download_book'] = array(
       '#type' => 'item',
-      '#value' => '<table><tr><th>Contributor name</th><th>College</th><th>Professor</th></tr><tr><td>AAAAA</td><td>BBBBBBB</td><td>CCCCCC</td></tr></table>',
+      '#value' => l('Download Full Book', $book_default_value),
+    );
+    $form['run']['contributor_name'] = array(
+      '#type' => 'item',
+      '#value' => '<strong>Contributor name : </strong>' . _contributor_name($book_default_value),
     );
     $form['run']['chapter'] = array(
       '#type' => 'select',
@@ -107,6 +105,10 @@ function textbook_companion_run_form($form_state)
     );
     if ($chapter_default_value > 0)
     {
+      $form['run']['download_chapter'] = array(
+        '#type' => 'item',
+        '#value' => l('Download Full Chapter', $chapter_default_value),
+      );
       $form['run']['example'] = array(
         '#type' => 'select',
         '#title' => t('Example No.'),
@@ -172,6 +174,10 @@ function textbook_companion_run_form($form_state)
         $example_files_header = array('Filename', 'Type');
         $example_files = theme_table($example_files_header, $example_files_rows); 
       }
+      $form['run']['download_example'] = array(
+        '#type' => 'item',
+        '#value' => l('Download Example', $example_default_value),
+      );
       $form['run']['example_files'] = array(
         '#type'  => 'item',
         '#title' => 'List of example files',
@@ -222,3 +228,8 @@ function _list_of_examples($chapter_id = 0)
   return $book_examples;
 }
 
+function _contributor_name($preference_id)
+{
+  $book_data = db_fetch_object(db_query("SELECT proposal.full_name as proposal_full_name FROM {textbook_companion_proposal} proposal LEFT JOIN {textbook_companion_preference} preference ON proposal.id = preference.proposal_id WHERE preference.id = %d", $preference_id));
+  return $book_data->proposal_full_name;
+}
