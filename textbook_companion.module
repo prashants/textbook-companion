@@ -140,8 +140,9 @@ function textbook_companion_menu()
 
   $items['textbook_companion/search'] = array(
     'title' => '',
-    'description' => '', 
-    'page callback' => 'textbook_companion_search_page',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('textbook_companion_search_form'),
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'search.inc',
