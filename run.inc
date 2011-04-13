@@ -10,7 +10,19 @@ function textbook_companion_run_form($form_state)
   /* default value for ahah fields */
   if (!isset($form_state['storage']['run']['book']))
   {
-    $book_default_value = 0;
+    /* get the book id from url */
+    $url_book_id = (int)arg(2);
+    if ($url_book_id)
+    {
+      /* add javascript for book selected */
+      $chapter_name_js = " $(document).ready(function() {
+        $('#edit-run-book').val(" . $url_book_id . ");
+        $('#edit-run-book').change();
+      });";
+      drupal_add_js($chapter_name_js, 'inline', 'footer');
+    } else {
+      $book_default_value = 0;
+    }
   } else {
     $book_default_value =  $form_state['storage']['run']['book'];
   }

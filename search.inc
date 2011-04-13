@@ -29,7 +29,7 @@ function textbook_companion_search_form()
 
   $form['cancel'] = array(
     '#type' => 'markup',
-    '#value' => l(t('Cancel'), 'textbook_companion/code'),
+    '#value' => l(t('Cancel'), ''),
   );
 
   if ($_POST)
