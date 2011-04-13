@@ -23,7 +23,7 @@ function upload_examples_form($form_state)
   /* add javascript for book title */
   $chapter_name_js = " $(document).ready(function() {
     $('#edit-number').change(function() {
-      $.get('" . base_path() . "textbook_companion/ajax/chapter_title/' + $('#edit-number').val(), function(data) {
+      $.get('" . base_path() . "textbook_companion/ajax/chapter_title/' + $('#edit-number').val() + '/' + " . $row->pre_id . ", function(data) {
         $('#edit-name').val(data);
       });
     });
@@ -159,7 +159,6 @@ function upload_examples_form($form_state)
     '#tree' => TRUE,
   );
 
-  /* existing dependencies */
   if (!isset($example_ids))
     $example_ids = array();
   if ($form_state['storage']['existing_depfile']['already_uploaded'])
@@ -167,10 +166,7 @@ function upload_examples_form($form_state)
     foreach ($form_state['storage']['existing_depfile']['already_uploaded'] as $item)
     {
       if ($item > 0)
-      {
-        //$example_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_example_files} WHERE id = %d LIMIT 1", $item);
-        $example_ids[$item] = $example_file_data->filename;
-      }
+        $example_ids[$item] = $item;
     }
   }
   if ($form_state['storage']['existing_depfile']['dep_chapter_example_files'])
@@ -179,8 +175,7 @@ function upload_examples_form($form_state)
     {
       if ($item > 0)
       {
-        //$example_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_example_files} WHERE id = %d LIMIT 1", $item);
-        $example_ids[$item] = $example_file_data->filename;
+        $example_ids[$item] = $item;
       }
     }
   }
@@ -190,7 +185,33 @@ function upload_examples_form($form_state)
     '#default_value' => $example_ids,
     '#options' => $example_ids,
     '#multiple' => TRUE,
+    '#prefix' => '<div style="visibility:hidden; height:0px;">',
+    '#suffix' => '</div>',
   );
+
+  if ($example_ids)
+  {
+    $existing_example_selected = "<ul>";
+    $temp_counter = 0;
+    foreach ($example_ids as $temp_example_id)
+    {
+      if ($temp_example_id > 0)
+      {
+        $temp_example_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_example_files} WHERE id = %d", $temp_example_id));
+        $existing_example_selected .= "<li>" . $temp_example_data->filename . "</li>";
+        $temp_counter++;
+      }
+    }
+    $existing_example_selected .= "</ul>";
+    if ($temp_counter > 0)
+    {
+      $form['existing_depfile']['already_uploaded_list'] = array(
+        '#type' => 'item',
+        '#title' => t('Existing Dependency Files Selected'),
+        '#value' => $existing_example_selected,
+      );
+    }
+  }
 
   $form['existing_depfile']['dep_book_title'] = array(
       '#type' => 'select',
@@ -464,6 +485,23 @@ function upload_examples_form_submit($form, &$form_state) {
     time()
   );
   $example_id = db_last_insert_id('textbook_companion_example', 'id');
+
+  /* linking existing dependencies */
+  foreach ($form_state['values']['existing_depfile']['already_uploaded'] as $row)
+  {
+    $existing_dependency_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_example_files} WHERE id = %d", $row));
+    db_query("INSERT INTO {textbook_companion_example_files} (example_id, filename, filepath, filemime, filesize, filetype, caption, timestamp)
+      VALUES (%d, '%s', '%s', '%s', %d, '%s', '%s', %d)",
+      $example_id,
+      $existing_dependency_data->filename,
+      $existing_dependency_data->filepath,
+      $existing_dependency_data->filemime,
+      $existing_dependency_data->filesize,
+      'D',
+      $existing_dependency_data->caption,
+      time()
+      );
+  }
 
   /* uploading files */
   foreach ($_FILES['files']['name'] as $file_form_name => $file_name)

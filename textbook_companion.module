@@ -138,6 +138,23 @@ function textbook_companion_menu()
     'weight' => 3,
   );
 
+  $items['textbook_companion/search'] = array(
+    'title' => '',
+    'description' => '', 
+    'page callback' => 'textbook_companion_search_page',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'search.inc',
+  );
+
+  $items['textbook_companion/run'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('textbook_companion_run_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'run.inc',
+  );
+
   /* general purpose callbacks */
   $items['download/example'] = array(
     'title' => 'Code Download',
@@ -753,7 +770,8 @@ function textbook_companion_ajax()
   if ($query_type == 'chapter_title')
   {
     $chapter_number = arg(3);
-    $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE number = %d LIMIT 1", $chapter_number);
+    $preference_id = arg(4);
+    $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE number = %d AND preference_id = %d LIMIT 1", $chapter_number, $preference_id);
     if ($chapter_data = db_fetch_object($chapter_q))
     {
       echo $chapter_data->name;
