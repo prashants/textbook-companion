@@ -144,11 +144,6 @@ function textbook_companion_run_form($form_state)
     '#attributes' => array('class' => 'no-js'),
   );
 
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Run')
-  );
-
   /************ START OF $_POST **************/
   if ($_POST)
   {
@@ -182,6 +177,10 @@ function textbook_companion_run_form($form_state)
         '#type'  => 'item',
         '#title' => 'List of example files',
         '#value' => $example_files,
+      );
+      $form['run']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Run')
       );
     }
   }
