@@ -134,20 +134,6 @@ function upload_examples_form($form_state)
     $dep_book_title_default_value =  $form_state['storage']['existing_depfile']['dep_book_title'];
   }
 
-  if (!isset($form_state['storage']['existing_depfile']['dep_chapter_title']))
-  {
-    $dep_chapter_title_default_value = 0;
-  } else {
-    $dep_chapter_title_default_value =  $form_state['storage']['existing_depfile']['dep_chapter_title'];
-  }
-
-  if (!isset($form_state['storage']['existing_depfile']['dep_chapter_examples']))
-  {
-    $dep_chapter_example_default_value = 0;
-  } else {
-    $dep_chapter_example_default_value =  $form_state['storage']['existing_depfile']['dep_chapter_examples'];
-  }
-
   /* existing dependencies */
   $form['existing_depfile'] = array(
     '#type' => 'fieldset',
@@ -179,6 +165,7 @@ function upload_examples_form($form_state)
       }
     }
   }
+
   $form['existing_depfile']['already_uploaded'] = array(
     '#type' => 'select',
     '#title' => 'Existing dep files',
@@ -232,63 +219,23 @@ function upload_examples_form($form_state)
 
   if ($dep_book_title_default_value)
   {
-    $form['existing_depfile']['dep_chapter_title'] = array(
-      '#type' => 'select',
-      '#title' => t('Title of the Chapter'),
-      '#options' => _list_of_book_chapters($dep_book_title_default_value),
-      '#default_value' => $dep_chapter_title_default_value,
-      '#tree' => TRUE,
-      '#ahah' => array(
-        'event'   => 'change',
-        'effect' => 'none',
-        'path'    => ahah_helper_path(array('existing_depfile')),
-        'wrapper' => 'existing-depfile-wrapper',
-        'progress' => array(
-          'type' => 'throbber',
-          'message' => t(''),
-        ),
-      ),
+    $form['existing_depfile']['dep_chapter_example_files'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Dependency Files'),
+        '#options' => _list_of_book_dependency_files($dep_book_title_default_value),
+        '#multiple' => TRUE,
     );
-    if ($dep_chapter_title_default_value)
-    {
-      $form['existing_depfile']['dep_chapter_examples'] = array(
-        '#type' => 'select',
-        '#title' => t('Example No.'),
-        '#options' => _list_of_book_examples($dep_chapter_title_default_value),
-        '#default_value' => $dep_chapter_example_default_value,
-        '#tree' => TRUE,
-        '#ahah' => array(
-          'event'   => 'change',
-          'effect' => 'none',
-          'path'    => ahah_helper_path(array('existing_depfile')),
-          'wrapper' => 'existing-depfile-wrapper',
-          'progress' => array(
-            'type' => 'throbber',
-            'message' => t(''),
-          ),
-        ),
-      );
-      if ($dep_chapter_example_default_value)
-      {
-        $form['existing_depfile']['dep_chapter_example_files'] = array(
-            '#type' => 'checkboxes',
-            '#title' => t('Dependency Files'),
-            '#options' => _list_of_book_dependency_files($dep_chapter_example_default_value),
-            '#multiple' => TRUE,
-        );
-        $form['existing_depfile']['add_existing_dependency'] = array(
-        '#type' => 'submit',
-        '#value' => t('Add'),
-        '#ahah' => array(
-          'event' => 'click',
-          'path' => ahah_helper_path(array('existing_depfile')),
-          'wrapper' => 'existing-depfile-wrapper',
-          'method' => 'replace',
-          ),
-          '#submit' => array('ahah_helper_generic_submit'),
-        );
-      }
-    }
+    $form['existing_depfile']['add_existing_dependency'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add'),
+    '#ahah' => array(
+      'event' => 'click',
+      'path' => ahah_helper_path(array('existing_depfile')),
+      'wrapper' => 'existing-depfile-wrapper',
+      'method' => 'replace',
+      ),
+      '#submit' => array('ahah_helper_generic_submit'),
+    );
   }
 
   /* hidden form elements */
@@ -413,20 +360,27 @@ function upload_examples_form($form_state)
 
 function upload_examples_form_validate($form, &$form_state)
 {
+  form_set_error('', t('You must select a name for this group of settings.'));
 }
 
 function upload_examples_form_submit($form, &$form_state) {
   global $user;
 
-  $dest_path = $_SERVER['DOCUMENT_ROOT'] . base_path() . 'uploads/';
+  $base_path = $_SERVER['DOCUMENT_ROOT'] . base_path();
+  $dest_path = 'uploads/';
+  $dest_dep_path = 'uploads/';
 
   /* get book details */
   $book_result = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pre.approval_status = 1 AND pro.uid = %d", $user->uid);
   $book_row = db_fetch_object($book_result);
   $preference_id = $book_row->pre_id;
+
   $dest_path .= $preference_id . '/';
-  if (!is_dir($dest_path))
-    mkdir($dest_path);
+  $dest_dep_path .= $preference_id . '/' . 'DEPENDENCIES' . '/';
+  if (!is_dir($base_path . $dest_path))
+    mkdir($base_path . $dest_path);
+  if (!is_dir($base_path . $dest_dep_path))
+    mkdir($base_path . $dest_dep_path);
 
   /* inserting chapter details */
   $chapter_id = 0;
@@ -457,7 +411,7 @@ function upload_examples_form_submit($form, &$form_state) {
       $cur_examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $cur_example_d->id);
       while ($cur_examples_files_data = db_fetch_object($cur_examples_files_q))
       {
-        if (!unlink($cur_examples_files_data->filepath))
+        if (!unlink($base_path . $cur_examples_files_data->filepath))
           drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
       }
       /* deleting old example database entries */
@@ -469,12 +423,12 @@ function upload_examples_form_submit($form, &$form_state) {
 
   /* creating directories */
   $dest_path .= 'CH' . $form_state['values']['number'] . '/';
-  if (!is_dir($dest_path))
-    mkdir($dest_path);
+  if (!is_dir($base_path . $dest_path))
+    mkdir($base_path . $dest_path);
 
   $dest_path .= 'EX' . $form_state['values']['example_number'] . '/';
-  if (!is_dir($dest_path))
-    mkdir($dest_path);
+  if (!is_dir($base_path . $dest_path))
+    mkdir($base_path . $dest_path);
 
   /* creating example entry */
   db_query("INSERT INTO {textbook_companion_example} (chapter_id, number, caption, approval_status, timestamp) VALUES (%d, '%s', '%s', %d, %d)",
@@ -489,6 +443,9 @@ function upload_examples_form_submit($form, &$form_state) {
   /* linking existing dependencies */
   foreach ($form_state['values']['existing_depfile']['already_uploaded'] as $row)
   {
+    /* copying file */
+    
+    /* insterting into database */
     $existing_dependency_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_example_files} WHERE id = %d", $row));
     db_query("INSERT INTO {textbook_companion_example_files} (example_id, filename, filepath, filemime, filesize, filetype, caption, timestamp)
       VALUES (%d, '%s', '%s', '%s', %d, '%s', '%s', %d)",
@@ -521,23 +478,29 @@ function upload_examples_form_submit($form, &$form_state) {
         $file_type = 'U';
 
       /* uploading file */
-      if (move_uploaded_file($_FILES['files']['tmp_name'][$file_form_name], $dest_path . $_FILES['files']['name'][$file_form_name]))
+      if ($file_type == 'D')
       {
-        if ($file_type == 'D')
+        if (move_uploaded_file($_FILES['files']['tmp_name'][$file_form_name], $base_path . $dest_dep_path . $_FILES['files']['name'][$file_form_name]))
         {
           /* for uploaded files making an entry in the database */
           db_query("INSERT INTO {textbook_companion_example_files} (example_id, filename, filepath, filemime, filesize, filetype, caption, timestamp)
             VALUES (%d, '%s', '%s', '%s', %d, '%s', '%s', %d)",
             $example_id,
             $_FILES['files']['name'][$file_form_name],
-            $dest_path . $_FILES['files']['name'][$file_form_name],
+            $dest_dep_path . $_FILES['files']['name'][$file_form_name],
             $_FILES['files']['type'][$file_form_name],
             $_FILES['files']['size'][$file_form_name],
             $file_type,
             $form_state['values'][$file_form_name . '_caption'],
             time()
             );
+          drupal_set_message($file_name . ' uploaded successfully.', 'status');
         } else {
+          drupal_set_message('Error uploading file : ' . $dest_path . '/' . $_FILES['files']['name'][$file_form_name], 'error');
+        }
+      } else {
+        if (move_uploaded_file($_FILES['files']['tmp_name'][$file_form_name], $base_path . $dest_path . $_FILES['files']['name'][$file_form_name]))
+        {
           /* for uploaded files making an entry in the database */
           db_query("INSERT INTO {textbook_companion_example_files} (example_id, filename, filepath, filemime, filesize, filetype, timestamp)
             VALUES (%d, '%s', '%s', '%s', %d, '%s', %d)",
@@ -549,10 +512,10 @@ function upload_examples_form_submit($form, &$form_state) {
             $file_type,
             time()
             );
+          drupal_set_message($file_name . ' uploaded successfully.', 'status');
+        } else {
+          drupal_set_message('Error uploading file : ' . $dest_path . '/' . $_FILES['files']['name'][$file_form_name], 'error');
         }
-        drupal_set_message($file_name . ' uploaded successfully.', 'status');
-      } else {
-        drupal_set_message('Error uploading file : ' . $dest_path . '/' . $_FILES['files']['name'][$file_form_name], 'error');
       }
     }
   }
@@ -649,35 +612,21 @@ function _list_of_book_titles()
   return $book_titles;
 }
 
-function _list_of_book_chapters($preference_id = 0)
+function _list_of_book_dependency_files($preference_id = 0)
 {
-  $book_chapters = array('0' => 'Please select...');
-  $book_chapters_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d ORDER BY number ASC", $preference_id);
-  while ($book_chapters_data = db_fetch_object($book_chapters_q))
-  {
-    $book_chapters[$book_chapters_data->id] = $book_chapters_data->number . '. ' . $book_chapters_data->name;
-  }
-  return $book_chapters;
-}
+  $book_dependency_files = array();
+  $book_dependency_files_q = db_query("SELECT * FROM {textbook_companion_chapter} chapter
+    LEFT JOIN {textbook_companion_example} example ON chapter.id = example.chapter_id
+    LEFT JOIN {textbook_companion_example_files} files ON example.id = files.example_id
+    WHERE chapter.preference_id = %d AND files.filetype = 'D' ORDER BY files.filename ASC", $preference_id
+  );
 
-function _list_of_book_examples($chapter_id = 0)
-{
-  $book_examples = array('0' => 'Please select...');
-  $book_examples_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d AND approval_status = 1 ORDER BY number ASC", $chapter_id);
-  while ($book_examples_data = db_fetch_object($book_examples_q))
+  while ($book_dependency_files_data = db_fetch_object($book_dependency_files_q))
   {
-    $book_examples[$book_examples_data->id] = $book_examples_data->number . ' (' . $book_examples_data->caption . ')';
+    $temp_caption = '';
+    if ($book_dependency_files_data->caption)
+      $temp_caption .= ' (' . $book_dependency_files_data->caption . ')';
+    $book_dependency_files[$book_dependency_files_data->id] = l($book_dependency_files_data->filename . $temp_caption, '');
   }
-  return $book_examples;
-}
-
-function _list_of_book_dependency_files($example_id = 0)
-{
-  $book_example_files = array();
-  $book_example_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d AND filetype = 'D' ORDER BY filename ASC", $example_id);
-  while ($book_example_files_data = db_fetch_object($book_example_files_q))
-  {
-    $book_example_files[$book_example_files_data->id] = l($book_example_files_data->filename, '');
-  }
-  return $book_example_files;
+  return $book_dependency_files;
 }
