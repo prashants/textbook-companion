@@ -8,7 +8,7 @@ function _proposal_pending()
   $pending_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE proposal_status = 0 ORDER BY id DESC");
   while ($pending_data = db_fetch_object($pending_q))
   {
-    $pending_rows[$pending_data->id] = array(date('d-m-Y', $pending_data->creation_date), $pending_data->full_name, date('d-m-Y', $pending_data->completion_date), l('Edit', 'manage_proposal/approve/' . $pending_data->id));
+    $pending_rows[$pending_data->id] = array(date('d-m-Y', $pending_data->creation_date), l($pending_data->full_name, 'user/' . $pending_data->uid), date('d-m-Y', $pending_data->completion_date), l('Edit', 'manage_proposal/approve/' . $pending_data->id));
   }
 
   /* check if there are any pending proposals */
@@ -43,7 +43,7 @@ function _proposal_all()
     case 3: $proposal_status = 'Completed'; break;
     default: $proposal_status = 'Unknown'; break;
     }
-    $proposal_rows[] = array(date('d-m-Y', $proposal_data->creation_date), $preference_data->book, $preference_data->author, $proposal_data->full_name, date('d-m-Y', $proposal_data->completion_date), $proposal_status, l('Edit', 'manage_proposal/edit/' . $proposal_data->id));
+    $proposal_rows[] = array(date('d-m-Y', $proposal_data->creation_date), $preference_data->book, $preference_data->author, l($proposal_data->full_name, 'user/' . $proposal_data->uid), date('d-m-Y', $proposal_data->completion_date), $proposal_status, l('Edit', 'manage_proposal/edit/' . $proposal_data->id));
   }
 
   /* check if there are any pending proposals */
