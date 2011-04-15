@@ -38,16 +38,16 @@ function textbook_companion_search_form()
     $search_rows = array();
     $search_query = '';
     if ($_POST['search_by_title'] && $_POST['search_by_author'])
-      $search_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE book LIKE '%%%s%%' OR author LIKE '%%%s%%'", $_POST['search'], $_POST['search']);
+      $search_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE approval_status = 1 AND (book LIKE '%%%s%%' OR author LIKE '%%%s%%')", $_POST['search'], $_POST['search']);
     else if ($_POST['search_by_title'])
-      $search_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE book LIKE '%%%s%%'", $_POST['search']);
+      $search_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE approval_status = 1 AND book LIKE '%%%s%%'", $_POST['search']);
     else if ($_POST['search_by_author'])
-      $search_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE author LIKE '%%%s%%'", $_POST['search']);
+      $search_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE approval_status = 1 AND author LIKE '%%%s%%'", $_POST['search']);
     else
       drupal_set_message('Please select whether to search by Title and/or Author of the Book.', 'error');
     while ($search_data = db_fetch_object($search_q))
     {
-      $search_rows[] = array(l($search_data->book, ''), $search_data->author); 
+      $search_rows[] = array(l($search_data->book, 'textbook_companion/run/' . $search_data->id), $search_data->author); 
     }
     if ($search_rows)
     {

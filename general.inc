@@ -17,11 +17,12 @@ function list_chapters()
 
   $return_html = '<br />';
   $return_html .= '<strong>Title of the Book:</strong><br />' . $book_data->pre_book . '<br /><br />';
-  $return_html .= '<strong>Contributor Name:</strong><br />' .$book_data->pro_full_name . '<br />';
+  $return_html .= '<strong>Contributor Name:</strong><br />' .$book_data->pro_full_name . '<br /><br />';
+  $return_html .= l('Upload Example Code', 'textbook_companion/code/upload') . '<br />';
 
   /* get chapter list */
   $chapter_rows = array();
-  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $book_data->pre_id);
+  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d ORDER BY number ASC", $book_data->pre_id);
   while ($chapter_data = db_fetch_object($chapter_q))
   {
     /* get example list */

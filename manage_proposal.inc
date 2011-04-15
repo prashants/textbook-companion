@@ -83,7 +83,7 @@ function proposal_approval_form($form_state)
 
   $form['full_name'] = array(
     '#type' => 'item',
-    '#value' => $row->full_name,
+    '#value' => l($row->full_name, 'user/' . $row->uid),
     '#title' => t('Contributor Name'),
   );
   $form['email'] = array(
