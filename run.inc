@@ -93,7 +93,7 @@ function textbook_companion_run_form($form_state)
   {
     $form['run']['download_book'] = array(
       '#type' => 'item',
-      '#value' => l('Download', $book_default_value) . ' ' . t('(Download all the examples of the entire book)'),
+      '#value' => l('Download', 'download/book/' . $book_default_value) . ' ' . t('(Download all the examples of the entire book)'),
     );
     $form['run']['contributor_name'] = array(
       '#type' => 'item',
@@ -120,7 +120,7 @@ function textbook_companion_run_form($form_state)
     {
       $form['run']['download_chapter'] = array(
         '#type' => 'item',
-        '#value' => l('Download', $chapter_default_value) . ' ' . t('(Download all the examples of the entire chapter)'),
+        '#value' => l('Download', 'download/chapter/' . $chapter_default_value) . ' ' . t('(Download all the examples of the entire chapter)'),
       );
       $form['run']['example'] = array(
         '#type' => 'select',
@@ -177,7 +177,7 @@ function textbook_companion_run_form($form_state)
           case 'X' : $example_file_type = 'xcos file'; break;
           default  : $example_file_type = 'Unknown'; break;
           }
-          $example_files_rows[] = array($example_list_data->filename, $example_file_type);
+          $example_files_rows[] = array(l($example_list_data->filename, 'download/file/' . $example_list_data->id), $example_file_type);
         }
         $example_files_header = array('Filename', 'Type');
         $example_files = theme_table($example_files_header, $example_files_rows); 

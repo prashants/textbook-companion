@@ -157,7 +157,15 @@ function textbook_companion_menu()
     'file' => 'run.inc',
   );
 
-  /* general purpose callbacks */
+  /* download callbacks */
+  $items['download/file'] = array(
+    'title' => 'Code Download',
+    'description' => 'Code Download', 
+    'page callback' => 'textbook_companion_download_example_file',
+    'access arguments' => array('download code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'download.inc',
+  );
   $items['download/example'] = array(
     'title' => 'Code Download',
     'description' => 'Code Download', 
@@ -166,6 +174,24 @@ function textbook_companion_menu()
     'type' => MENU_CALLBACK,
     'file' => 'download.inc',
   );
+  $items['download/chapter'] = array(
+    'title' => 'Code Download',
+    'description' => 'Code Download', 
+    'page callback' => 'textbook_companion_download_chapter',
+    'access arguments' => array('download code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'download.inc',
+  );
+  $items['download/book'] = array(
+    'title' => 'Code Download',
+    'description' => 'Code Download', 
+    'page callback' => 'textbook_companion_download_book',
+    'access arguments' => array('download code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'download.inc',
+  );
+
+  /* general purpose callbacks */
   $items['textbook_companion/ajax'] = array(
     'title' => 'Ajax',
     'description' => 'Ajax',
