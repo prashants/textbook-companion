@@ -48,21 +48,5 @@ function textbook_companion_download_example()
   header('Content-Length: ' . filesize($zip_filename));
   readfile($zip_filename);
   unlink($zip_filename);
-
-/* $zip = new ZipArchive;
-$zip->open('uploads/myzip.zip', ZipArchive::CREATE);
-foreach (glob($dest_path . '*') as $file) {
-  echo $file;
-    $zip->addFile($file, $file);
-}
-$zip->close();
-var_dump($zip);
-
-$zipfilename = '/var/www/textbook/uploads/myzip.zip';
-var_dump(filesize($zipfilename)); die();
-header('Content-Type: application/zip');
-header('Content-disposition: attachment; filename=myzip.zip');
-header('Content-Length: ' . filesize($zipfilename));
-readfile($zipfilename); */
 }
 

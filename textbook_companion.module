@@ -825,4 +825,3 @@ function textbook_companion_ajax()
   echo '';
 }
 
-
