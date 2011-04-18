@@ -11,7 +11,7 @@ function textbook_companion_run_form($form_state)
   if (!isset($form_state['storage']['run']['book']))
   {
     /* get the book id from url */
-    $url_book_id = (int)arg(2);
+    $url_book_id = (int)arg(1);
     if ($url_book_id)
     {
       /* add javascript for book selected */
@@ -93,7 +93,7 @@ function textbook_companion_run_form($form_state)
   {
     $form['run']['download_book'] = array(
       '#type' => 'item',
-      '#value' => l('Download Full Book', $book_default_value),
+      '#value' => l('Download', $book_default_value) . ' ' . t('(Download all the examples of the entire book)'),
     );
     $form['run']['contributor_name'] = array(
       '#type' => 'item',
@@ -120,7 +120,7 @@ function textbook_companion_run_form($form_state)
     {
       $form['run']['download_chapter'] = array(
         '#type' => 'item',
-        '#value' => l('Download Full Chapter', $chapter_default_value),
+        '#value' => l('Download', $chapter_default_value) . ' ' . t('(Download all the examples of the entire chapter)'),
       );
       $form['run']['example'] = array(
         '#type' => 'select',
@@ -184,7 +184,7 @@ function textbook_companion_run_form($form_state)
       }
       $form['run']['download_example'] = array(
         '#type' => 'item',
-        '#value' => l('Download Example', $example_default_value),
+        '#value' => l('Download Example', 'download/example/' . $example_default_value),
       );
       $form['run']['example_files'] = array(
         '#type'  => 'item',

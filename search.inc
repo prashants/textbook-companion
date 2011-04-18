@@ -47,7 +47,7 @@ function textbook_companion_search_form()
       drupal_set_message('Please select whether to search by Title and/or Author of the Book.', 'error');
     while ($search_data = db_fetch_object($search_q))
     {
-      $search_rows[] = array(l($search_data->book, 'textbook_companion/run/' . $search_data->id), $search_data->author); 
+      $search_rows[] = array(l($search_data->book, 'textbook_run/' . $search_data->id), $search_data->author); 
     }
     if ($search_rows)
     {
