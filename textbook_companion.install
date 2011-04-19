@@ -39,13 +39,11 @@ function textbook_companion_schema() {
       'uid' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '10',
         'not null' => TRUE,
       ),
       'approver_uid' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '10',
         'not null' => TRUE,
       ),
       'full_name' => array(
@@ -99,25 +97,21 @@ function textbook_companion_schema() {
       'completion_date' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '11',
         'not null' => TRUE,
       ),
       'creation_date' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '11',
         'not null' => TRUE,
       ),
       'approval_date' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '11',
         'not null' => TRUE,
       ),
       'proposal_status' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '1',
         'not null' => TRUE,
       ),
       'message' => array(
@@ -145,13 +139,11 @@ function textbook_companion_schema() {
       'proposal_id' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '10',
         'not null' => TRUE,
       ),
       'pref_number' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '1',
         'not null' => TRUE,
       ),
       'book' => array(
@@ -187,13 +179,11 @@ function textbook_companion_schema() {
       'year' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '4',
         'not null' => TRUE,
       ),
       'approval_status' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '1',
         'not null' => TRUE,
       ),
     ),
@@ -215,13 +205,11 @@ function textbook_companion_schema() {
       'preference_id' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '10',
         'not null' => TRUE,
       ),
       'number' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '2',
         'not null' => TRUE,
       ),
       'name' => array(
@@ -246,7 +234,6 @@ function textbook_companion_schema() {
       'chapter_id' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '10',
         'not null' => TRUE,
       ),
       'number' => array(
@@ -264,13 +251,11 @@ function textbook_companion_schema() {
       'approval_status' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '1',
         'not null' => TRUE,
       ),
       'timestamp' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '11',
         'not null' => TRUE,
       ),
     ),
@@ -289,7 +274,6 @@ function textbook_companion_schema() {
       'example_id' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '10',
         'not null' => TRUE,
       ),
       'filename' => array(
@@ -313,7 +297,6 @@ function textbook_companion_schema() {
       'filesize' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '11',
         'not null' => TRUE,
       ),
       'filetype' => array(
@@ -331,7 +314,6 @@ function textbook_companion_schema() {
       'timestamp' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
-        'length' => '11',
         'not null' => TRUE,
       ),
     ),
