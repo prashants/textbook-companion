@@ -62,6 +62,9 @@ function list_examples()
   $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d LIMIT 1", $chapter_id);
   if ($chapter_data = db_fetch_object($chapter_q))
   {
+    $return_html = '<br />';
+    $return_html .= '<strong>Title of the Book:</strong><br />' . $book_data->pre_book . '<br /><br />';
+    $return_html .= '<strong>Contributor Name:</strong><br />' .$book_data->pro_full_name . '<br /><br />';
     $return_html .= '<strong>Chapter Number:</strong><br />' .$chapter_data->number . '<br /><br />';
     $return_html .= '<strong>Title of the Chapter:</strong><br />' .$chapter_data->name . '<br />';
   }

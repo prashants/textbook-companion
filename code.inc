@@ -534,7 +534,7 @@ function _list_of_book_titles()
   $book_titles_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE approval_status = 1 OR approval_status = 3 ORDER BY book ASC");
   while ($book_titles_data = db_fetch_object($book_titles_q))
   {
-    $book_titles[$book_titles_data->id] = $book_titles_data->book . ' (' . $book_titles_data->author . ')';
+    $book_titles[$book_titles_data->id] = $book_titles_data->book . ' (Written by ' . $book_titles_data->author . ')';
   }
   return $book_titles;
 }
