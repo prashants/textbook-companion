@@ -20,7 +20,7 @@ function upload_examples_form($form_state)
     return;
   }
 
-  /* add javascript for book title */
+  /* add javascript for automatic book title, check if example uploaded, dependency selection effects */
   $chapter_name_js = " $(document).ready(function() {
     $('#edit-number').change(function() {
       $.get('" . base_path() . "textbook_companion/ajax/chapter_title/' + $('#edit-number').val() + '/' + " . $row->pre_id . ", function(data) {
@@ -57,13 +57,6 @@ function upload_examples_form($form_state)
     $('#edit-existing-depfile-dep-book-title').trigger('change');
   });";
   drupal_add_js($chapter_name_js, 'inline', 'header');
-
-  // Register the form with ahah_helper so we can use it. Also updates
-  // $form_state['storage'] to ensure it contains the latest values that have
-  // been entered, even when the form item has temporarily been removed from
-  // the form. So if a form item *once* had a value, you *always* can retrieve
-  // it.
-  ahah_helper_register($form, $form_state);
 
   $form['#attributes'] = array('enctype' => "multipart/form-data");
 
@@ -127,6 +120,7 @@ function upload_examples_form($form_state)
       '#title' => t('Upload main or source file'),
       '#size' => 48,
       '#description' => t('Upload main or source file of the example.'),
+      '#required' => TRUE,
   );
   $form['sourcefile']['sourcefile2'] = array(
       '#type' => 'file',
@@ -282,7 +276,58 @@ function upload_examples_form($form_state)
 
 function upload_examples_form_validate($form, &$form_state)
 {
-  //form_set_error('', t('You must select a name for this group of settings.'));
+  if (isset($_FILES['files']))
+  {
+    $allowed_extensions = explode(',' , variable_get('textbook_companion_extensions', ''));
+    foreach ($_FILES['files']['name'] as $file_form_name => $file_name)
+    {
+      if ($file_name)
+      {
+         if (!in_array(end(explode('.', strtolower($_FILES['files']['name'][$file_form_name]))), $allowed_extensions))
+           form_set_error($file_form_name, t('Only ' . variable_get('textbook_companion_extensions', '') . ' extensions can be uploaded.'));
+         if ($_FILES['files']['size'][$file_form_name] <= 0)
+           form_set_error($file_form_name, t('File size is zero.'));
+      }
+    }
+  }
+
+  /* add javascript again for automatic book title, check if example uploaded, dependency selection effects */
+  $chapter_name_js = " $(document).ready(function() {
+    $('#edit-number').change(function() {
+      $.get('" . base_path() . "textbook_companion/ajax/chapter_title/' + $('#edit-number').val() + '/' + " . $row->pre_id . ", function(data) {
+        $('#edit-name').val(data);
+      });
+    });
+    $('#edit-example-number').change(function() {
+      $.get('" . base_path() . "textbook_companion/ajax/example_exists/' + $('#edit-number').val() + '/' + $('#edit-example-number').val(), function(data) {
+        if (data) {
+          alert(data);
+        }
+      });
+    });
+    $('#edit-existing-depfile-dep-book-title').change(function() {
+      var dep_selected = ''; 
+      /* showing and hiding relevant files */
+      $('.form-checkboxes .option').hide();
+      $('.form-checkboxes .option').each(function(index) {
+        var activeClass = $('#edit-existing-depfile-dep-book-title').val();
+        if ($(this).children().hasClass(activeClass)) {
+          $(this).show();
+        }
+        if ($(this).children().attr('checked') == true) {
+          dep_selected += $(this).children().next().text() + '<br />';
+        }
+      });
+      /* showing list of already existing dependencies */
+      $('#existing_depfile_selected').html(dep_selected);
+    });
+
+    $('.form-checkboxes .option').change(function() {
+      $('#edit-existing-depfile-dep-book-title').trigger('change');
+    });
+    $('#edit-existing-depfile-dep-book-title').trigger('change');
+  });";
+  drupal_add_js($chapter_name_js, 'inline', 'header');
 }
 
 function upload_examples_form_submit($form, &$form_state) {
@@ -558,4 +603,8 @@ function _list_of_book_dependency_files()
     $book_dependency_files_class[$book_dependency_files_data->files_id] = $book_dependency_files_data->chapter_preference_id;
   }
   return array($book_dependency_files, $book_dependency_files_class);
+}
+
+function theme_upload_examples_form($form) {
+  drupal_add_js('alert("hi");', 'inline', 'header');
 }
