@@ -3,4 +3,4 @@ description = IIT Bombay Textbook Companion project
 package = IITB
 version = VERSION
 core = 6.x
-
+dependencies[] = ahah_helper

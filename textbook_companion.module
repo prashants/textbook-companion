@@ -504,6 +504,8 @@ function book_proposal_form_validate($form, &$form_state)
   $d = (int)$d; $m = (int)$m; $y = (int)$y;
   if (!checkdate($m, $d, $y))
     form_set_error('completion_date', t('Invalid expected date of completion'));
+  if (mktime(0, 0, 0, $m, $d, $y) <= time())
+  	form_set_error('completion_date', t('Expected date of completion should be in future'));  
 
   /* edition */
   if (!preg_match('/^[1-9][0-9]{0,1}$/', $form_state['values']['edition1']))
@@ -529,12 +531,12 @@ function book_proposal_form_validate($form, &$form_state)
   if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn3']))
     form_set_error('isbn3', t('Invalid ISBN for Book Preference 3'));
 
-  if ( ! _is_isbn_valid($form_state['values']['isbn1']))
-    form_set_error('isbn1', t('Invalid ISBN for Book Preference 1'));
-  if ( ! _is_isbn_valid($form_state['values']['isbn2']))
-    form_set_error('isbn2', t('Invalid ISBN for Book Preference 2'));
-  if ( ! _is_isbn_valid($form_state['values']['isbn3']))
-    form_set_error('isbn3', t('Invalid ISBN for Book Preference 3'));
+  //if ( ! _is_isbn_valid($form_state['values']['isbn1']))
+  //  form_set_error('isbn1', t('Invalid ISBN for Book Preference 1'));
+  //if ( ! _is_isbn_valid($form_state['values']['isbn2']))
+  //  form_set_error('isbn2', t('Invalid ISBN for Book Preference 2'));
+  //if ( ! _is_isbn_valid($form_state['values']['isbn3']))
+  //  form_set_error('isbn3', t('Invalid ISBN for Book Preference 3'));
   return;
 }
 

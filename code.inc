@@ -99,7 +99,7 @@ function upload_examples_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Caption'),
     '#size' => 40,
-    '#maxlength' => 100,
+    '#maxlength' => 50,
     '#required' => TRUE,
   );
   $form['example_warning'] = array(
@@ -120,7 +120,6 @@ function upload_examples_form($form_state)
       '#title' => t('Upload main or source file'),
       '#size' => 48,
       '#description' => t('Upload main or source file of the example.'),
-      '#required' => TRUE,
   );
   $form['sourcefile']['sourcefile2'] = array(
       '#type' => 'file',
@@ -278,6 +277,9 @@ function upload_examples_form_validate($form, &$form_state)
 {
   if (isset($_FILES['files']))
   {
+    if ( ! ($_FILES['files']['name']['sourcefile1'] || $_FILES['files']['name']['xcos1']))
+      form_set_error('sourcefile1', t('Please upload atleast one main or source file or xcos file.'));
+
     $allowed_extensions = explode(',' , variable_get('textbook_companion_extensions', ''));
     foreach ($_FILES['files']['name'] as $file_form_name => $file_name)
     {
