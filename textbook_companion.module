@@ -111,6 +111,16 @@ function textbook_companion_menu()
     'file' => 'code.inc',
     'weight' => 2,
   );
+  $items['textbook_companion/code/upload_dep'] = array(
+    'title' => 'Upload Dependency',
+    'description' => 'Upload Dependency Files',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('upload_dependency_form'),
+    'access arguments' => array('upload code'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'code.inc',
+    'weight' => 3,
+  );
   $items['textbook_companion/code/edit'] = array(
     'title' => 'Edit Example',
     'description' => 'Edit Example', 

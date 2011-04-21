@@ -168,64 +168,11 @@ function upload_examples_form($form_state)
       '#multiple' => TRUE,
   );
 
+  $form['existing_depfile']['dep_upload'] = array(
+      '#type' => 'item',
+      '#value' => l('Upload New Depedency Files', 'textbook_companion/code/upload_dep'),
+  );
   /************ END OF EXISTING DEPENDENCIES **************/
-
-  $form['depfile'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('New Dependency Files'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-  );
-  $form['depfile']['depfile1_caption'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Caption for dependency file 1'),
-      '#size' => 15,
-  );
-  $form['depfile']['depfile1'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload dependency file 1'),
-      '#size' => 48,
-  );
-  $form['depfile']['depfile2_caption'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Caption for dependency file 2'),
-      '#size' => 15,
-  );
-  $form['depfile']['depfile2'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload dependency file 2'),
-      '#size' => 48,
-  );
-  $form['depfile']['depfile3_caption'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Caption for dependency file 3'),
-      '#size' => 15,
-  );
-  $form['depfile']['depfile3'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload dependency file 3'),
-      '#size' => 48,
-  );
-  $form['depfile']['depfile4_caption'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Caption for dependency file 4'),
-      '#size' => 15,
-  );
-  $form['depfile']['depfile4'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload dependency file 4'),
-      '#size' => 48,
-  );
-  $form['depfile']['depfile5_caption'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Caption for dependency file 5'),
-      '#size' => 15,
-  );
-  $form['depfile']['depfile5'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload dependency file 5'),
-      '#size' => 48,
-  );
 
   $form['result'] = array(
     '#type' => 'fieldset',
@@ -285,10 +232,11 @@ function upload_examples_form_validate($form, &$form_state)
     {
       if ($file_name)
       {
-         if (!in_array(end(explode('.', strtolower($_FILES['files']['name'][$file_form_name]))), $allowed_extensions))
+         $temp_extension = end(explode('.', strtolower($_FILES['files']['name'][$file_form_name])));
+         if (!in_array($temp_extension, $allowed_extensions))
            form_set_error($file_form_name, t('Only ' . variable_get('textbook_companion_extensions', '') . ' extensions can be uploaded.'));
          if ($_FILES['files']['size'][$file_form_name] <= 0)
-           form_set_error($file_form_name, t('File size is zero.'));
+           form_set_error($file_form_name, t('File size cannot be zero.'));
       }
     }
   }
@@ -576,6 +524,104 @@ function _list_of_book_dependency_files()
   return array($book_dependency_files, $book_dependency_files_class);
 }
 
-function theme_upload_examples_form($form) {
-  drupal_add_js('alert("hi");', 'inline', 'header');
+function upload_dependency_form($form_state)
+{
+  global $user;
+
+  /* get approved book details */
+  $result = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book, pro.full_name as pro_full_name FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pre.approval_status = 1 AND pro.uid = %d", $user->uid);
+  $row = db_fetch_object($result);
+  if (!$row)
+  {
+    drupal_set_message("Your book proposal has not been approved. You will receive a email from us when your proposal is approved.", 'error');
+    drupal_goto('');
+    return;
+  }
+
+  $form['#attributes'] = array('enctype' => "multipart/form-data");
+
+  $form['book_details']['book'] = array(
+    '#type' => 'item',
+    '#value' => $row->pre_book,
+    '#title' => t('Title of the Book'),
+  );
+  $form['contributor_name'] = array(
+    '#type' => 'item',
+    '#value' => $row->pro_full_name,
+    '#title' => t('Contributor Name'),
+  );
+
+  $form['existing_depfile'] = array(
+    '#type' => 'item',
+    '#value' => _list_existing_dependency($row->pre_id),
+    '#title' => t('List of existing dependency files for this book'),
+  );
+
+  $form['depfile'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('New Dependency Files'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+  $form['depfile']['depfile1_caption'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Caption for dependency file 1'),
+      '#size' => 15,
+  );
+  $form['depfile']['depfile1'] = array(
+      '#type' => 'file',
+      '#title' => t('Upload dependency file 1'),
+      '#size' => 48,
+  );
+  $form['depfile']['depfile2_caption'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Caption for dependency file 2'),
+      '#size' => 15,
+  );
+  $form['depfile']['depfile2'] = array(
+      '#type' => 'file',
+      '#title' => t('Upload dependency file 2'),
+      '#size' => 48,
+  );
+  $form['depfile']['depfile3_caption'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Caption for dependency file 3'),
+      '#size' => 15,
+  );
+  $form['depfile']['depfile3'] = array(
+      '#type' => 'file',
+      '#title' => t('Upload dependency file 3'),
+      '#size' => 48,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit')
+  );
+
+  $form['cancel'] = array(
+    '#type' => 'markup',
+    '#value' => l(t('Back'), 'textbook_companion/code/upload'),
+  );
+  return $form;
+}
+
+function _list_existing_dependency($book_id)
+{
+  $return_html = '<ul>';
+  $book_dependency_files_q = db_query("SELECT chapter.preference_id as chapter_preference_id, files.id as files_id, files.filename as files_filename, files.caption as files_caption
+    FROM {textbook_companion_chapter} chapter
+    LEFT JOIN {textbook_companion_example} example ON chapter.id = example.chapter_id
+    LEFT JOIN {textbook_companion_example_files} files ON example.id = files.example_id
+    WHERE files.filetype = 'D' ORDER BY files.filename ASC", $book_id);
+
+  while ($book_dependency_files_data = db_fetch_object($book_dependency_files_q))
+  {
+    $temp_caption = '';
+    if ($book_dependency_files_data->caption)
+      $temp_caption = ' (' . $book_dependency_files_data->files_caption . ')';
+    $return_html .= '<li>' . l($book_dependency_files_data->files_filename . $temp_caption, 'download/file/' . $book_dependency_files_data->files_id) . '</li>';
+  }
+  $return_html .= '</ul>';
+  return $return_html;
 }

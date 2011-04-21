@@ -41,9 +41,10 @@ function textbook_companion_download_example()
     else
       $zip->addFile($root_path . $example_files_row->filepath, $EX_PATH . $example_files_row->filename);
   }
+  $zip_file_count = $zip->numFiles;
   $zip->close();
 
-  if ($zip->numFiles > 0)
+  if ($zip_file_count > 0)
   {
     /* download zip file */
     header('Content-Type: application/zip');
@@ -52,7 +53,7 @@ function textbook_companion_download_example()
     readfile($zip_filename);
     unlink($zip_filename);
   } else {
-    drupal_set_message("There are no examples to download", 'error');
+    drupal_set_message("There are no files in this examples to download", 'error');
     drupal_goto('textbook_run');
   }
 }
@@ -87,9 +88,10 @@ function textbook_companion_download_chapter()
         $zip->addFile($root_path . $example_files_row->filepath, $CH_PATH . $EX_PATH . $example_files_row->filename);
     }
   }
+  $zip_file_count = $zip->numFiles;
   $zip->close();
 
-  if ($zip->numFiles > 0)
+  if ($zip_file_count > 0)
   {
     /* download zip file */
     header('Content-Type: application/zip');
@@ -138,9 +140,10 @@ function textbook_companion_download_book()
       }
     }
   }
+  $zip_file_count = $zip->numFiles;
   $zip->close();
 
-  if ($zip->numFiles > 0)
+  if ($zip_file_count > 0)
   {
     /* download zip file */
     header('Content-Type: application/zip');
