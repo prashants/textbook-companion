@@ -811,6 +811,50 @@ function textbook_companion_mail($key, &$message, $params)
         Best Regards,\n\n
         !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
+
+    case 'example_uploaded':
+      $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $params['example_uploaded']['example_id']);
+      $example_data = db_fetch_object($example_q);
+      $user_data = user_load($params['example_uploaded']['user_id']);
+
+      $message['subject'] = t('[!site_name] You have uploaded example', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['body'] = t('Dear !user_name,\n\n
+        We have recived your following example: \n\n
+        Example number : ' . $example_data->number . '\n
+        Caption : ' .  $example_data->caption . '\n\n
+        Your uploaded example is under review. You will be notified when it has been approved.\n\n
+        Best Regards,\n\n
+        !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      break;
+
+    case 'example_approved':
+      $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $params['example_approved']['example_id']);
+      $example_data = db_fetch_object($example_q);
+      $user_data = user_load($params['example_approved']['user_id']);
+
+      $message['subject'] = t('[!site_name] Your uploaded example has been approved', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['body'] = t('Dear !user_name,\n\n
+        Your following example has been approved: \n\n
+        Example number : ' . $example_data->number . '\n
+        Caption : ' .  $example_data->caption . '\n\n
+        Best Regards,\n\n
+        !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      break;
+
+    case 'example_disapproved':
+      $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $params['example_disapproved']['example_id']);
+      $example_data = db_fetch_object($example_q);
+      $user_data = user_load($params['example_disapproved']['user_id']);
+
+      $message['subject'] = t('[!site_name] Your uploaded example has been disapproved', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['body'] = t('Dear !user_name,\n\n
+        Your following example has been disapproved: \n\n
+        Example number : ' . $example_data->number . '\n
+        Caption : ' .  $example_data->caption . '\n\n
+        Reason for dis-approval : ' . $params['example_disapproved']['message'] . '\n\n
+        Best Regards,\n\n
+        !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      break;
   }
 }
 

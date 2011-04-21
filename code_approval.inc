@@ -133,11 +133,34 @@ function code_approval_form_submit($form, &$form_state)
 {
   foreach ($form_state['values']['example_details'] as $ex_id => $ex_data)
   {
+    $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $ex_data['example_id']);
+    $example_data = db_fetch_object($example_q);
+    $chapter_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d LIMIT 1", $example_data->chapter_id));
+    $preference_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d LIMIT 1", $chapter_data->preference_id));
+    $proposal_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d LIMIT 1", $preference_data->proposal_id));
+    $user_data = user_load($proposal_data->uid);
+
     if ($ex_data['approved'] == "0")
     {
       db_query("UPDATE {textbook_companion_example} SET approval_status = 1 WHERE id = %d", $ex_data['example_id']);
+
+      /* sending email */
+      $email_to = $user_data->mail . ', ' . variable_get('textbook_companion_emails', '');
+      $param['example_approved']['example_id'] = $ex_data['example_id'];
+      $param['example_approved']['user_id'] = $user_data->uid;
+      if (!drupal_mail('textbook_companion', 'example_approved', $email_to, language_default(), $param, NULL, TRUE))
+        drupal_set_message('Error sending email message.', 'error');
+
     } else if ($ex_data['approved'] == "1") {
       db_query("UPDATE {textbook_companion_example} SET approval_status = 2 WHERE id = %d", $ex_data['example_id']);
+
+      /* sending email */
+      $email_to = $user_data->mail . ', ' . variable_get('textbook_companion_emails', '');
+      $param['example_disapproved']['example_id'] = $ex_data['example_id'];
+      $param['example_disapproved']['user_id'] = $user_data->uid;
+      $param['example_disapproved']['message'] = $ex_data['message'];
+      if (!drupal_mail('textbook_companion', 'example_disapproved', $email_to, language_default(), $param, NULL, TRUE))
+        drupal_set_message('Error sending email message.', 'error');
     }
   }
   drupal_set_message('Approval status updated.', 'status');
