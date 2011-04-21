@@ -43,12 +43,18 @@ function textbook_companion_download_example()
   }
   $zip->close();
 
-  /* download zip file */
-  header('Content-Type: application/zip');
-  header('Content-disposition: attachment; filename="EX' . $example_data->number . '.zip"');
-  header('Content-Length: ' . filesize($zip_filename));
-  readfile($zip_filename);
-  unlink($zip_filename);
+  if ($zip->numFiles > 0)
+  {
+    /* download zip file */
+    header('Content-Type: application/zip');
+    header('Content-disposition: attachment; filename="EX' . $example_data->number . '.zip"');
+    header('Content-Length: ' . filesize($zip_filename));
+    readfile($zip_filename);
+    unlink($zip_filename);
+  } else {
+    drupal_set_message("There are no examples to download", 'error');
+    drupal_goto('textbook_run');
+  }
 }
 
 function textbook_companion_download_chapter()
@@ -68,7 +74,7 @@ function textbook_companion_download_chapter()
   $zip = new ZipArchive;
   $zip->open($zip_filename, ZipArchive::CREATE);
 
-  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_id);
+  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d AND approval_status = 1", $chapter_id);
   while ($example_row = db_fetch_object($example_q))
   {
     $EX_PATH = 'EX' . $example_row->number . '/';
@@ -83,12 +89,18 @@ function textbook_companion_download_chapter()
   }
   $zip->close();
 
-  /* download zip file */
-  header('Content-Type: application/zip');
-  header('Content-disposition: attachment; filename="CH' . $chapter_data->number . '.zip"');
-  header('Content-Length: ' . filesize($zip_filename));
-  readfile($zip_filename);
-  unlink($zip_filename);
+  if ($zip->numFiles > 0)
+  {
+    /* download zip file */
+    header('Content-Type: application/zip');
+    header('Content-disposition: attachment; filename="CH' . $chapter_data->number . '.zip"');
+    header('Content-Length: ' . filesize($zip_filename));
+    readfile($zip_filename);
+    unlink($zip_filename);
+  } else {
+    drupal_set_message("There are no examples in this chapter to download", 'error');
+    drupal_goto('textbook_run');
+  }
 }
 
 function textbook_companion_download_book()
@@ -112,7 +124,7 @@ function textbook_companion_download_book()
   while ($chapter_row = db_fetch_object($chapter_q))
   {
     $CH_PATH = 'CH' . $chapter_row->number . '/';
-    $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_row->id);
+    $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d AND approval_status = 1", $chapter_row->id);
     while ($example_row = db_fetch_object($example_q))
     {
       $EX_PATH = 'EX' . $example_row->number . '/';
@@ -128,11 +140,17 @@ function textbook_companion_download_book()
   }
   $zip->close();
 
-  /* download zip file */
-  header('Content-Type: application/zip');
-  header('Content-disposition: attachment; filename="' . $book_data->book . '.zip"');
-  header('Content-Length: ' . filesize($zip_filename));
-  readfile($zip_filename);
-  unlink($zip_filename);
+  if ($zip->numFiles > 0)
+  {
+    /* download zip file */
+    header('Content-Type: application/zip');
+    header('Content-disposition: attachment; filename="' . $book_data->book . '.zip"');
+    header('Content-Length: ' . filesize($zip_filename));
+    readfile($zip_filename);
+    unlink($zip_filename);
+  } else {
+    drupal_set_message("There are no examples in this book to download", 'error');
+    drupal_goto('textbook_run');
+  }
 }
 
