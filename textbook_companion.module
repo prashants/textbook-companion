@@ -157,6 +157,34 @@ function textbook_companion_menu()
     'type' => MENU_NORMAL_ITEM,
     'file' => 'search.inc',
   );
+  $items['textbook_search/search'] = array(
+    'title' => 'Search',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('textbook_companion_search_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'search.inc',
+    'weight' => 1,
+  );
+  $items['textbook_search/book'] = array(
+    'title' => 'Browse By Title of the Book',
+    'description' => '',
+    'page callback' => 'textbook_companion_browse_book',
+    'access arguments' => array('access content'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'search.inc',
+    'weight' => 2,
+  );
+  $items['textbook_search/author'] = array(
+    'title' => 'Browse By Author Name',
+    'description' => '',
+    'page callback' => 'textbook_companion_browse_author',
+    'access arguments' => array('access content'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'search.inc',
+    'weight' => 3,
+  );
 
   $items['textbook_run'] = array(
     'title' => 'Run',

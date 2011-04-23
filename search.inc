@@ -69,3 +69,71 @@ function textbook_companion_search_form()
   return $form;
 }
 
+/******************************************************************************/
+/**************************** BROWSE BY FORMS *********************************/
+/******************************************************************************/
+
+function textbook_companion_browse_book()
+{
+  $return_html = _browse_list('book');
+  $return_html .= '<br /><br />';
+  $query_character = arg(2);
+  if (!$query_character) {
+    /* all books */
+    $return_html .= "Please select the starting character of the title of the book";
+    return $return_html;
+  }
+  $book_rows = array();
+  $book_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE book like '%s%%' AND approval_status = 1", $query_character);
+  while ($book_data = db_fetch_object($book_q))
+  {
+    $book_rows[] = array(l($book_data->book, 'textbook_run/' . $book_data->id), $book_data->author);
+  }
+  if (!$book_rows)
+  {
+    $return_html .= "Sorry no books are available with that title";
+  } else {
+      $book_header = array('Title of the Book', 'Author Name');
+      $return_html .= theme_table($book_header, $book_rows);
+  }
+  return $return_html;
+}
+
+function textbook_companion_browse_author()
+{
+  $return_html = _browse_list('author');
+  $return_html .= '<br /><br />';
+  $query_character = arg(2);
+  if (!$query_character) {
+    /* all books */
+    $return_html .= "Please select the starting character of the author's name";
+    return $return_html;
+  }
+  $book_rows = array();
+  $book_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE author like '%s%%' AND approval_status = 1", $query_character);
+  while ($book_data = db_fetch_object($book_q))
+  {
+    $book_rows[] = array(l($book_data->book, 'textbook_run/' . $book_data->id), $book_data->author);
+  }
+  if (!$book_rows)
+  {
+    $return_html .= "Sorry no books are available with that author's name";
+  } else {
+      $book_header = array('Title of the Book', 'Author Name');
+      $return_html .= theme_table($book_header, $book_rows);
+  }
+  return $return_html;
+}
+
+function _browse_list($type)
+{
+  $return_html = '';
+  $char_list = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+  foreach ($char_list as $char_name)
+  {
+    $return_html .= l($char_name, 'textbook_search/' . $type . '/' . $char_name);
+    if ($char_name != 'Z')
+      $return_html .= ' | ';
+  }
+  return $return_html;
+}

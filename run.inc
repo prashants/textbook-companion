@@ -181,7 +181,7 @@ function textbook_companion_run_form($form_state)
 
         /* dependency files */
         $dependency_list_q = db_query("SELECT dependency.id as dependency_id, dependency.filename as dependency_filename, dependency.caption as dependency_caption
-          FROM {textbook_companion_example_dependency} example_dependency JOIN {textbook_companion_dependency_files} dependency
+          FROM {textbook_companion_example_dependency} example_dependency LEFT JOIN {textbook_companion_dependency_files} dependency
           ON example_dependency.dependency_id = dependency.id
           WHERE example_dependency.example_id = %d", $form_state['values']['run']['example']);
           while ($dependency_list_data = db_fetch_object($dependency_list_q))
