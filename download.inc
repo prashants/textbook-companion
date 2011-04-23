@@ -51,6 +51,7 @@ function textbook_companion_download_example()
   {
       $zip->addFile($root_path . $example_files_row->filepath, $EX_PATH . $example_files_row->filename);
   }
+  /* dependency files */
   while ($example_dependency_files_row = db_fetch_object($example_dependency_files_q))
   {
     $dependency_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $example_dependency_files_row->dependency_id));
@@ -101,6 +102,7 @@ function textbook_companion_download_chapter()
     {
       $zip->addFile($root_path . $example_files_row->filepath, $CH_PATH . $EX_PATH . $example_files_row->filename);
     }
+    /* dependency files */
     while ($example_dependency_files_row = db_fetch_object($example_dependency_files_q))
     {
       $dependency_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $example_dependency_files_row->dependency_id));
@@ -156,6 +158,7 @@ function textbook_companion_download_book()
       {
         $zip->addFile($root_path . $example_files_row->filepath, $BK_PATH . $CH_PATH . $EX_PATH . $example_files_row->filename);
       }
+      /* dependency files */
       while ($example_dependency_files_row = db_fetch_object($example_dependency_files_q))
       {
         $dependency_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $example_dependency_files_row->dependency_id));

@@ -171,7 +171,6 @@ function textbook_companion_run_form($form_state)
           $example_file_type = '';
           switch ($example_list_data->filetype)
           {
-          case 'D' : $example_file_type = 'Dependency file'; break;
           case 'S' : $example_file_type = 'Source or Main file'; break;
           case 'R' : $example_file_type = 'Result file'; break;
           case 'X' : $example_file_type = 'xcos file'; break;
@@ -179,6 +178,22 @@ function textbook_companion_run_form($form_state)
           }
           $example_files_rows[] = array(l($example_list_data->filename, 'download/file/' . $example_list_data->id), $example_file_type);
         }
+
+        /* dependency files */
+        $dependency_list_q = db_query("SELECT dependency.id as dependency_id, dependency.filename as dependency_filename, dependency.caption as dependency_caption
+          FROM {textbook_companion_example_dependency} example_dependency JOIN {textbook_companion_dependency_files} dependency
+          ON example_dependency.dependency_id = dependency.id
+          WHERE example_dependency.example_id = %d", $form_state['values']['run']['example']);
+          while ($dependency_list_data = db_fetch_object($dependency_list_q))
+          {
+            $example_file_type = 'Dependency file';
+            $temp_caption = '';
+            if ($dependency_list_data->dependency_caption)
+              $temp_caption = ' (' . $dependency_list_data->dependency_caption . ')';
+            $example_files_rows[] = array(l($dependency_list_data->dependency_filename, 'download/dependency/' . $dependency_list_data->dependency_id) . $temp_caption, $example_file_type);
+          }
+
+        /* creating list of files table */
         $example_files_header = array('Filename', 'Type');
         $example_files = theme_table($example_files_header, $example_files_rows); 
       }
