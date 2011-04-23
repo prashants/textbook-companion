@@ -118,7 +118,7 @@ function textbook_companion_menu()
     'page arguments' => array('upload_dependency_form'),
     'access arguments' => array('upload code'),
     'type' => MENU_LOCAL_TASK,
-    'file' => 'code.inc',
+    'file' => 'dependency.inc',
     'weight' => 3,
   );
   $items['textbook_companion/code/edit'] = array(
@@ -172,6 +172,14 @@ function textbook_companion_menu()
     'title' => 'Code Download',
     'description' => 'Code Download', 
     'page callback' => 'textbook_companion_download_example_file',
+    'access arguments' => array('download code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'download.inc',
+  );
+  $items['download/dependency'] = array(
+    'title' => 'Code Download',
+    'description' => 'Code Download', 
+    'page callback' => 'textbook_companion_download_dependency_file',
     'access arguments' => array('download code'),
     'type' => MENU_CALLBACK,
     'file' => 'download.inc',

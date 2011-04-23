@@ -13,6 +13,18 @@ function textbook_companion_download_example_file()
   readfile($root_path . $example_file_data->filepath);
 }
 
+function textbook_companion_download_dependency_file()
+{
+  $dependency_file_id = arg(2);
+  $root_path = $_SERVER['DOCUMENT_ROOT'] . base_path();
+  $dependency_file_q = db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $dependency_file_id);
+  $dependency_file_data = db_fetch_object($dependency_file_q);
+  header('Content-Type: ' . $dependency_file_data->filemime);
+  header('Content-disposition: attachment; filename="' . $dependency_file_data->filename . '"');
+  header('Content-Length: ' . filesize($root_path . $dependency_file_data->filepath));
+  readfile($root_path . $dependency_file_data->filepath);
+}
+
 function textbook_companion_download_example()
 {
   $example_id = arg(2);
