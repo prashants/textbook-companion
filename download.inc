@@ -36,6 +36,7 @@ function textbook_companion_download_example()
   $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d", $example_data->chapter_id);
   $chapter_data = db_fetch_object($chapter_q);
   $example_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
+  $example_dependency_files_q = db_query("SELECT * FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
 
   $EX_PATH = 'EX' . $example_data->number . '/';
 
@@ -48,10 +49,13 @@ function textbook_companion_download_example()
 
   while ($example_files_row = db_fetch_object($example_files_q))
   {
-    if ($example_files_row->filetype == 'D')
-      $zip->addFile($root_path . $example_files_row->filepath, $EX_PATH . 'DEPENDENCIES/' . $example_files_row->filename);
-    else
       $zip->addFile($root_path . $example_files_row->filepath, $EX_PATH . $example_files_row->filename);
+  }
+  while ($example_dependency_files_row = db_fetch_object($example_dependency_files_q))
+  {
+    $dependency_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $example_dependency_files_row->dependency_id));
+    if ($dependency_file_data)
+      $zip->addFile($root_path . $dependency_file_data->filepath, $EX_PATH . 'DEPENDENCIES/' . $dependency_file_data->filename);
   }
   $zip_file_count = $zip->numFiles;
   $zip->close();
@@ -92,12 +96,16 @@ function textbook_companion_download_chapter()
   {
     $EX_PATH = 'EX' . $example_row->number . '/';
     $example_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_row->id);
+    $example_dependency_files_q = db_query("SELECT * FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_row->id);
     while ($example_files_row = db_fetch_object($example_files_q))
     {
-      if ($example_files_row->filetype == 'D')
-        $zip->addFile($root_path . $example_files_row->filepath, $CH_PATH . $EX_PATH . 'DEPENDENCIES/' . $example_files_row->filename);
-      else
-        $zip->addFile($root_path . $example_files_row->filepath, $CH_PATH . $EX_PATH . $example_files_row->filename);
+      $zip->addFile($root_path . $example_files_row->filepath, $CH_PATH . $EX_PATH . $example_files_row->filename);
+    }
+    while ($example_dependency_files_row = db_fetch_object($example_dependency_files_q))
+    {
+      $dependency_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $example_dependency_files_row->dependency_id));
+      if ($dependency_file_data)
+        $zip->addFile($root_path . $dependency_file_data->filepath, $CH_PATH . $EX_PATH . 'DEPENDENCIES/' . $dependency_file_data->filename);
     }
   }
   $zip_file_count = $zip->numFiles;
@@ -143,12 +151,16 @@ function textbook_companion_download_book()
     {
       $EX_PATH = 'EX' . $example_row->number . '/';
       $example_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_row->id);
+      $example_dependency_files_q = db_query("SELECT * FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_row->id);
       while ($example_files_row = db_fetch_object($example_files_q))
       {
-        if ($example_files_row->filetype == 'D')
-          $zip->addFile($root_path . $example_files_row->filepath, $BK_PATH . $CH_PATH . $EX_PATH . 'DEPENDENCIES/' . $example_files_row->filename);
-        else
-          $zip->addFile($root_path . $example_files_row->filepath, $BK_PATH . $CH_PATH . $EX_PATH . $example_files_row->filename);
+        $zip->addFile($root_path . $example_files_row->filepath, $BK_PATH . $CH_PATH . $EX_PATH . $example_files_row->filename);
+      }
+      while ($example_dependency_files_row = db_fetch_object($example_dependency_files_q))
+      {
+        $dependency_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $example_dependency_files_row->dependency_id));
+        if ($dependency_file_data)
+          $zip->addFile($root_path . $dependency_file_data->filepath, $BK_PATH . $CH_PATH . $EX_PATH . 'DEPENDENCIES/' . $dependency_file_data->filename);
       }
     }
   }

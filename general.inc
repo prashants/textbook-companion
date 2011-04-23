@@ -90,12 +90,34 @@ function list_examples()
     $example_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d ORDER BY filetype", $example_data->id);
     while ($example_files_data = db_fetch_object($example_files_q))
     {
-      $example_files .= $example_files_data->filename . ' (' . $example_files_data->filetype . ')<br />';
+      $file_type = '';
+      switch ($example_files_data->filetype)
+      {
+      case 'S': $file_type = 'Main or Source'; break;
+      case 'R': $file_type = 'Result'; break;
+      case 'X': $file_type = 'xcos'; break;
+      default:
+      }
+      $example_files .= l($example_files_data->filename, 'download/file/' . $example_files_data->id) . ' (' . $file_type . ')<br />';
     }
+    /* dependency files */
+    $dependency_files = '';
+    $dependency_files_q = db_query("SELECT dependency.id as dependency_id, dependency.filename as dependency_filename
+      FROM {textbook_companion_example_dependency} example_dependency JOIN {textbook_companion_dependency_files} dependency
+      ON example_dependency.dependency_id = dependency.id
+      WHERE example_dependency.example_id = %d", $example_data->id);
+    while ($dependency_files_data = db_fetch_object($dependency_files_q))
+    {
+      $dependency_files .= l($dependency_files_data->dependency_filename, 'download/dependency/' . $dependency_files_data->dependency_id) . ' (Dependency)<br />';
+    }
+    $example_files .= $dependency_files;
+
     if ($example_data->approval_status == 0)
+    {
       $example_rows[] = array('data' => array($example_data->number, $example_data->caption, $approval_status, $example_files, l('Delete', 'textbook_companion/code/delete/' . $example_data->id, array('attributes' => array('onClick' => 'return confirm("Are you sure you want to delete the example?")')))), 'valign' => 'top');
-    else
+    } else {
       $example_rows[] = array('data' => array($example_data->number, $example_data->caption, $approval_status, $example_files, l('Download', 'download/example/' . $example_data->id)), 'valign' => 'top');
+    }
   }
   $example_header = array('Example No.', 'Caption', 'Status', 'Files', 'Action');
   $return_html .= theme_table($example_header, $example_rows);
