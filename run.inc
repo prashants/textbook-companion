@@ -91,14 +91,30 @@ function textbook_companion_run_form($form_state)
 
   if ($book_default_value > 0)
   {
+    $book_details = _book_information($book_default_value);
+    $form['run']['book_details'] = array(
+      '#type' => 'item',
+      '#value' => '<table cellspacing="1" cellpadding="1" border="0" style="width: 100%;" valign="top">' .
+                  '<tr><td style="width: 35%;"><span style="color: rgb(128, 0, 0);"><strong>About the Book</strong></span></td><td style="width: 35%;"><span style="color: rgb(128, 0, 0);"><strong>About the Contributor</strong></span></td>' .
+                  '<tr><td valign="top"><ul>' .
+                  '<li><strong>Author:</strong> ' . $book_details->preference_author . '</li>' .
+                  '<li><strong>Title of the Book:</strong> ' . $book_details->preference_book . '</li>' .
+                  '<li><strong>Publisher:</strong> ' . $book_details->preference_publisher . '</li>' .
+                  '<li><strong>Year:</strong> ' . $book_details->preference_year . '</li>' .
+                  '<li><strong>Edition:</strong> ' . $book_details->preference_edition . '</li>' .
+                  '</ul></td><td valign="top"><ul>' .
+                  '<li><strong>Contributor name :</strong>' . $book_details->proposal_full_name . ', ' . $book_details->proposal_course . ', ' . $book_details->proposal_branch . ', ' . $book_details->proposal_university . '</li>' .
+                  '<li><strong>College teacher :</strong>' . $book_details->proposal_faculty . '</li>' .
+                  '<li><strong>Reviewer :</strong>' . $book_details->proposal_reviewer . '</li>' .
+                  '</ul></td></tr>' .
+                  '</table>',
+    );
+
     $form['run']['download_book'] = array(
       '#type' => 'item',
       '#value' => l('Download', 'download/book/' . $book_default_value) . ' ' . t('(Download all the examples of the entire book)'),
     );
-    $form['run']['contributor_name'] = array(
-      '#type' => 'item',
-      '#value' => '<strong>Contributor name : </strong>' . _contributor_name($book_default_value),
-    );
+
     $form['run']['chapter'] = array(
       '#type' => 'select',
       '#title' => t('Title of the Chapter'),
@@ -255,8 +271,11 @@ function _list_of_examples($chapter_id = 0)
   return $book_examples;
 }
 
-function _contributor_name($preference_id)
+function _book_information($preference_id)
 {
-  $book_data = db_fetch_object(db_query("SELECT proposal.full_name as proposal_full_name FROM {textbook_companion_proposal} proposal LEFT JOIN {textbook_companion_preference} preference ON proposal.id = preference.proposal_id WHERE preference.id = %d", $preference_id));
-  return $book_data->proposal_full_name;
+  $book_data = db_fetch_object(db_query("SELECT
+    preference.book as preference_book, preference.author as preference_author, preference.isbn as preference_isbn, preference.publisher as preference_publisher, preference.edition as preference_edition, preference.year as preference_year,
+    proposal.full_name as proposal_full_name, proposal.faculty as proposal_faculty, proposal.reviewer as proposal_reviewer, proposal.course as proposal_course, proposal.branch as proposal_branch, proposal.university as proposal_university
+    FROM {textbook_companion_proposal} proposal LEFT JOIN {textbook_companion_preference} preference ON proposal.id = preference.proposal_id WHERE preference.id = %d", $preference_id));
+  return $book_data;
 }

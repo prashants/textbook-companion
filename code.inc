@@ -119,7 +119,7 @@ function upload_examples_form($form_state)
       '#type' => 'file',
       '#title' => t('Upload main or source file'),
       '#size' => 48,
-      '#description' => t('Upload main or source file of the example.'),
+      '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
   );
 
   $form['dep_files'] = array(
@@ -178,11 +178,13 @@ function upload_examples_form($form_state)
       '#type' => 'file',
       '#title' => t('Upload result file'),
       '#size' => 48,
+      '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
   );
   $form['result']['result2'] = array(
       '#type' => 'file',
       '#title' => t('Upload result file'),
       '#size' => 48,
+      '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
   );
 
   $form['xcos'] = array(
@@ -195,11 +197,13 @@ function upload_examples_form($form_state)
       '#type' => 'file',
       '#title' => t('Upload xcos file'),
       '#size' => 48,
+      '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
   );
   $form['xcos']['xcos2'] = array(
       '#type' => 'file',
       '#title' => t('Upload xcos file'),
       '#size' => 48,
+      '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
   );
 
   $form['submit'] = array(
