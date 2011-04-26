@@ -124,6 +124,10 @@ function upload_dependency_form_validate($form, &$form_state)
          $dep_exists_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE filename = '%s' AND preference_id = %d", $_FILES['files']['name'][$file_form_name], $book_data->pre_id));
          if ($dep_exists_data)
            form_set_error($file_form_name, t('Dependency file for this book has been already uploaded. Please rename the file and try again.'));
+
+         /* check if valid file name */
+         if (!textbook_companion_check_valid_filename($_FILES['files']['name'][$file_form_name]))
+           form_set_error($file_form_name, t('Invalid file name specified. Only alphabets, numbers and underscore is allowed as a valid filename.'));
       }
     }
   }

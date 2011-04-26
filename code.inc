@@ -253,6 +253,10 @@ function upload_examples_form_validate($form, &$form_state)
           form_set_error($file_form_name, t('Only ' . $allowed_extensions_str . ' extensions can be uploaded.'));
         if ($_FILES['files']['size'][$file_form_name] <= 0)
           form_set_error($file_form_name, t('File size cannot be zero.'));
+
+        /* check if valid file name */
+        if (!textbook_companion_check_valid_filename($_FILES['files']['name'][$file_form_name]))
+         form_set_error($file_form_name, t('Invalid file name specified. Only alphabets, numbers and underscore is allowed as a valid filename.'));
       }
     }
   }

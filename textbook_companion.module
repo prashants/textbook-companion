@@ -941,3 +941,9 @@ function textbook_companion_ajax()
   echo '';
 }
 
+function textbook_companion_check_valid_filename($file_name) {
+  if (!preg_match('/^[0-9a-zA-Z\_\.]+$/', $file_name))
+    return FALSE;
+  else
+    return TRUE;
+}
