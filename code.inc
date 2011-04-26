@@ -104,7 +104,7 @@ function upload_examples_form($form_state)
   );
   $form['example_warning'] = array(
     '#type' => 'item',
-    '#title' => t('You should upload all the files (main or source files, dependencies, result files, executable file if any)'),
+    '#title' => t('You should upload all the files (main or source files, result files, executable file if any)'),
     '#prefix' => '<div style="color:red">',
     '#suffix' => '</div>',
   );
@@ -116,12 +116,6 @@ function upload_examples_form($form_state)
     '#collapsed' => FALSE,
   );
   $form['sourcefile']['sourcefile1'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload main or source file'),
-      '#size' => 48,
-      '#description' => t('Upload main or source file of the example.'),
-  );
-  $form['sourcefile']['sourcefile2'] = array(
       '#type' => 'file',
       '#title' => t('Upload main or source file'),
       '#size' => 48,
@@ -229,16 +223,32 @@ function upload_examples_form_validate($form, &$form_state)
       form_set_error('sourcefile1', t('Please upload atleast one main or source file or xcos file.'));
 
     /* check for valid filename extensions */  
-    $allowed_extensions = explode(',' , variable_get('textbook_companion_extensions', ''));
     foreach ($_FILES['files']['name'] as $file_form_name => $file_name)
     {
       if ($file_name)
       {
-         $temp_extension = end(explode('.', strtolower($_FILES['files']['name'][$file_form_name])));
-         if (!in_array($temp_extension, $allowed_extensions))
-           form_set_error($file_form_name, t('Only ' . variable_get('textbook_companion_extensions', '') . ' extensions can be uploaded.'));
-         if ($_FILES['files']['size'][$file_form_name] <= 0)
-           form_set_error($file_form_name, t('File size cannot be zero.'));
+        /* checking file type */
+        if (strstr($file_form_name, 'source'))
+          $file_type = 'S';
+        else if (strstr($file_form_name, 'result'))
+          $file_type = 'R';
+        else if (strstr($file_form_name, 'xcos'))
+          $file_type = 'X';
+        else
+          $file_type = 'U';
+
+        if ($file_type == 'X')
+        {
+          $allowed_extensions_str = 'xcos,scicos';
+        } else {
+          $allowed_extensions_str = variable_get('textbook_companion_extensions', '');
+        }
+        $allowed_extensions = explode(',' , $allowed_extensions_str);
+        $temp_extension = end(explode('.', strtolower($_FILES['files']['name'][$file_form_name])));
+        if (!in_array($temp_extension, $allowed_extensions))
+          form_set_error($file_form_name, t('Only ' . $allowed_extensions_str . ' extensions can be uploaded.'));
+        if ($_FILES['files']['size'][$file_form_name] <= 0)
+          form_set_error($file_form_name, t('File size cannot be zero.'));
       }
     }
   }

@@ -568,6 +568,15 @@ function book_proposal_form_validate($form, &$form_state)
     form_set_error('year2', t('Invalid year of pulication for Book Preference 2'));
   if (!preg_match('/^[1-3][0-9][0-9][0-9]$/', $form_state['values']['year3']))
     form_set_error('year3', t('Invalid year of pulication for Book Preference 3'));
+
+  /* year of publication */
+  $cur_year = date('Y');
+  if ((int)$form_state['values']['year1'] > $cur_year)
+    form_set_error('year1', t('Year of pulication should be not in the future for Book Preference 1'));
+  if ((int)$form_state['values']['year2'] > $cur_year)
+    form_set_error('year2', t('Year of pulication should be not in the future for Book Preference 2'));
+  if ((int)$form_state['values']['year3'] > $cur_year)
+    form_set_error('year3', t('Year of pulication should be not in the future for Book Preference 3'));
   
   /* isbn */
   if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn1']))
@@ -576,24 +585,7 @@ function book_proposal_form_validate($form, &$form_state)
     form_set_error('isbn2', t('Invalid ISBN for Book Preference 2'));
   if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn3']))
     form_set_error('isbn3', t('Invalid ISBN for Book Preference 3'));
-
-  //if ( ! _is_isbn_valid($form_state['values']['isbn1']))
-  //  form_set_error('isbn1', t('Invalid ISBN for Book Preference 1'));
-  //if ( ! _is_isbn_valid($form_state['values']['isbn2']))
-  //  form_set_error('isbn2', t('Invalid ISBN for Book Preference 2'));
-  //if ( ! _is_isbn_valid($form_state['values']['isbn3']))
-  //  form_set_error('isbn3', t('Invalid ISBN for Book Preference 3'));
   return;
-}
-
-function _is_isbn_valid($digits) {
-  $digits = str_replace('-', '', $digits);
-  $i = 0; $a = 0; $b = 0;
-  for ($i = 0; $i < 10; $i++) {
-      $a += (int)$digits[$i];  // Assumed already converted from ASCII to 0..9
-      $b += $a;
-  }
-  return $b % 11 == 0;
 }
 
 function book_proposal_form_submit($form, &$form_state)
