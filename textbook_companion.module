@@ -893,6 +893,11 @@ function textbook_companion_mail($key, &$message, $params)
         Best Regards,\n\n
         !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
+
+    case 'standard':
+      $message['subject'] = $params['subject'];
+      $message['body'] = $params['body'];
+      break;
   }
 }
 

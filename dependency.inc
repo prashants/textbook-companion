@@ -121,7 +121,7 @@ function upload_dependency_form_validate($form, &$form_state)
            form_set_error($file_form_name, t('File size cannot be zero.'));
 
          /* check if file already exists */
-         $dep_exists_data = db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE filename = '%s' AND preference_id = %d", $_FILES['files']['name'][$file_form_name], $book_data->pre_id);
+         $dep_exists_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE filename = '%s' AND preference_id = %d", $_FILES['files']['name'][$file_form_name], $book_data->pre_id));
          if ($dep_exists_data)
            form_set_error($file_form_name, t('Dependency file for this book has been already uploaded. Please rename the file and try again.'));
       }
@@ -140,7 +140,11 @@ function upload_dependency_form_submit($form, &$form_state) {
   $book_row = db_fetch_object($book_result);
   $preference_id = $book_row->pre_id;
 
-  $dest_path .= $preference_id . '/' . 'DEPENDENCIES' . '/';
+  $dest_path .= $preference_id . '/';
+  if (!is_dir($base_path . $dest_path))
+    mkdir($base_path . $dest_path);
+
+  $dest_path .= 'DEPENDENCIES' . '/';
   if (!is_dir($base_path . $dest_path))
     mkdir($base_path . $dest_path);
 
