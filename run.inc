@@ -291,7 +291,7 @@ function textbook_companion_run_form_submit($form, &$form_state)
       "Example No.: " . $example_data->number . "<br />" .
       "Your feedback :<br />" .  $form_state['values']['run']['feedback'];
   
-      $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '') . ", " . user_load($proposal_data->uid)->mail;
+      $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '') . ", " . user_load($proposal_data->uid)->mail. ", " . user_load($example_data->approver_uid)->mail;
       if (!drupal_mail('textbook_companion', 'default', $email_to, language_default(), $param, NULL, TRUE))
         drupal_set_message('Error sending email message.', 'error');
   
