@@ -40,21 +40,21 @@ function upload_dependency_form($form_state)
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
-  $form['depfile']['depfile1_caption'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Caption for dependency file 1'),
-      '#size' => 15,
-  );
   $form['depfile']['depfile1'] = array(
       '#type' => 'file',
-      '#title' => t('Upload dependency file 1'),
-      '#size' => 48,
+      '#title' => t('Upload dependency file'),
       '#description' => t("Allowed file extensions : ") . variable_get('textbook_companion_extensions', ''),
+  );
+  $form['depfile']['depfile1_caption'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Caption for dependency file'),
+      '#size' => 15,
   );
   $form['depfile']['depfile1_description'] = array(
       '#type' => 'textarea',
-      '#title' => t('Brief Description of the Dependency file 1'),
+      '#title' => t('Brief Description of the dependency file'),
   );
+/*
   $form['depfile']['depfile2_caption'] = array(
       '#type' => 'textfield',
       '#title' => t('Caption for dependency file 2'),
@@ -85,7 +85,7 @@ function upload_dependency_form($form_state)
       '#type' => 'textarea',
       '#title' => t('Brief Description of the Dependency file 3'),
   );
-
+*/
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit')
@@ -153,6 +153,7 @@ function upload_dependency_form_submit($form, &$form_state) {
     mkdir($base_path . $dest_path);
 
   /* uploading dependencies */
+  $file_upload_counter = 0;
   $dependency_ids = array();
   foreach ($_FILES['files']['name'] as $file_form_name => $file_name)
   {
@@ -175,19 +176,24 @@ function upload_dependency_form_submit($form, &$form_state) {
           );
         drupal_set_message($file_name . ' uploaded successfully.', 'status');
         $dependency_ids[] = db_last_insert_id('textbook_companion_dependency_files', 'id');
+        $file_upload_counter++;
       } else {
         drupal_set_message('Error uploading dependency : ' . $dest_path . '/' . $_FILES['files']['name'][$file_form_name], 'error');
       }
     }
   }
-  drupal_set_message('Dependencies uploaded successfully.', 'status');
 
-  /* sending email */
-  $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');
-  $param['dependency_uploaded']['dependency_ids'] = $dependency_ids;
-  $param['dependency_uploaded']['user_id'] = $user->uid;
-  if (!drupal_mail('textbook_companion', 'dependency_uploaded', $email_to, language_default(), $param, NULL, TRUE))
-    drupal_set_message('Error sending email message.', 'error');
+  if ($file_upload_counter > 0)
+  {
+    drupal_set_message('Dependencies uploaded successfully.', 'status');
+  
+    /* sending email */
+    $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');
+    $param['dependency_uploaded']['dependency_ids'] = $dependency_ids;
+    $param['dependency_uploaded']['user_id'] = $user->uid;
+    if (!drupal_mail('textbook_companion', 'dependency_uploaded', $email_to, language_default(), $param, NULL, TRUE))
+      drupal_set_message('Error sending email message.', 'error');
+  }
 
   drupal_goto('textbook_companion/code/upload_dep');
 }

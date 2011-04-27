@@ -131,6 +131,8 @@ function code_approval_form($form_state)
 
 function code_approval_form_submit($form, &$form_state)
 {
+  global $user;
+
   foreach ($form_state['values']['example_details'] as $ex_id => $ex_data)
   {
     $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $ex_data['example_id']);
@@ -142,7 +144,7 @@ function code_approval_form_submit($form, &$form_state)
 
     if ($ex_data['approved'] == "0")
     {
-      db_query("UPDATE {textbook_companion_example} SET approval_status = 1 WHERE id = %d", $ex_data['example_id']);
+      db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d, approval_date = %d WHERE id = %d", $user->uid, time(), $ex_data['example_id']);
 
       /* sending email */
       $email_to = $user_data->mail . ', ' . variable_get('textbook_companion_emails', '');
@@ -152,7 +154,7 @@ function code_approval_form_submit($form, &$form_state)
         drupal_set_message('Error sending email message.', 'error');
 
     } else if ($ex_data['approved'] == "1") {
-      db_query("UPDATE {textbook_companion_example} SET approval_status = 2 WHERE id = %d", $ex_data['example_id']);
+      db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d, approval_date = %d WHERE id = %d", $user->uid, time(), $ex_data['example_id']);
 
       /* sending email */
       $email_to = $user_data->mail . ', ' . variable_get('textbook_companion_emails', '');

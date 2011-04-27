@@ -103,9 +103,9 @@ function textbook_companion_run_form($form_state)
                   '<li><strong>Year:</strong> ' . $book_details->preference_year . '</li>' .
                   '<li><strong>Edition:</strong> ' . $book_details->preference_edition . '</li>' .
                   '</ul></td><td valign="top"><ul>' .
-                  '<li><strong>Contributor name :</strong>' . $book_details->proposal_full_name . ', ' . $book_details->proposal_course . ', ' . $book_details->proposal_branch . ', ' . $book_details->proposal_university . '</li>' .
-                  '<li><strong>College teacher :</strong>' . $book_details->proposal_faculty . '</li>' .
-                  '<li><strong>Reviewer :</strong>' . $book_details->proposal_reviewer . '</li>' .
+                  '<li><strong>Contributor Name: </strong>' . $book_details->proposal_full_name . ', ' . $book_details->proposal_course . ', ' . $book_details->proposal_branch . ', ' . $book_details->proposal_university . '</li>' .
+                  '<li><strong>College Teacher: </strong>' . $book_details->proposal_faculty . '</li>' .
+                  '<li><strong>Reviewer: </strong>' . $book_details->proposal_reviewer . '</li>' .
                   '</ul></td></tr>' .
                   '</table>',
     );
@@ -226,14 +226,17 @@ function textbook_companion_run_form($form_state)
         '#type' => 'submit',
         '#value' => t('Run')
       );
-      $form['run']['feedback'] = array(
-        '#type' => 'textarea',
-        '#title' => t('Feedback on the above example')
-      );
-      $form['run']['feedback_submit'] = array(
-        '#type' => 'submit',
-        '#value' => t('Submit')
-      );
+      if (user_access('create feedback'))
+      {
+        $form['run']['feedback'] = array(
+          '#type' => 'textarea',
+          '#title' => t('Feedback on the above example')
+        );
+        $form['run']['feedback_submit'] = array(
+          '#type' => 'submit',
+          '#value' => t('Submit')
+        );
+      }
     }
   }
   /************ END OF $_POST **************/
@@ -247,50 +250,55 @@ function textbook_companion_run_form_submit($form, &$form_state)
 
 	if ($form_state['clicked_button']['#value'] == 'Submit')
 	{
-		$example_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d", $form_state['values']['run']['example']));
-		if (!$example_data)
-		{
-			drupal_set_message(t('Invalid example selected'), 'error');
-			return;
-		}
-		$chapter_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d", $example_data->chapter_id));
-		if (!$chapter_data)
-		{
-			drupal_set_message(t('Invalid chapter selected'), 'error');
-			return;
-		}
-		$book_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $chapter_data->preference_id));
-		if (!$book_data)
-		{
-			drupal_set_message(t('Invalid book selected'), 'error');
-			return;
-		}
-		$proposal_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d", $book_data->proposal_id));
-		if (!$proposal_data)
-		{
-			drupal_set_message(t('Invalid proposal selected'), 'error');
-			return;
-		}
-		db_query("INSERT INTO {textbook_companion_comment} (example_id, uid, comment, ip_address, timestamp) VALUES (%d, %d, '%s', '%s', %d)",
-			  $example_data->id,
-			  $user->uid,
-			  $form_state['values']['run']['feedback'],
-			  $_SERVER['REMOTE_ADDR'],
-			  time());
-
-		/* sending email */
-		$param['subject'] = t("[!site_name] We have received your feedback", array('!site_name' => variable_get('site_name', '')));
-		$param['body'] = "We have received your follow feedback :<br \>
-		Title of the Book: " . $book_data->book . "<br />" .
-		"Title of the Chapter: " . $chapter_data->number . ". " . $chapter_data->name . "<br />" .
-		"Example No.: " . $example_data->number . "<br />" .
-		"Your feedback :<br />" .  $form_state['values']['run']['feedback'];
-
-		$email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '') . ", " . user_load($proposal_data->uid)->mail;
-    if (!drupal_mail('textbook_companion', 'default', $email_to, language_default(), $param, NULL, TRUE))
-      drupal_set_message('Error sending email message.', 'error');
-
-    drupal_set_message(t('Thank you for your feedback.'), 'status');
+	  if (user_access('create feedback'))
+    {
+      $example_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d", $form_state['values']['run']['example']));
+      if (!$example_data)
+      {
+        drupal_set_message(t('Invalid example selected'), 'error');
+        return;
+      }
+      $chapter_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d", $example_data->chapter_id));
+      if (!$chapter_data)
+      {
+        drupal_set_message(t('Invalid chapter selected'), 'error');
+        return;
+      }
+      $book_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $chapter_data->preference_id));
+      if (!$book_data)
+      {
+        drupal_set_message(t('Invalid book selected'), 'error');
+        return;
+      }
+      $proposal_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d", $book_data->proposal_id));
+      if (!$proposal_data)
+      {
+        drupal_set_message(t('Invalid proposal selected'), 'error');
+        return;
+      }
+      db_query("INSERT INTO {textbook_companion_feedback} (example_id, uid, feedback, ip_address, timestamp) VALUES (%d, %d, '%s', '%s', %d)",
+          $example_data->id,
+          $user->uid,
+          $form_state['values']['run']['feedback'],
+          $_SERVER['REMOTE_ADDR'],
+          time());
+  
+      /* sending email */
+      $param['subject'] = t("[!site_name] We have received your feedback", array('!site_name' => variable_get('site_name', '')));
+      $param['body'] = "We have received your follow feedback :<br \>
+      Title of the Book: " . $book_data->book . "<br />" .
+      "Title of the Chapter: " . $chapter_data->number . ". " . $chapter_data->name . "<br />" .
+      "Example No.: " . $example_data->number . "<br />" .
+      "Your feedback :<br />" .  $form_state['values']['run']['feedback'];
+  
+      $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '') . ", " . user_load($proposal_data->uid)->mail;
+      if (!drupal_mail('textbook_companion', 'default', $email_to, language_default(), $param, NULL, TRUE))
+        drupal_set_message('Error sending email message.', 'error');
+  
+      drupal_set_message(t('Thank you for your feedback.'), 'status');
+    } else {
+      drupal_set_message(t('You do not have permission to submit feeback.'), 'error');
+    }
 	}
 }
 

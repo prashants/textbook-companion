@@ -68,8 +68,8 @@ function textbook_companion_menu()
   );
 
   $items['code_approval'] = array(
-    'title' => 'Code Approval',
-    'description' => 'Code Approval',
+    'title' => 'Manage Code Approval',
+    'description' => 'Manage Code Approval',
     'page callback' => 'code_approval',
     'access arguments' => array('approve code'),
     'type' => MENU_NORMAL_ITEM,
@@ -149,7 +149,7 @@ function textbook_companion_menu()
   );
 
   $items['textbook_search'] = array(
-    'title' => 'Search',
+    'title' => 'Book Search',
     'description' => '',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('textbook_companion_search_form'),
@@ -158,7 +158,7 @@ function textbook_companion_menu()
     'file' => 'search.inc',
   );
   $items['textbook_search/search'] = array(
-    'title' => 'Search',
+    'title' => 'Book Search',
     'description' => '',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('textbook_companion_search_form'),
@@ -263,7 +263,7 @@ function textbook_companion_menu()
  * Implementation of hook_perm().
  */
 function textbook_companion_perm() {
-  return array('create book proposal', 'upload code', 'download code', 'approve book proposal', 'approve code');
+  return array('create book proposal', 'approve book proposal', 'approve code', 'upload code', 'download code', 'create feedback');
 }
 
 function book_proposal_form($form_state)
@@ -942,7 +942,7 @@ function textbook_companion_ajax()
 }
 
 function textbook_companion_check_valid_filename($file_name) {
-  if (!preg_match('/^[0-9a-zA-Z\_\.]+$/', $file_name))
+  if (!preg_match('/^[0-9a-zA-Z\_\.\-]+$/', $file_name))
     return FALSE;
   else
     return TRUE;

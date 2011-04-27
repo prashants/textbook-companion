@@ -236,6 +236,11 @@ function textbook_companion_schema() {
         'type' => 'int',
         'not null' => TRUE,
       ),
+      'approver_uid' => array(
+        'description' => t('TODO: please describe this field!'),
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
       'number' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'varchar',
@@ -246,6 +251,11 @@ function textbook_companion_schema() {
         'description' => t('TODO: please describe this field!'),
         'type' => 'varchar',
         'length' => '255',
+        'not null' => TRUE,
+      ),
+      'approval_date' => array(
+        'description' => t('TODO: please describe this field!'),
+        'type' => 'int',
         'not null' => TRUE,
       ),
       'approval_status' => array(
@@ -411,7 +421,7 @@ function textbook_companion_schema() {
     'primary key' => array('id'),
   );
 
-  $schema['textbook_companion_comment'] = array(
+  $schema['textbook_companion_feedback'] = array(
     'description' => t('TODO: please describe this table!'),
     'fields' => array(
       'id' => array(
@@ -429,7 +439,7 @@ function textbook_companion_schema() {
         'type' => 'int',
         'not null' => TRUE,
       ),
-      'comment' => array(
+      'feedback' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'text',
         'size' => 'medium',
