@@ -150,7 +150,7 @@ function code_approval_form_submit($form, &$form_state)
       $email_to = $user_data->mail . ', ' . variable_get('textbook_companion_emails', '');
       $param['example_approved']['example_id'] = $ex_data['example_id'];
       $param['example_approved']['user_id'] = $user_data->uid;
-      if (!drupal_mail('textbook_companion', 'example_approved', $email_to, language_default(), $param, NULL, TRUE))
+      if (!drupal_mail('textbook_companion', 'example_approved', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
         drupal_set_message('Error sending email message.', 'error');
 
     } else if ($ex_data['approved'] == "1") {
@@ -161,7 +161,7 @@ function code_approval_form_submit($form, &$form_state)
       $param['example_disapproved']['example_id'] = $ex_data['example_id'];
       $param['example_disapproved']['user_id'] = $user_data->uid;
       $param['example_disapproved']['message'] = $ex_data['message'];
-      if (!drupal_mail('textbook_companion', 'example_disapproved', $email_to, language_default(), $param, NULL, TRUE))
+      if (!drupal_mail('textbook_companion', 'example_disapproved', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
         drupal_set_message('Error sending email message.', 'error');
     }
   }

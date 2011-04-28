@@ -693,7 +693,7 @@ function book_proposal_form_submit($form, &$form_state)
   $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');
   $param['proposal_received']['proposal_id'] = $proposal_id;
   $param['proposal_received']['user_id'] = $user->uid;
-  if (!drupal_mail('textbook_companion', 'proposal_received', $email_to , language_default(), $param, NULL, TRUE))
+  if (!drupal_mail('textbook_companion', 'proposal_received', $email_to , language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
     drupal_set_message('Error sending email message.', 'error');
 
   drupal_set_message(t('We have received you book proposal. We will get back to you soon.'), 'status');
@@ -919,6 +919,22 @@ Example number : ' . $example_data->number . '
 Caption : ' .  $example_data->caption . '
 
 Reason for dis-approval : ' . $params['example_disapproved']['message'] . '
+
+Best Regards,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      break;
+
+    case 'dependency_uploaded':
+      $user_data = user_load($params['dependency_uploaded']['user_id']);
+      $dependency_files = implode(',', $params['dependency_uploaded']['dependency_names']);
+
+      $message['subject'] = t('[!site_name] You have uploaded dependency file', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+You have uploaded following dependency files :
+    ' . $dependency_files . '
 
 Best Regards,
 

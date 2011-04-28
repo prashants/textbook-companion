@@ -207,7 +207,7 @@ function proposal_approval_form_submit($form, &$form_state)
     $param['proposal_disapproved']['proposal_id'] = $proposal_id;
     $param['proposal_disapproved']['user_id'] = $row->uid;
     $email_to = $book_user->mail . ', ' . variable_get('textbook_companion_emails', '');
-    if (!drupal_mail('textbook_companion', 'proposal_disapproved', $email_to , language_default(), $param, NULL, TRUE))
+    if (!drupal_mail('textbook_companion', 'proposal_disapproved', $email_to , language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
       drupal_set_message('Error sending email message.', 'error');
 
     drupal_set_message('Book proposal dis-approved. User has been notified of the dis-approval.', 'error');
@@ -225,7 +225,7 @@ function proposal_approval_form_submit($form, &$form_state)
   $param['proposal_approved']['proposal_id'] = $proposal_id;
   $param['proposal_approved']['user_id'] = $row->uid;
   $email_to = $book_user->mail . ', ' . variable_get('textbook_companion_emails', '');
-  if (!drupal_mail('textbook_companion', 'proposal_approved', $email_to , language_default(), $param, NULL, TRUE))
+  if (!drupal_mail('textbook_companion', 'proposal_approved', $email_to , language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
     drupal_set_message('Error sending email message.', 'error');
 
   drupal_set_message('Book proposal approved. User has been notified of the approval', 'status');
@@ -398,7 +398,7 @@ function proposal_edit_form_submit($form, &$form_state)
     $param['proposal_approved']['proposal_id'] = $proposal_id;
     $param['proposal_approved']['user_id'] = $row->uid;
     $email_to = $book_user->mail . ', ' . variable_get('textbook_companion_emails', '');
-    if (!drupal_mail('textbook_companion', 'proposal_completed', $email_to , language_default(), $param, NULL, TRUE))
+    if (!drupal_mail('textbook_companion', 'proposal_completed', $email_to , language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
       drupal_set_message('Error sending email message.', 'error');
   
     drupal_set_message('Congratulations! Book proposal has been marked as completed. User has been notified of the completion.', 'status');

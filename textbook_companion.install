@@ -8,6 +8,7 @@ function textbook_companion_install() {
   // Create tables.
   drupal_install_schema('textbook_companion');
   variable_set('textbook_companion_emails', '');
+  variable_set('textbook_companion_from_email', '');
   variable_set('textbook_companion_extensions', '');
 }
 
@@ -19,6 +20,7 @@ function textbook_companion_uninstall() {
   drupal_uninstall_schema('textbook_companion');
   // Remove variables
   variable_del('textbook_companion_emails');
+  variable_del('textbook_companion_from_email');
   variable_del('textbook_companion_extensions');
 }
 

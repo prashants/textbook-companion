@@ -432,7 +432,7 @@ function upload_examples_form_submit($form, &$form_state) {
   $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');
   $param['example_uploaded']['example_id'] = $example_id;
   $param['example_uploaded']['user_id'] = $user->uid;
-  if (!drupal_mail('textbook_companion', 'example_uploaded', $email_to, language_default(), $param, NULL, TRUE))
+  if (!drupal_mail('textbook_companion', 'example_uploaded', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
     drupal_set_message('Error sending email message.', 'error');
 
   drupal_goto('textbook_companion/code');

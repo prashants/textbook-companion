@@ -292,7 +292,7 @@ function textbook_companion_run_form_submit($form, &$form_state)
       $param['feedback_received']['feedback'] = $form_state['values']['run']['feedback'];
 
       $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');// . ', ' . user_load($proposal_data->uid)->mail. ', ' . user_load($example_data->approver_uid)->mail;
-      if (!drupal_mail('textbook_companion', 'feedback_received', $email_to, language_default(), $param, NULL, TRUE))
+      if (!drupal_mail('textbook_companion', 'feedback_received', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
         drupal_set_message('Error sending email message.', 'error');
 
       drupal_set_message(t('Thank you for your feedback.'), 'status');

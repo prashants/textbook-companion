@@ -155,6 +155,8 @@ function upload_dependency_form_submit($form, &$form_state) {
   /* uploading dependencies */
   $file_upload_counter = 0;
   $dependency_ids = array();
+  $dependency_names = array();
+
   foreach ($_FILES['files']['name'] as $file_form_name => $file_name)
   {
     if ($file_name)
@@ -176,6 +178,7 @@ function upload_dependency_form_submit($form, &$form_state) {
           );
         drupal_set_message($file_name . ' uploaded successfully.', 'status');
         $dependency_ids[] = db_last_insert_id('textbook_companion_dependency_files', 'id');
+        $dependency_names[] =  $_FILES['files']['name'][$file_form_name];
         $file_upload_counter++;
       } else {
         drupal_set_message('Error uploading dependency : ' . $dest_path . '/' . $_FILES['files']['name'][$file_form_name], 'error');
@@ -188,10 +191,11 @@ function upload_dependency_form_submit($form, &$form_state) {
     drupal_set_message('Dependencies uploaded successfully.', 'status');
   
     /* sending email */
-    $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');
-    $param['dependency_uploaded']['dependency_ids'] = $dependency_ids;
     $param['dependency_uploaded']['user_id'] = $user->uid;
-    if (!drupal_mail('textbook_companion', 'dependency_uploaded', $email_to, language_default(), $param, NULL, TRUE))
+    $param['dependency_uploaded']['dependency_names'] = $dependency_names;
+
+    $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');
+    if (!drupal_mail('textbook_companion', 'dependency_uploaded', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
       drupal_set_message('Error sending email message.', 'error');
   }
 
