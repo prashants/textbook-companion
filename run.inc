@@ -284,17 +284,17 @@ function textbook_companion_run_form_submit($form, &$form_state)
           time());
   
       /* sending email */
-      $param['subject'] = t("[!site_name] We have received your feedback", array('!site_name' => variable_get('site_name', '')));
-      $param['body'] = "We have received your follow feedback :<br \>
-      Title of the Book: " . $book_data->book . "<br />" .
-      "Title of the Chapter: " . $chapter_data->number . ". " . $chapter_data->name . "<br />" .
-      "Example No.: " . $example_data->number . "<br />" .
-      "Your feedback :<br />" .  $form_state['values']['run']['feedback'];
-  
-      $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '') . ", " . user_load($proposal_data->uid)->mail. ", " . user_load($example_data->approver_uid)->mail;
-      if (!drupal_mail('textbook_companion', 'default', $email_to, language_default(), $param, NULL, TRUE))
+      $param['feedback_received']['user_id'] = $user->uid;
+      $param['feedback_received']['book_title'] = $book_data->book;
+      $param['feedback_received']['chapter_number'] = $chapter_data->number;
+      $param['feedback_received']['chapter_title'] = $chapter_data->name;
+      $param['feedback_received']['example_no'] = $example_data->number;
+      $param['feedback_received']['feedback'] = $form_state['values']['run']['feedback'];
+
+      $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');// . ', ' . user_load($proposal_data->uid)->mail. ', ' . user_load($example_data->approver_uid)->mail;
+      if (!drupal_mail('textbook_companion', 'feedback_received', $email_to, language_default(), $param, NULL, TRUE))
         drupal_set_message('Error sending email message.', 'error');
-  
+
       drupal_set_message(t('Thank you for your feedback.'), 'status');
     } else {
       drupal_set_message(t('You do not have permission to submit feeback.'), 'error');

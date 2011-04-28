@@ -722,46 +722,51 @@ function textbook_companion_mail($key, &$message, $params)
       $user_data = user_load($params['proposal_received']['user_id']);
  
       $message['subject'] = t('[!site_name] Your book proposal has been received', array('!site_name' => variable_get('site_name', '')), $language->language);
-      $message['body'] = t('Dear !user_name,\n\n
-        We have received your following book proposal:\n\n
-        Full Name : ' . $proposal_data->full_name . '\n
-        Email : ' . $user_data->mail . '\n
-        Mobile : ' . $proposal_data->mobile . '\n
-        Course : ' . $proposal_data->course . '\n
-        Department/Branch : ' . $proposal_data->branch . '\n
-        University/Institute : ' .  $proposal_data->university . '\n
-        College Teacher / Professor : ' . $proposal_data->faculty . '\n
-        Reviewer : ' .  $proposal_data->reviewer . '\n
-        Expected date of completion : ' .  date('d-m-Y', $proposal_data->completion_date) . '\n\n
-        Your Book Preferences :\n
-        -----------------------\n
-        Book Preference 1 :-\n
-        Title of the book : ' . $preference1_data->book . '\n
-        Author name : ' . $preference1_data->author . '\n
-        ISBN No. : ' . $preference1_data->isbn . '\n
-        Publisher and Place : ' . $preference1_data->publisher . '\n
-        Edition : ' . $preference1_data->edition . '\n
-        Year of publication : ' . $preference1_data->year . '\n
-        -----------------------\n
-        Book Preference 2 :-\n
-        Title of the book : ' . $preference2_data->book . '\n
-        Author name : ' . $preference2_data->author . '\n
-        ISBN No. : ' . $preference2_data->isbn . '\n
-        Publisher and Place : ' . $preference2_data->publisher . '\n
-        Edition : ' . $preference2_data->edition . '\n
-        Year of publication : ' . $preference2_data->year . '\n
-        -----------------------\n
-        Book Preference 3 :-\n
-        Title of the book : ' . $preference3_data->book . '\n
-        Author name : ' . $preference3_data->author . '\n
-        ISBN No. : ' . $preference3_data->isbn . '\n
-        Publisher and Place : ' . $preference3_data->publisher . '\n
-        Edition : ' . $preference3_data->edition . '\n
-        Year of publication : ' . $preference3_data->year . '\n
-        -----------------------\n\n
-        Your proposal is under review and you will soon receive an email from us you regarding the same.\n\n
-        Best Regards,\n\n
-        !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+We have received your following book proposal:
+
+Full Name : ' . $proposal_data->full_name . '
+Email : ' . $user_data->mail . '
+Mobile : ' . $proposal_data->mobile . '
+Course : ' . $proposal_data->course . '
+Department/Branch : ' . $proposal_data->branch . '
+University/Institute : ' .  $proposal_data->university . '
+College Teacher / Professor : ' . $proposal_data->faculty . '
+Reviewer : ' .  $proposal_data->reviewer . '
+Expected date of completion : ' .  date('d-m-Y', $proposal_data->completion_date) . '
+
+Your Book Preferences :
+
+Book Preference 1 :-
+Title of the book : ' . $preference1_data->book . '
+Author name : ' . $preference1_data->author . '
+ISBN No. : ' . $preference1_data->isbn . '
+Publisher and Place : ' . $preference1_data->publisher . '
+Edition : ' . $preference1_data->edition . '
+Year of publication : ' . $preference1_data->year . '
+
+Book Preference 2 :-
+Title of the book : ' . $preference2_data->book . '
+Author name : ' . $preference2_data->author . '
+ISBN No. : ' . $preference2_data->isbn . '
+Publisher and Place : ' . $preference2_data->publisher . '
+Edition : ' . $preference2_data->edition . '
+Year of publication : ' . $preference2_data->year . '
+
+Book Preference 3 :-
+Title of the book : ' . $preference3_data->book . '
+Author name : ' . $preference3_data->author . '
+ISBN No. : ' . $preference3_data->isbn . '
+Publisher and Place : ' . $preference3_data->publisher . '
+Edition : ' . $preference3_data->edition . '
+Year of publication : ' . $preference3_data->year . '
+
+Your proposal is under review and you will soon receive an email from us you regarding the same.
+
+Best Regards,\n\n
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
     case 'proposal_disapproved':
@@ -777,46 +782,52 @@ function textbook_companion_mail($key, &$message, $params)
       $user_data = user_load($params['proposal_disapproved']['user_id']);
 
       $message['subject'] = t('[!site_name] Your book proposal has been disapproved', array('!site_name' => variable_get('site_name', '')), $language->language);
-      $message['body'] = t('Dear !user_name,\n\n
-        Your following book proposal as been disapproved: \n\n
-        Reason for disapproval: ' . $proposal_data->message . '\n\n
-        Full Name : ' . $proposal_data->full_name . '\n
-        Email : ' . $user_data->mail . '\n
-        Mobile : ' . $proposal_data->mobile . '\n
-        Course : ' . $proposal_data->course . '\n
-        Department/Branch : ' . $proposal_data->branch . '\n
-        University/Institute : ' .  $proposal_data->university . '\n
-        College Teacher / Professor : ' . $proposal_data->faculty . '\n
-        Reviewer : ' .  $proposal_data->reviewer . '\n
-        Expected date of completion : ' .  date('d-m-Y', $proposal_data->completion_date) . '\n\n
-        Your Book Preferences :\n
-        -----------------------\n
-        Book Preference 1 :-\n
-        Title of the book : ' . $preference1_data->book . '\n
-        Author name : ' . $preference1_data->author . '\n
-        ISBN No. : ' . $preference1_data->isbn . '\n
-        Publisher and Place : ' . $preference1_data->publisher . '\n
-        Edition : ' . $preference1_data->edition . '\n
-        Year of publication : ' . $preference1_data->year . '\n
-        -----------------------\n
-        Book Preference 2 :-\n
-        Title of the book : ' . $preference2_data->book . '\n
-        Author name : ' . $preference2_data->author . '\n
-        ISBN No. : ' . $preference2_data->isbn . '\n
-        Publisher and Place : ' . $preference2_data->publisher . '\n
-        Edition : ' . $preference2_data->edition . '\n
-        Year of publication : ' . $preference2_data->year . '\n
-        -----------------------\n
-        Book Preference 3 :-\n
-        Title of the book : ' . $preference3_data->book . '\n
-        Author name : ' . $preference3_data->author . '\n
-        ISBN No. : ' . $preference3_data->isbn . '\n
-        Publisher and Place : ' . $preference3_data->publisher . '\n
-        Edition : ' . $preference3_data->edition . '\n
-        Year of publication : ' . $preference3_data->year . '\n
-        -----------------------\n\n
-        Best Regards,\n\n
-        !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+Your following book proposal as been disapproved:
+
+Reason for disapproval: ' . $proposal_data->message . '
+
+Full Name : ' . $proposal_data->full_name . '
+Email : ' . $user_data->mail . '
+Mobile : ' . $proposal_data->mobile . '
+Course : ' . $proposal_data->course . '
+Department/Branch : ' . $proposal_data->branch . '
+University/Institute : ' .  $proposal_data->university . '
+College Teacher / Professor : ' . $proposal_data->faculty . '
+Reviewer : ' .  $proposal_data->reviewer . '
+Expected date of completion : ' .  date('d-m-Y', $proposal_data->completion_date) . '
+
+Your Book Preferences :
+
+Book Preference 1 :-
+Title of the book : ' . $preference1_data->book . '
+Author name : ' . $preference1_data->author . '
+ISBN No. : ' . $preference1_data->isbn . '
+Publisher and Place : ' . $preference1_data->publisher . '
+Edition : ' . $preference1_data->edition . '
+Year of publication : ' . $preference1_data->year . '
+
+Book Preference 2 :-
+Title of the book : ' . $preference2_data->book . '
+Author name : ' . $preference2_data->author . '
+ISBN No. : ' . $preference2_data->isbn . '
+Publisher and Place : ' . $preference2_data->publisher . '
+Edition : ' . $preference2_data->edition . '
+Year of publication : ' . $preference2_data->year . '
+
+Book Preference 3 :-
+Title of the book : ' . $preference3_data->book . '
+Author name : ' . $preference3_data->author . '
+ISBN No. : ' . $preference3_data->isbn . '
+Publisher and Place : ' . $preference3_data->publisher . '
+Edition : ' . $preference3_data->edition . '
+Year of publication : ' . $preference3_data->year . '
+
+Best Regards,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
     case 'proposal_approved':
@@ -827,27 +838,30 @@ function textbook_companion_mail($key, &$message, $params)
       $user_data = user_load($params['proposal_approved']['user_id']);
 
       $message['subject'] = t('[!site_name] Your book proposal has been approved', array('!site_name' => variable_get('site_name', '')), $language->language);
-      $message['body'] = t('Dear !user_name,\n\n
-        Your following book proposal as been approved: \n\n
-        Full Name : ' . $proposal_data->full_name . '\n
-        Email : ' . $user_data->mail . '\n
-        Mobile : ' . $params['proposal_received']['mobile'] . '\n
-        Course : ' . $proposal_data->course . '\n
-        Department/Branch : ' . $proposal_data->branch . '\n
-        University/Institute : ' .  $proposal_data->university . '\n
-        College Teacher / Professor : ' . $proposal_data->faculty . '\n
-        Reviewer : ' .  $proposal_data->reviewer . '\n
-        Expected date of completion : ' .  date('d-m-Y', $proposal_data->completion_date) . '\n\n
-        -----------------------\n
-        Title of the book : ' . $approved_preference_data->book . '\n
-        Author name : ' . $approved_preference_data->author . '\n
-        ISBN No. : ' . $approved_preference_data->isbn . '\n
-        Publisher and Place : ' . $approved_preference_data->publisher . '\n
-        Edition : ' . $approved_preference_data->edition . '\n
-        Year of publication : ' . $approved_preference_data->year . '\n
-        -----------------------\n\n
-        Best Regards,\n\n
-        !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+Your following book proposal as been approved:
+
+Full Name : ' . $proposal_data->full_name . '
+Email : ' . $user_data->mail . '
+Mobile : ' .  $proposal_data->mobile . '
+Course : ' . $proposal_data->course . '
+Department/Branch : ' . $proposal_data->branch . '
+University/Institute : ' .  $proposal_data->university . '
+College Teacher / Professor : ' . $proposal_data->faculty . '
+Reviewer : ' .  $proposal_data->reviewer . '
+Expected date of completion : ' .  date('d-m-Y', $proposal_data->completion_date) . '
+
+Title of the book : ' . $approved_preference_data->book . '\n
+Author name : ' . $approved_preference_data->author . '\n
+ISBN No. : ' . $approved_preference_data->isbn . '\n
+Publisher and Place : ' . $approved_preference_data->publisher . '\n
+Edition : ' . $approved_preference_data->edition . '\n
+Year of publication : ' . $approved_preference_data->year . '\n
+
+Best Regards,
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
     case 'example_uploaded':
@@ -856,13 +870,19 @@ function textbook_companion_mail($key, &$message, $params)
       $user_data = user_load($params['example_uploaded']['user_id']);
 
       $message['subject'] = t('[!site_name] You have uploaded example', array('!site_name' => variable_get('site_name', '')), $language->language);
-      $message['body'] = t('Dear !user_name,\n\n
-        We have recived your following example: \n\n
-        Example number : ' . $example_data->number . '\n
-        Caption : ' .  $example_data->caption . '\n\n
-        Your uploaded example is under review. You will be notified when it has been approved.\n\n
-        Best Regards,\n\n
-        !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+You have uploaded the following example:
+
+Example number : ' . $example_data->number . '
+Caption : ' .  $example_data->caption . '
+
+The example is under review. You will be notified when it has been approved.
+
+Best Regards,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
     case 'example_approved':
@@ -871,12 +891,17 @@ function textbook_companion_mail($key, &$message, $params)
       $user_data = user_load($params['example_approved']['user_id']);
 
       $message['subject'] = t('[!site_name] Your uploaded example has been approved', array('!site_name' => variable_get('site_name', '')), $language->language);
-      $message['body'] = t('Dear !user_name,\n\n
-        Your following example has been approved: \n\n
-        Example number : ' . $example_data->number . '\n
-        Caption : ' .  $example_data->caption . '\n\n
-        Best Regards,\n\n
-        !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+Your following example has been approved:
+
+Example number : ' . $example_data->number . '
+Caption : ' .  $example_data->caption . '
+
+Best Regards,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
     case 'example_disapproved':
@@ -885,13 +910,40 @@ function textbook_companion_mail($key, &$message, $params)
       $user_data = user_load($params['example_disapproved']['user_id']);
 
       $message['subject'] = t('[!site_name] Your uploaded example has been disapproved', array('!site_name' => variable_get('site_name', '')), $language->language);
-      $message['body'] = t('Dear !user_name,\n\n
-        Your following example has been disapproved: \n\n
-        Example number : ' . $example_data->number . '\n
-        Caption : ' .  $example_data->caption . '\n\n
-        Reason for dis-approval : ' . $params['example_disapproved']['message'] . '\n\n
-        Best Regards,\n\n
-        !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+Your following example has been disapproved:
+
+Example number : ' . $example_data->number . '
+Caption : ' .  $example_data->caption . '
+
+Reason for dis-approval : ' . $params['example_disapproved']['message'] . '
+
+Best Regards,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      break;
+
+    case 'feedback_received':
+      $user_data = user_load($params['feedback_received']['user_id']);
+
+      $message['subject'] = t('[!site_name] We have received your feedback', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+We have received your following feedback
+
+Title of the Book: ' . $params['feedback_received']['book_title'] . '
+Title of the Chapter: ' . $params['feedback_received']['chapter_number'] . ' ' . $params['feedback_received']['chapter_title'] . '
+Example No.: ' . $params['feedback_received']['example_no'] . '
+
+Your feedback :
+' . $params['feedback_received']['feedback'] . '
+
+Best Regards,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
     case 'standard':
