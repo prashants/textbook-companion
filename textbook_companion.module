@@ -765,7 +765,8 @@ Year of publication : ' . $preference3_data->year . '
 
 Your proposal is under review and you will soon receive an email from us you regarding the same.
 
-Best Regards,\n\n
+Best Regards,
+
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
@@ -853,14 +854,15 @@ College Teacher / Professor : ' . $proposal_data->faculty . '
 Reviewer : ' .  $proposal_data->reviewer . '
 Expected date of completion : ' .  date('d-m-Y', $proposal_data->completion_date) . '
 
-Title of the book : ' . $approved_preference_data->book . '\n
-Author name : ' . $approved_preference_data->author . '\n
-ISBN No. : ' . $approved_preference_data->isbn . '\n
-Publisher and Place : ' . $approved_preference_data->publisher . '\n
-Edition : ' . $approved_preference_data->edition . '\n
-Year of publication : ' . $approved_preference_data->year . '\n
+Title of the book : ' . $approved_preference_data->book . '
+Author name : ' . $approved_preference_data->author . '
+ISBN No. : ' . $approved_preference_data->isbn . '
+Publisher and Place : ' . $approved_preference_data->publisher . '
+Edition : ' . $approved_preference_data->edition . '
+Year of publication : ' . $approved_preference_data->year . '
 
 Best Regards,
+
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
