@@ -1015,3 +1015,7 @@ function textbook_companion_check_valid_filename($file_name) {
   else
     return TRUE;
 }
+
+function textbook_companion_path() {
+  return $_SERVER['DOCUMENT_ROOT'] . base_path() . 'uploads/';
+}

@@ -4,7 +4,8 @@
 function textbook_companion_download_example_file()
 {
   $example_file_id = arg(2);
-  $root_path = $_SERVER['DOCUMENT_ROOT'] . base_path();
+  $root_path = textbook_companion_path();
+
   $example_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE id = %d LIMIT 1", $example_file_id);
   $example_file_data = db_fetch_object($example_files_q);
   header('Content-Type: ' . $example_file_data->filemime);
@@ -16,7 +17,8 @@ function textbook_companion_download_example_file()
 function textbook_companion_download_dependency_file()
 {
   $dependency_file_id = arg(2);
-  $root_path = $_SERVER['DOCUMENT_ROOT'] . base_path();
+  $root_path = textbook_companion_path();
+
   $dependency_file_q = db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $dependency_file_id);
   $dependency_file_data = db_fetch_object($dependency_file_q);
   header('Content-Type: ' . $dependency_file_data->filemime);
@@ -28,7 +30,7 @@ function textbook_companion_download_dependency_file()
 function textbook_companion_download_example()
 {
   $example_id = arg(2);
-  $root_path = $_SERVER['DOCUMENT_ROOT'] . base_path();
+  $root_path = textbook_companion_path();
 
   /* get example data */
   $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d", $example_id);
@@ -41,7 +43,7 @@ function textbook_companion_download_example()
   $EX_PATH = 'EX' . $example_data->number . '/';
 
   /* zip filename */
-  $zip_filename = $root_path . 'uploads/zip-' . time() . '-' . rand(0, 999999) . '.zip';
+  $zip_filename = $root_path . 'zip-' . time() . '-' . rand(0, 999999) . '.zip';
 
   /* creating zip archive on the server */
   $zip = new ZipArchive;
@@ -78,7 +80,7 @@ function textbook_companion_download_example()
 function textbook_companion_download_chapter()
 {
   $chapter_id = arg(2);
-  $root_path = $_SERVER['DOCUMENT_ROOT'] . base_path();
+  $root_path = textbook_companion_path();
 
   /* get example data */
   $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d", $chapter_id);
@@ -86,7 +88,7 @@ function textbook_companion_download_chapter()
   $CH_PATH = 'CH' . $chapter_data->number . '/';
 
   /* zip filename */
-  $zip_filename = $root_path . 'uploads/zip-' . time() . '-' . rand(0, 999999) . '.zip';
+  $zip_filename = $root_path . 'zip-' . time() . '-' . rand(0, 999999) . '.zip';
 
   /* creating zip archive on the server */
   $zip = new ZipArchive;
@@ -130,7 +132,7 @@ function textbook_companion_download_chapter()
 function textbook_companion_download_book()
 {
   $book_id = arg(2);
-  $root_path = $_SERVER['DOCUMENT_ROOT'] . base_path();
+  $root_path = textbook_companion_path();
 
   /* get example data */
   $book_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $book_id);
@@ -138,7 +140,7 @@ function textbook_companion_download_book()
   $BK_PATH = $book_data->book . '/';
 
   /* zip filename */
-  $zip_filename = $root_path . 'uploads/zip-' . time() . '-' . rand(0, 999999) . '.zip';
+  $zip_filename = $root_path . 'zip-' . time() . '-' . rand(0, 999999) . '.zip';
 
   /* creating zip archive on the server */
   $zip = new ZipArchive;

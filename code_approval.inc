@@ -4,7 +4,7 @@
 function code_approval()
 {
   /* get a list of unapproved chapters */
-  $pending_chapter_q = db_query("SELECT c.id as c_id, c.number as c_number, c.name as c_name, c.preference_id as c_preference_id FROM {textbook_companion_example} as e JOIN {textbook_companion_chapter} as c ON c.id = e.chapter_id  WHERE e.approval_status = 0");
+  $pending_chapter_q = db_query("SELECT c.id as c_id, c.number as c_number, c.name as c_name, c.preference_id as c_preference_id FROM {textbook_companion_example} as e JOIN {textbook_companion_chapter} as c ON c.id = e.chapter_id WHERE e.approval_status = 0");
   if (!$pending_chapter_q)
   {
     drupal_set_message(t('There are no pending code approvals.'), 'status');
@@ -81,7 +81,7 @@ function code_approval_form($form_state)
   );
 
   /* get example data */
-  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_id);
+  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d AND approval_status = 0", $chapter_id);
   while ($example_data = db_fetch_object($example_q))
   {
     $form['example_details'][$example_data->id] = array(

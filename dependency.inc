@@ -136,21 +136,20 @@ function upload_dependency_form_validate($form, &$form_state)
 function upload_dependency_form_submit($form, &$form_state) {
   global $user;
 
-  $base_path = $_SERVER['DOCUMENT_ROOT'] . base_path();
-  $dest_path = 'uploads/';
+  $root_path = textbook_companion_path();
 
   /* get book details */
   $book_result = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pre.approval_status = 1 AND pro.uid = %d", $user->uid);
   $book_row = db_fetch_object($book_result);
   $preference_id = $book_row->pre_id;
 
-  $dest_path .= $preference_id . '/';
-  if (!is_dir($base_path . $dest_path))
-    mkdir($base_path . $dest_path);
+  $dest_path = $preference_id . '/';
+  if (!is_dir($root_path . $dest_path))
+    mkdir($root_path . $dest_path);
 
   $dest_path .= 'DEPENDENCIES' . '/';
-  if (!is_dir($base_path . $dest_path))
-    mkdir($base_path . $dest_path);
+  if (!is_dir($root_path . $dest_path))
+    mkdir($root_path . $dest_path);
 
   /* uploading dependencies */
   $file_upload_counter = 0;
@@ -162,7 +161,7 @@ function upload_dependency_form_submit($form, &$form_state) {
     if ($file_name)
     {
       /* uploading file */
-      if (move_uploaded_file($_FILES['files']['tmp_name'][$file_form_name], $base_path . $dest_path . $_FILES['files']['name'][$file_form_name]))
+      if (move_uploaded_file($_FILES['files']['tmp_name'][$file_form_name], $root_path . $dest_path . $_FILES['files']['name'][$file_form_name]))
       {
         /* for uploaded files making an entry in the database */
         db_query("INSERT INTO {textbook_companion_dependency_files} (preference_id, filename, filepath, filemime, filesize, caption, description, timestamp)
