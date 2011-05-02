@@ -256,6 +256,15 @@ function textbook_companion_menu()
     'type' => MENU_NORMAL_ITEM,
     'file' => 'settings.inc',
   );
+
+  $items['textbook_companion/update'] = array(
+    'title' => 'Update database',
+    'description' => 'Update database',
+    'page callback' => 'update_db',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'file' => 'general.inc',
+  );
   return $items;
 }
 
@@ -1020,4 +1029,36 @@ function textbook_companion_check_valid_filename($file_name) {
 
 function textbook_companion_path() {
   return $_SERVER['DOCUMENT_ROOT'] . base_path() . 'uploads/';
+}
+
+function update_db()
+{
+  $dep_update = db_query("SELECT * FROM {textbook_companion_dependency_files}");
+  while ($row = db_fetch_object($dep_update))
+  {
+    $filepath = $row->filepath;
+    if (strstr($filepath, "uploads/"))
+    {
+      echo "found dep : " . $filepath . " : " . $row->id . "<br />";
+      $new_path = str_replace("uploads/", '', $filepath);
+      var_dump($new_path);
+      db_query("UPDATE {textbook_companion_dependency_files} SET filepath = '%s' WHERE id = %d", $new_path, $row->id);
+      echo "updated : " .  $row->id . "<br />";
+    }
+  }
+
+  $example_update = db_query("SELECT * FROM {textbook_companion_example_files}");
+  while ($row = db_fetch_object($example_update))
+  {
+    $filepath = $row->filepath;
+    if (strstr($filepath, "uploads/"))
+    {
+      echo "found : " . $filepath . " : " . $row->id . "<br />";
+      $new_path = str_replace("uploads/", '', $filepath);
+      var_dump($new_path);
+      db_query("UPDATE {textbook_companion_example_files} SET filepath = '%s' WHERE id = %d", $new_path, $row->id);
+      echo "updated : " .  $row->id . "<br />";
+    }
+  }
+  return $str;
 }
