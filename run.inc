@@ -140,7 +140,7 @@ function textbook_companion_run_form($form_state)
       );
       $form['run']['example'] = array(
         '#type' => 'select',
-        '#title' => t('Example No.'),
+        '#title' => t('Example No. (Caption)'),
         '#options' => _list_of_examples($chapter_default_value),
         '#default_value' => $example_default_value,
         '#tree' => TRUE,
