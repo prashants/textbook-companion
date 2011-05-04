@@ -80,6 +80,11 @@ function code_approval_form($form_state)
     '#title' => t('Title of the Chapter'),
   );
 
+  $form['book_details']['back_to_list'] = array(
+    '#type' => 'item',
+    '#value' => l('Back to Code Approval List', 'code_approval'),
+  );
+
   /* get example data */
   $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d AND approval_status = 0", $chapter_id);
   while ($example_data = db_fetch_object($example_q))
@@ -168,3 +173,146 @@ function code_approval_form_submit($form, &$form_state)
   drupal_set_message('Approval status updated.', 'status');
   drupal_goto('code_approval');
 }
+
+
+/******************************************************************************/
+/********************************* BULK APPROVAL ******************************/
+/******************************************************************************/
+
+function bulk_approval_form($form_state)
+{
+  $form['#redirect'] = FALSE;
+
+  ahah_helper_register($form, $form_state);
+
+  /* default value for ahah fields */
+  if (!isset($form_state['storage']['run']['book']))
+  {
+    $book_default_value = 0;
+  } else {
+    $book_default_value =  $form_state['storage']['run']['book'];
+  }
+
+  if (!isset($form_state['storage']['run']['chapter']))
+  {
+    $chapter_default_value = 0;
+  } else {
+    if ($form_state['values']['run']['book_hidden'] !=  $form_state['values']['run']['book'])
+      $chapter_default_value = 0;
+    else
+      $chapter_default_value = $form_state['storage']['run']['chapter'];
+  }
+
+  $form['run'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Run Book Example'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+    '#prefix' => '<div id="run-wrapper">',
+    '#suffix' => '</div>',
+    '#tree' => TRUE,
+  );
+
+  $form['run']['book'] = array(
+      '#type' => 'select',
+      '#title' => t('Title of the Book'),
+      '#options' => _list_of_books(),
+      '#default_value' => $book_default_value,
+      '#tree' => TRUE,
+      '#ahah' => array(
+        'event'   => 'change',
+        'effect' => 'none',
+        'path'    => ahah_helper_path(array('run')),
+        'wrapper' => 'run-wrapper',
+        'progress' => array(
+          'type' => 'throbber',
+          'message' => t(''),
+        ),
+      ),
+  );
+
+  /* hidden form elements */
+  $form['run']['book_hidden'] = array(
+    '#type'  => 'hidden',
+    '#value' =>  $form_state['values']['run']['book'],
+  );
+
+  /* hidden form elements */
+  $form['run']['chapter_hidden'] = array(
+    '#type'  => 'hidden',
+    '#value' =>  $form_state['values']['run']['chapter'],
+  );
+
+  if ($book_default_value > 0)
+  {
+    $form['run']['download_book'] = array(
+      '#type' => 'item',
+      '#value' => l('Download', 'full_download/book/' . $book_default_value) . ' ' . t('(Download all the approved and unapproved examples of the entire book)'),
+    );
+
+    $form['run']['chapter'] = array(
+      '#type' => 'select',
+      '#title' => t('Title of the Chapter'),
+      '#options' => _list_of_chapters($book_default_value),
+      '#default_value' => $chapter_default_value,
+      '#tree' => TRUE,
+      '#ahah' => array(
+        'event'   => 'change',
+        'effect' => 'none',
+        'path'    => ahah_helper_path(array('run')),
+        'wrapper' => 'run-wrapper',
+        'progress' => array(
+          'type' => 'throbber',
+          'message' => t(''),
+        ),
+      ),
+    );
+    if ($chapter_default_value > 0)
+    {
+      $form['run']['download_chapter'] = array(
+        '#type' => 'item',
+        '#value' => l('Download', 'full_download/chapter/' . $chapter_default_value) . ' ' . t('(Download all the approved and unapproved examples of the entire chapter)'),
+      );
+      $form['run']['approve_chapter'] = array(
+        '#type'  => 'checkbox',
+        '#title' => t('Approve Entire Chapter'),
+        '#value' => FALSE,
+      );
+    }
+
+    $form['run']['approve_book'] = array(
+      '#type'  => 'checkbox',
+      '#title' => t('Approve Entire Book'),
+      '#value' => FALSE,
+    );
+    $form['run']['update_book'] = array(
+      '#type'  => 'submit',
+      '#value' => t('Submit'),
+    );
+  }
+  return $form;
+}
+
+
+function _list_of_books()
+{
+  $book_titles = array('0' => 'Please select...');
+  $book_titles_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE approval_status = 1 OR approval_status = 3 ORDER BY book ASC");
+  while ($book_titles_data = db_fetch_object($book_titles_q))
+  {
+    $book_titles[$book_titles_data->id] = $book_titles_data->book . ' (Written by ' . $book_titles_data->author . ')';
+  }
+  return $book_titles;
+}
+
+function _list_of_chapters($preference_id = 0)
+{
+  $book_chapters = array('0' => 'Please select...');
+  $book_chapters_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d ORDER BY number ASC", $preference_id);
+  while ($book_chapters_data = db_fetch_object($book_chapters_q))
+  {
+    $book_chapters[$book_chapters_data->id] = $book_chapters_data->number . '. ' . $book_chapters_data->name;
+  }
+  return $book_chapters;
+}
+

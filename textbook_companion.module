@@ -81,7 +81,18 @@ function textbook_companion_menu()
     'page callback' => 'drupal_get_form',
     'page arguments' => array('code_approval_form'),
     'access arguments' => array('approve code'),
-    'type' => MENU_CALLBACK,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'code_approval.inc',
+  );
+  $items['code_approval/bulk'] = array(
+    'title' => 'Bulk Approval',
+    'description' => 'Bulk Approval',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bulk_approval_form'),
+    'access arguments' => array('approve code'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
     'file' => 'code_approval.inc',
   );
 
@@ -235,6 +246,24 @@ function textbook_companion_menu()
     'access arguments' => array('download code'),
     'type' => MENU_CALLBACK,
     'file' => 'download.inc',
+  );
+
+  /* reviewer download */
+  $items['full_download/chapter'] = array(
+    'title' => 'Code Download',
+    'description' => 'Code Download', 
+    'page callback' => 'textbook_companion_download_full_chapter',
+    'access arguments' => array('approve code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'full_download.inc',
+  );
+  $items['full_download/book'] = array(
+    'title' => 'Code Download',
+    'description' => 'Code Download', 
+    'page callback' => 'textbook_companion_download_full_book',
+    'access arguments' => array('approve code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'full_download.inc',
   );
 
   /* general purpose callbacks */
