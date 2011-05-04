@@ -198,7 +198,7 @@ function textbook_companion_menu()
   );
 
   $items['textbook_run'] = array(
-    'title' => 'Run',
+    'title' => 'Run Code',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('textbook_companion_run_form'),
     'access arguments' => array('access content'),
