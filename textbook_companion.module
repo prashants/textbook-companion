@@ -21,7 +21,7 @@ function textbook_companion_menu()
 
   /* for reviewers */
   $items['manage_proposal'] = array(
-    'title' => 'Manage Proposals',
+    'title' => 'Manage Book Proposals',
     'description' => 'Manage Book Proposals',
     'page callback' => '_proposal_pending',
     'access callback' => 'user_access',
