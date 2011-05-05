@@ -203,9 +203,21 @@ function bulk_approval_form($form_state)
       $chapter_default_value = $form_state['storage']['run']['chapter'];
   }
 
+  if (!isset($form_state['storage']['run']['example']))
+  {
+    $example_default_value = 0;
+  } else {
+    if ($form_state['values']['run']['book_hidden'] !=  $form_state['values']['run']['book'])
+      $example_default_value = 0;
+    else if ($form_state['values']['run']['chapter_hidden'] !=  $form_state['values']['run']['chapter'])
+      $example_default_value = 0;
+    else
+      $example_default_value = $form_state['storage']['run']['example'];
+  }
+
   $form['run'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Run Book Example'),
+    '#title' => t('Bulk Manage Code'),
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
     '#prefix' => '<div id="run-wrapper">',
@@ -250,6 +262,27 @@ function bulk_approval_form($form_state)
       '#value' => l('Download', 'full_download/book/' . $book_default_value) . ' ' . t('(Download all the approved and unapproved examples of the entire book)'),
     );
 
+    $form['run']['approve_book'] = array(
+      '#type'  => 'checkbox',
+      '#title' => t('Approve Entire Book'),
+    );
+    $form['run']['unapprove_book'] = array(
+      '#type'  => 'checkbox',
+      '#title' => t('Un-Approve Entire Book'),
+    );
+    $form['run']['disapprove_book'] = array(
+      '#type'  => 'checkbox',
+      '#title' => t('Dis-Approve Entire Book'),
+    );
+    $form['run']['delete_book'] = array(
+      '#type'  => 'checkbox',
+      '#title' => t('Delete Entire Book'),
+    );
+    $form['run']['delete_book_including_proposal'] = array(
+      '#type'  => 'checkbox',
+      '#title' => t('Delete Entire Book Including Proposal'),
+    );
+
     $form['run']['chapter'] = array(
       '#type' => 'select',
       '#title' => t('Title of the Chapter'),
@@ -273,26 +306,258 @@ function bulk_approval_form($form_state)
         '#type' => 'item',
         '#value' => l('Download', 'full_download/chapter/' . $chapter_default_value) . ' ' . t('(Download all the approved and unapproved examples of the entire chapter)'),
       );
+
       $form['run']['approve_chapter'] = array(
         '#type'  => 'checkbox',
         '#title' => t('Approve Entire Chapter'),
-        '#value' => FALSE,
+      );
+      $form['run']['unapprove_chapter'] = array(
+        '#type'  => 'checkbox',
+        '#title' => t('Un-Approve Entire Chapter'),
+      );
+      $form['run']['disapprove_chapter'] = array(
+        '#type'  => 'checkbox',
+        '#title' => t('Dis-Approve Entire Chapter'),
+      );
+      $form['run']['delete_chapter'] = array(
+        '#type'  => 'checkbox',
+        '#title' => t('Delete Entire Chapter'),
+      );
+
+      $form['run']['example'] = array(
+        '#type' => 'select',
+        '#title' => t('Example No. (Caption)'),
+        '#options' => _list_of_examples($chapter_default_value),
+        '#default_value' => $example_default_value,
+        '#tree' => TRUE,
+        '#ahah' => array(
+          'event'   => 'change',
+          'effect' => 'none',
+          'path'    => ahah_helper_path(array('run')),
+          'wrapper' => 'run-wrapper',
+          'progress' => array(
+            'type' => 'throbber',
+            'message' => t(''),
+          ),
+        ),
       );
     }
-
-    $form['run']['approve_book'] = array(
-      '#type'  => 'checkbox',
-      '#title' => t('Approve Entire Book'),
-      '#value' => FALSE,
-    );
-    $form['run']['update_book'] = array(
-      '#type'  => 'submit',
-      '#value' => t('Submit'),
-    );
   }
+
+  /************ START OF $_POST **************/
+  if ($_POST)
+  {
+    if (($book_default_value > 0) && ($chapter_default_value > 0) && ($example_default_value > 0))
+    {
+      $example_list_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $form_state['values']['run']['example']);
+      if ($example_list_q)
+      {
+        $example_files_rows = array();
+        while ($example_list_data = db_fetch_object($example_list_q))
+        {
+          $example_file_type = '';
+          switch ($example_list_data->filetype)
+          {
+          case 'S' : $example_file_type = 'Source or Main file'; break;
+          case 'R' : $example_file_type = 'Result file'; break;
+          case 'X' : $example_file_type = 'xcos file'; break;
+          default  : $example_file_type = 'Unknown'; break;
+          }
+          $example_files_rows[] = array(l($example_list_data->filename, 'download/file/' . $example_list_data->id), $example_file_type);
+        }
+
+        /* dependency files */
+        $dependency_list_q = db_query("SELECT dependency.id as dependency_id, dependency.filename as dependency_filename, dependency.caption as dependency_caption
+          FROM {textbook_companion_example_dependency} example_dependency LEFT JOIN {textbook_companion_dependency_files} dependency
+          ON example_dependency.dependency_id = dependency.id
+          WHERE example_dependency.example_id = %d", $form_state['values']['run']['example']);
+          while ($dependency_list_data = db_fetch_object($dependency_list_q))
+          {
+            $example_file_type = 'Dependency file';
+            $temp_caption = '';
+            if ($dependency_list_data->dependency_caption)
+              $temp_caption = ' (' . $dependency_list_data->dependency_caption . ')';
+            $example_files_rows[] = array(l($dependency_list_data->dependency_filename, 'download/dependency/' . $dependency_list_data->dependency_id) . $temp_caption, $example_file_type);
+          }
+
+        /* creating list of files table */
+        $example_files_header = array('Filename', 'Type');
+        $example_files = theme_table($example_files_header, $example_files_rows); 
+      }
+      $form['run']['download_example'] = array(
+        '#type' => 'item',
+        '#value' => l('Download Example', 'download/example/' . $example_default_value),
+      );
+      $form['run']['example_files'] = array(
+        '#type'  => 'item',
+        '#title' => 'List of example files',
+        '#value' => $example_files,
+      );
+
+      $form['run']['approve_example'] = array(
+        '#type'  => 'checkbox',
+        '#title' => t('Approve Example'),
+      );
+      $form['run']['unapprove_example'] = array(
+        '#type'  => 'checkbox',
+        '#title' => t('Un-approve Example'),
+      );
+      $form['run']['disapprove_example'] = array(
+        '#type'  => 'checkbox',
+        '#title' => t('Dis-approve Example'),
+      );
+      $form['run']['delete_example'] = array(
+        '#type'  => 'checkbox',
+        '#title' => t('Delete Example'),
+      );
+    }
+  }
+  /************ END OF $_POST **************/
+
+  $form['run']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit')
+  );
+
   return $form;
 }
 
+
+function bulk_approval_form_submit($form, &$form_state)
+{
+	global $user;
+
+	if ($form_state['clicked_button']['#value'] == 'Submit')
+	{
+	  if (user_access('bulk manage code'))
+    {
+      if ($form_state['values']['run']['approve_book'] == "1")
+      {
+
+        /* approving entire book */
+        $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
+        while ($chapter_data = db_fetch_object($chapter_q))
+        {
+          db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d WHERE chapter_id = %d AND approval_status = 0", $user->uid, $chapter_data->id);
+        }
+        drupal_set_message(t('Approved Entire Book (except already dis-approved examples).'), 'status');
+
+      } else if ($form_state['values']['run']['unapprove_book'] == "1") {
+
+        /* approving entire book */
+        $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
+        while ($chapter_data = db_fetch_object($chapter_q))
+        {
+          db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE chapter_id = %d", $chapter_data->id);
+        }
+        drupal_set_message(t('Un-Approved Entire Book.'), 'status');
+
+      } else if ($form_state['values']['run']['disapprove_book'] == "1") {
+
+        /* approving entire book */
+        $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
+        while ($chapter_data = db_fetch_object($chapter_q))
+        {
+          db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d WHERE chapter_id = %d", $user->uid, $chapter_data->id);
+        }
+        drupal_set_message(t('Dis-Approved Entire Book.'), 'status');
+
+      } else if ($form_state['values']['run']['delete_book'] == "1") {
+
+        /* deleting entire book */
+        $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
+        while ($chapter_data = db_fetch_object($chapter_q))
+        {
+          $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
+          while ($example_data = db_fetch_object($example_q))
+          {
+            _delete_example($example_data->id);
+          }
+          /* delete example database entry */
+          db_query("DELETE FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
+        }
+        /* deleting chapters */
+        db_query("DELETE FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
+        drupal_set_message(t('Deleted Entire Book.'), 'status');
+
+      } else if ($form_state['values']['run']['delete_book_including_proposal'] == "1") {
+
+        /* deleting entire book including proposal */
+        $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
+        while ($chapter_data = db_fetch_object($chapter_q))
+        {
+          $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
+          while ($example_data = db_fetch_object($example_q))
+          {
+            _delete_example($example_data->id);
+          }
+          /* delete example database entry */
+          db_query("DELETE FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
+        }
+        /* deleting chapters */
+        db_query("DELETE FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
+
+        /* deleting preference and proposal */
+        $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $form_state['values']['run']['book']);
+        $preference_data = db_fetch_object($preference_q);
+        $proposal_id = $preference_data->proposal_id;
+        db_query("DELETE FROM {textbook_companion_preference} WHERE proposal_id = %d", $proposal_id);
+        db_query("DELETE FROM {textbook_companion_proposal} WHERE id = %d", $proposal_id);
+
+        drupal_set_message(t('Deleted Entire Book Including Proposal.'), 'status');
+
+      } else if ($form_state['values']['run']['approve_chapter'] == "1") {
+
+        db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d WHERE chapter_id = %d AND approval_status = 0", $user->uid, $form_state['values']['run']['chapter']);
+        drupal_set_message(t('Approved Entire Chapter (except already dis-approved examples).'), 'status');
+
+      } else if ($form_state['values']['run']['unapprove_chapter'] == "1") {
+
+        db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE chapter_id = %d", $form_state['values']['run']['chapter']);
+        drupal_set_message(t('Un-Approved Entire Chapter.'), 'status');
+
+      } else if ($form_state['values']['run']['disapprove_chapter'] == "1") {
+
+        db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d WHERE chapter_id = %d", $user->uid, $form_state['values']['run']['chapter']);
+        drupal_set_message(t('Dis-Approved Entire Chapter.'), 'status');
+
+      } else if ($form_state['values']['run']['delete_chapter'] == "1") {
+
+        $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $form_state['values']['run']['chapter']);
+        while ($example_data = db_fetch_object($example_q))
+        {
+          _delete_example($example_data->id);
+        }
+        /* delete example database entry */
+        db_query("DELETE FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
+        db_query("DELETE FROM {textbook_companion_chapter} WHERE id = %d", $form_state['values']['run']['chapter']);
+        drupal_set_message(t('Deleted Entire Chapter.'), 'status');
+
+      } else if ($form_state['values']['run']['approve_example'] == "1") {
+
+        db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d WHERE id = %d", $user->uid, $form_state['values']['run']['example']);
+        drupal_set_message(t('Approved Example.'), 'status');
+       
+      } else if ($form_state['values']['run']['unapprove_example'] == "1") {
+
+        db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE id = %d", $form_state['values']['run']['example']);
+        drupal_set_message(t('Unapproved Example.'), 'status');
+
+      } else if ($form_state['values']['run']['disapprove_example'] == "1") {
+
+        db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d WHERE id = %d", $user->uid, $form_state['values']['run']['example']);
+        drupal_set_message(t('Dis-Approved Example.'), 'status');
+
+      } else if ($form_state['values']['run']['delete_example'] == "1") {
+
+        _delete_example($form_state['values']['run']['example']);
+        drupal_set_message(t('Deleted Example.'), 'status');
+      }
+    } else {
+      drupal_set_message(t('You do not have permission to bulk manage code.'), 'error');
+    }
+	}
+}
 
 function _list_of_books()
 {
@@ -316,3 +581,31 @@ function _list_of_chapters($preference_id = 0)
   return $book_chapters;
 }
 
+function _list_of_examples($chapter_id = 0)
+{
+  $book_examples = array('0' => 'Please select...');
+  $book_examples_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d ORDER BY number ASC", $chapter_id);
+  while ($book_examples_data = db_fetch_object($book_examples_q))
+  {
+    $book_examples[$book_examples_data->id] = $book_examples_data->number . ' (' . $book_examples_data->caption . ')';
+  }
+  return $book_examples;
+}
+
+function _delete_example($exmaple_id)
+{
+  $root_path = textbook_companion_path();
+
+  /* deleting example files */
+  $examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
+  while ($examples_files_data = db_fetch_object($examples_files_q))
+  {
+    if (!unlink($root_path . $examples_files_data->filepath))
+      drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
+  }
+  /* deleting example files database entries */
+  db_query("DELETE FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
+  /* deleting example dependency database entries */
+  db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
+  db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $example_id);
+}

@@ -86,11 +86,11 @@ function textbook_companion_menu()
     'file' => 'code_approval.inc',
   );
   $items['code_approval/bulk'] = array(
-    'title' => 'Bulk Approval',
-    'description' => 'Bulk Approval',
+    'title' => 'Bulk Manage',
+    'description' => 'Bulk Mangage',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bulk_approval_form'),
-    'access arguments' => array('approve code'),
+    'access arguments' => array('bulk manage code'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
     'file' => 'code_approval.inc',
@@ -293,7 +293,7 @@ function textbook_companion_menu()
  * Implementation of hook_perm().
  */
 function textbook_companion_perm() {
-  return array('create book proposal', 'approve book proposal', 'approve code', 'upload code', 'download code', 'create feedback');
+  return array('create book proposal', 'approve book proposal', 'approve code', 'upload code', 'download code', 'create feedback', 'bulk manage code');
 }
 
 function book_proposal_form($form_state)
