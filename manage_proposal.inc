@@ -407,6 +407,9 @@ function proposal_edit_form_submit($form, &$form_state)
   return;
 }
 
+/******************************************************************************/
+/**************************** PROPOSAL EDIT FORM ******************************/
+/******************************************************************************/
 function proposal_change_form($form_state)
 {
   global $user;
@@ -647,7 +650,7 @@ function proposal_change_form($form_state)
     '#size' => 30,
     '#maxlength' => 64,
     '#required' => TRUE,
-    '#default_value' => $preference2_data->book,
+    '#default_value' => $preference3_data->book,
   );
   $form['preference3']['author3'] = array(
     '#type' => 'textfield',
@@ -655,7 +658,7 @@ function proposal_change_form($form_state)
     '#size' => 30,
     '#maxlength' => 64,
     '#required' => TRUE,
-    '#default_value' => $preference2_data->author,
+    '#default_value' => $preference3_data->author,
   );
   $form['preference3']['isbn3'] = array(
     '#type' => 'textfield',
@@ -663,7 +666,7 @@ function proposal_change_form($form_state)
     '#size' => 30,
     '#maxlength' => 64,
     '#required' => TRUE,
-    '#default_value' => $preference2_data->isbn,
+    '#default_value' => $preference3_data->isbn,
   );
   $form['preference3']['publisher3'] = array(
     '#type' => 'textfield',
@@ -671,7 +674,7 @@ function proposal_change_form($form_state)
     '#size' => 30,
     '#maxlength' => 64,
     '#required' => TRUE,
-    '#default_value' => $preference2_data->publisher,
+    '#default_value' => $preference3_data->publisher,
   );
   $form['preference3']['edition3'] = array(
     '#type' => 'textfield',
@@ -679,7 +682,7 @@ function proposal_change_form($form_state)
     '#size' => 30,
     '#maxlength' => 64,
     '#required' => TRUE,
-    '#default_value' => $preference2_data->edition,
+    '#default_value' => $preference3_data->edition,
   );
   $form['preference3']['year3'] = array(
     '#type' => 'textfield',
@@ -687,11 +690,86 @@ function proposal_change_form($form_state)
     '#size' => 4,
     '#maxlength' => 4,
     '#required' => TRUE,
-    '#default_value' => $preference2_data->year,
+    '#default_value' => $preference3_data->year,
   );
+
+  /* hidden fields */
+  $form['hidden_proposal_id'] = array(
+    '#type' => 'hidden',
+    '#value' => $proposal_id,
+  );
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit')
   );
   return $form;
 }
+
+function proposal_change_form_validate($form, &$form_state)
+{
+  /* mobile */
+  if (!preg_match('/^[0-9\ \+]{0,15}$/', $form_state['values']['mobile']))
+    form_set_error('mobile', t('Invalid mobile number'));
+
+  /* date of completion */
+  if (!preg_match('/^[0-9]{1,2}-[0-9]{1,2}-[0-9]{4}$/', $form_state['values']['completion_date']))
+    form_set_error('completion_date', t('Invalid expected date of completion'));
+
+  list($d, $m, $y) = explode('-', $form_state['values']['completion_date']);
+  $d = (int)$d; $m = (int)$m; $y = (int)$y;
+  if (!checkdate($m, $d, $y))
+    form_set_error('completion_date', t('Invalid expected date of completion'));
+  if (mktime(0, 0, 0, $m, $d, $y) <= time())
+  	form_set_error('completion_date', t('Expected date of completion should be in future'));  
+
+  /* edition */
+  if (!preg_match('/^[1-9][0-9]{0,1}$/', $form_state['values']['edition1']))
+    form_set_error('edition1', t('Invalid edition for Book Preference 1'));
+  if (!preg_match('/^[1-9][0-9]{0,1}$/', $form_state['values']['edition2']))
+    form_set_error('edition2', t('Invalid edition for Book Preference 2'));
+  if (!preg_match('/^[1-9][0-9]{0,1}$/', $form_state['values']['edition3']))
+    form_set_error('edition3', t('Invalid edition for Book Preference 3'));
+
+  /* year of publication */
+  if (!preg_match('/^[1-3][0-9][0-9][0-9]$/', $form_state['values']['year1']))
+    form_set_error('year1', t('Invalid year of pulication for Book Preference 1'));
+  if (!preg_match('/^[1-3][0-9][0-9][0-9]$/', $form_state['values']['year2']))
+    form_set_error('year2', t('Invalid year of pulication for Book Preference 2'));
+  if (!preg_match('/^[1-3][0-9][0-9][0-9]$/', $form_state['values']['year3']))
+    form_set_error('year3', t('Invalid year of pulication for Book Preference 3'));
+
+  /* year of publication */
+  $cur_year = date('Y');
+  if ((int)$form_state['values']['year1'] > $cur_year)
+    form_set_error('year1', t('Year of pulication should be not in the future for Book Preference 1'));
+  if ((int)$form_state['values']['year2'] > $cur_year)
+    form_set_error('year2', t('Year of pulication should be not in the future for Book Preference 2'));
+  if ((int)$form_state['values']['year3'] > $cur_year)
+    form_set_error('year3', t('Year of pulication should be not in the future for Book Preference 3'));
+  
+  /* isbn */
+  if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn1']))
+    form_set_error('isbn1', t('Invalid ISBN for Book Preference 1'));
+  if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn2']))
+    form_set_error('isbn2', t('Invalid ISBN for Book Preference 2'));
+  if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn3']))
+    form_set_error('isbn3', t('Invalid ISBN for Book Preference 3'));
+  return;
+}
+
+function proposal_change_form_submit($form, &$form_state)
+{
+  db_query("UPDATE {textbook_companion_proposal} SET full_name = '%s', mobile = '%s', how_project = '%s', course = '%s', branch = '%s', university = '%s', faculty = '%s', reviewer = '%s', completion_date = %d WHERE id = %d",
+    $form_state['#values']['full_name'],
+    $form_state['#values']['mobile'],
+    $form_state['#values']['how_project'],
+    $form_state['#values']['course'],
+    $form_state['#values']['branch'],
+    $form_state['#values']['university'],
+    $form_state['#values']['faculty'],
+    $form_state['#values']['reviewer'],
+    $form_state['#values']['completion_date'],
+    $form_state['#values']['hidden_proposal_id']);
+}
+
