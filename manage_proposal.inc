@@ -8,7 +8,7 @@ function _proposal_pending()
   $pending_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE proposal_status = 0 ORDER BY id DESC");
   while ($pending_data = db_fetch_object($pending_q))
   {
-    $pending_rows[$pending_data->id] = array(date('d-m-Y', $pending_data->creation_date), l($pending_data->full_name, 'user/' . $pending_data->uid), date('d-m-Y', $pending_data->completion_date), l('Edit', 'manage_proposal/approve/' . $pending_data->id));
+    $pending_rows[$pending_data->id] = array(date('d-m-Y', $pending_data->creation_date), l($pending_data->full_name, 'user/' . $pending_data->uid), date('d-m-Y', $pending_data->completion_date), l('Edit', 'manage_proposal/approve/' . $pending_data->id) . ' | ' . l('Change', 'manage_proposal/change/' . $pending_data->id));
   }
 
   /* check if there are any pending proposals */
@@ -43,7 +43,7 @@ function _proposal_all()
     case 3: $proposal_status = 'Completed'; break;
     default: $proposal_status = 'Unknown'; break;
     }
-    $proposal_rows[] = array(date('d-m-Y', $proposal_data->creation_date), $preference_data->book, $preference_data->author, l($proposal_data->full_name, 'user/' . $proposal_data->uid), date('d-m-Y', $proposal_data->completion_date), $proposal_status, l('Edit', 'manage_proposal/edit/' . $proposal_data->id));
+    $proposal_rows[] = array(date('d-m-Y', $proposal_data->creation_date), $preference_data->book, $preference_data->author, l($proposal_data->full_name, 'user/' . $proposal_data->uid), date('d-m-Y', $proposal_data->completion_date), $proposal_status, l('Edit', 'manage_proposal/edit/' . $proposal_data->id) . ' | ' . l('Change', 'manage_proposal/change/' . $proposal_data->id));
   }
 
   /* check if there are any pending proposals */
@@ -369,7 +369,7 @@ function proposal_edit_form($form_state)
 
   $form['cancel'] = array(
     '#type' => 'markup',
-    '#value' => l(t('Cancel'), 'manage_proposal'),
+    '#value' => l(t('Cancel'), 'manage_proposal/all'),
   );
   return $form;
 }
@@ -407,4 +407,291 @@ function proposal_edit_form_submit($form, &$form_state)
   return;
 }
 
+function proposal_change_form($form_state)
+{
+  global $user;
 
+  /* get current proposal */
+  $proposal_id = arg(2);
+  $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d", $proposal_id);
+  if ($proposal_q)
+  {
+    $proposal_data = db_fetch_object($proposal_q);
+    if (!$proposal_data)
+    {
+      drupal_set_message(t('Invalid proposal selected. Please try again.'), 'error');
+      drupal_goto('manage_proposal');
+      return;
+    }
+  } else {
+    drupal_set_message(t('Invalid proposal selected. Please try again.'), 'error');
+    drupal_goto('manage_proposal');
+    return;
+  }
+
+  $preference1_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 1);
+  $preference1_data = db_fetch_object($preference1_q);
+  $preference2_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 2);
+  $preference2_data = db_fetch_object($preference2_q);
+  $preference3_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 3);
+  $preference3_data = db_fetch_object($preference3_q);
+
+  $form['full_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Full Name'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $proposal_data->full_name,
+  );
+  $form['email_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#value' => $user->mail,
+    '#disabled' => TRUE,
+  );
+  $form['mobile'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mobile No.'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $proposal_data->mobile,
+  );
+  $form['how_project'] = array(
+    '#type' => 'select',
+    '#title' => t('How did you come to know about this project'),
+    '#options' => array('Scilab Website' => 'Scilab Website',
+                        'Friend' => 'Friend',
+                        'Professor/Teacher' => 'Professor/Teacher',
+                        'Mailing List' => 'Mailing List',
+                        'Poster in my/other college' => 'Poster in my/other college',
+                        'Others' => 'Others'),
+    '#required' => TRUE,
+    '#default_value' => $proposal_data->how_project,
+  );
+  $form['course'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Course'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $proposal_data->course,
+  );
+  $form['branch'] = array(
+    '#type' => 'select',
+    '#title' => t('Department/Branch'),
+    '#options' => array('Electrical Engineering' => 'Electrical Engineering',
+                        'Electronics Engineering' => 'Electronics Engineering',
+                        'Computer Engineering' => 'Computer Engineering',
+                        'Chemical Engineering' => 'Chemical Engineering',
+                        'Instrumentation Engineering' => 'Instrumentation Engineering',
+                        'Mechanical Engineering' => 'Mechanical Engineering',
+                        'Civil Engineering' => 'Civil Engineering',
+                        'Physics' => 'Physics',
+                        'Mathematics' => 'Mathematics',
+                        'Others' => 'Others'),
+    '#required' => TRUE,
+    '#default_value' => $proposal_data->branch,
+  );
+  $form['university'] = array(
+    '#type' => 'textfield',
+    '#title' => t('University/Institute'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $proposal_data->university,
+  );
+  $form['faculty'] = array(
+    '#type' => 'textfield',
+    '#title' => t('College Teacher/Professor'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $proposal_data->university,
+  );
+  $form['reviewer'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Reviewer'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#default_value' => $proposal_data->reviewer,
+  );
+  $form['completion_date'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Expected Date of Completion'),
+    '#description' => t('Input date format should be DD-MM-YYYY. Eg: 23-03-2011'),
+    '#size' => 10,
+    '#maxlength' => 10,
+    '#default_value' => date('d-m-Y', $proposal_data->completion_date),
+  );
+  $form['preference1'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Book Preference 1'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['preference1']['book1'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title of the book'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference1_data->book,
+  );
+  $form['preference1']['author1'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Author Name'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference1_data->author,
+  );
+  $form['preference1']['isbn1'] = array(
+    '#type' => 'textfield',
+    '#title' => t('ISBN No'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference1_data->isbn,
+  );
+  $form['preference1']['publisher1'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Publisher & Place'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference1_data->publisher,
+  );
+  $form['preference1']['edition1'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Edition'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference1_data->edition,
+  );
+  $form['preference1']['year1'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Year of pulication'),
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#required' => TRUE,
+    '#default_value' => $preference1_data->year,
+  );
+  $form['preference2'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Book Preference 2'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['preference2']['book2'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title of the book'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->book,
+  );
+  $form['preference2']['author2'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Author Name'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->author,
+  );
+  $form['preference2']['isbn2'] = array(
+    '#type' => 'textfield',
+    '#title' => t('ISBN No'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->isbn,
+  );
+  $form['preference2']['publisher2'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Publisher & Place'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->publisher,
+  );
+  $form['preference2']['edition2'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Edition'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->edition,
+  );
+  $form['preference2']['year2'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Year of pulication'),
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->year,
+  );
+  $form['preference3'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Book Preference 3'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['preference3']['book3'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title of the book'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->book,
+  );
+  $form['preference3']['author3'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Author Name'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->author,
+  );
+  $form['preference3']['isbn3'] = array(
+    '#type' => 'textfield',
+    '#title' => t('ISBN No'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->isbn,
+  );
+  $form['preference3']['publisher3'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Publisher & Place'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->publisher,
+  );
+  $form['preference3']['edition3'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Edition'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->edition,
+  );
+  $form['preference3']['year3'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Year of pulication'),
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#required' => TRUE,
+    '#default_value' => $preference2_data->year,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit')
+  );
+  return $form;
+}

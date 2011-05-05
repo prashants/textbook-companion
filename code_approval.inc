@@ -400,7 +400,7 @@ function bulk_approval_form($form_state)
       );
       $form['run']['unapprove_example'] = array(
         '#type'  => 'checkbox',
-        '#title' => t('Un-approve Example'),
+        '#title' => t('Pending Review Example'),
       );
       $form['run']['disapprove_example'] = array(
         '#type'  => 'checkbox',
