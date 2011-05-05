@@ -268,7 +268,7 @@ function bulk_approval_form($form_state)
     );
     $form['run']['unapprove_book'] = array(
       '#type'  => 'checkbox',
-      '#title' => t('Un-Approve Entire Book'),
+      '#title' => t('Pending Review Entire Book'),
     );
     $form['run']['disapprove_book'] = array(
       '#type'  => 'checkbox',
@@ -313,7 +313,7 @@ function bulk_approval_form($form_state)
       );
       $form['run']['unapprove_chapter'] = array(
         '#type'  => 'checkbox',
-        '#title' => t('Un-Approve Entire Chapter'),
+        '#title' => t('Pending Review Entire Chapter'),
       );
       $form['run']['disapprove_chapter'] = array(
         '#type'  => 'checkbox',
@@ -450,7 +450,7 @@ function bulk_approval_form_submit($form, &$form_state)
         {
           db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE chapter_id = %d", $chapter_data->id);
         }
-        drupal_set_message(t('Un-Approved Entire Book.'), 'status');
+        drupal_set_message(t('Pending Review Entire Book.'), 'status');
 
       } else if ($form_state['values']['run']['disapprove_book'] == "1") {
 
@@ -514,7 +514,7 @@ function bulk_approval_form_submit($form, &$form_state)
       } else if ($form_state['values']['run']['unapprove_chapter'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE chapter_id = %d", $form_state['values']['run']['chapter']);
-        drupal_set_message(t('Un-Approved Entire Chapter.'), 'status');
+        drupal_set_message(t('Pending Review Entire Chapter.'), 'status');
 
       } else if ($form_state['values']['run']['disapprove_chapter'] == "1") {
 
