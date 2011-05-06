@@ -57,11 +57,11 @@ function textbook_companion_menu()
     'type' => MENU_CALLBACK,
     'file' => 'manage_proposal.inc',
   );
-  $items['manage_proposal/edit'] = array(
-    'title' => 'Proposal Edit',
-    'description' => 'Proposal Edit',
+  $items['manage_proposal/status'] = array(
+    'title' => 'Proposal Status',
+    'description' => 'Proposal Status',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('proposal_edit_form'),
+    'page arguments' => array('proposal_status_form'),
     'access arguments' => array('approve book proposal'),
     'type' => MENU_CALLBACK,
     'file' => 'manage_proposal.inc',
