@@ -443,6 +443,8 @@ function proposal_edit_form($form_state)
     return;
   }
 
+  $user_data = user_load($proposal_data->uid);
+
   $preference1_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 1);
   $preference1_data = db_fetch_object($preference1_q);
   $preference2_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 2);
@@ -463,7 +465,7 @@ function proposal_edit_form($form_state)
     '#title' => t('Email'),
     '#size' => 30,
     '#maxlength' => 64,
-    '#value' => $user->mail,
+    '#value' => $user_data->mail,
     '#disabled' => TRUE,
   );
   $form['mobile'] = array(
