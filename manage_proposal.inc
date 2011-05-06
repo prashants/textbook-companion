@@ -760,16 +760,58 @@ function proposal_change_form_validate($form, &$form_state)
 
 function proposal_change_form_submit($form, &$form_state)
 {
+  /* completion date to timestamp */
+  list($d, $m, $y) = explode('-', $form_state['values']['completion_date']);
+  $completion_date_timestamp = mktime(0, 0, 0, $m, $d, $y);
+
+  $proposal_id = $form_state['values']['hidden_proposal_id'];
+
   db_query("UPDATE {textbook_companion_proposal} SET full_name = '%s', mobile = '%s', how_project = '%s', course = '%s', branch = '%s', university = '%s', faculty = '%s', reviewer = '%s', completion_date = %d WHERE id = %d",
-    $form_state['#values']['full_name'],
-    $form_state['#values']['mobile'],
-    $form_state['#values']['how_project'],
-    $form_state['#values']['course'],
-    $form_state['#values']['branch'],
-    $form_state['#values']['university'],
-    $form_state['#values']['faculty'],
-    $form_state['#values']['reviewer'],
-    $form_state['#values']['completion_date'],
-    $form_state['#values']['hidden_proposal_id']);
+    $form_state['values']['full_name'],
+    $form_state['values']['mobile'],
+    $form_state['values']['how_project'],
+    $form_state['values']['course'],
+    $form_state['values']['branch'],
+    $form_state['values']['university'],
+    $form_state['values']['faculty'],
+    $form_state['values']['reviewer'],
+    $completion_date_timestamp,
+    $proposal_id);
+
+  $preference1_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 1);
+  $preference1_data = db_fetch_object($preference1_q);
+  $preference1_id = $preference1_data->id;
+  $preference2_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 2);
+  $preference2_data = db_fetch_object($preference2_q);
+  $preference2_id = $preference2_data->id;
+  $preference3_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 3);
+  $preference3_data = db_fetch_object($preference3_q);
+  $preference3_id = $preference3_data->id;
+
+  db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
+    $form_state['values']['book1'],
+    $form_state['values']['author1'],
+    $form_state['values']['isbn1'],
+    $form_state['values']['publisher1'],
+    $form_state['values']['edition1'],
+    $form_state['values']['year1'],
+    $preference1_id);
+  db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
+    $form_state['values']['book2'],
+    $form_state['values']['author2'],
+    $form_state['values']['isbn2'],
+    $form_state['values']['publisher2'],
+    $form_state['values']['edition2'],
+    $form_state['values']['year2'],
+    $preference2_id);
+  db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
+    $form_state['values']['book3'],
+    $form_state['values']['author3'],
+    $form_state['values']['isbn3'],
+    $form_state['values']['publisher3'],
+    $form_state['values']['edition3'],
+    $form_state['values']['year3'],
+    $preference3_id);
+  drupal_set_message(t('Proposal Updated'), 'status');
 }
 
