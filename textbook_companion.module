@@ -66,11 +66,11 @@ function textbook_companion_menu()
     'type' => MENU_CALLBACK,
     'file' => 'manage_proposal.inc',
   );
-  $items['manage_proposal/change'] = array(
-    'title' => 'Proposal Edit',
-    'description' => 'Proposal Edit',
+  $items['manage_proposal/edit'] = array(
+    'title' => 'Edit Proposal',
+    'description' => 'Edit Proposal',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('proposal_change_form'),
+    'page arguments' => array('proposal_edit_form'),
     'access arguments' => array('edit book proposal'),
     'type' => MENU_CALLBACK,
     'file' => 'manage_proposal.inc',
@@ -804,7 +804,7 @@ Year of publication : ' . $preference3_data->year . '
 
 Your proposal is under review and you will soon receive an email from us regarding the same.
 
-Best Regards,
+Best Wishes,
 
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
@@ -865,7 +865,7 @@ Publisher and Place : ' . $preference3_data->publisher . '
 Edition : ' . $preference3_data->edition . '
 Year of publication : ' . $preference3_data->year . '
 
-Best Regards,
+Best Wishes,
 
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
@@ -900,7 +900,7 @@ Publisher and Place : ' . $approved_preference_data->publisher . '
 Edition : ' . $approved_preference_data->edition . '
 Year of publication : ' . $approved_preference_data->year . '
 
-Best Regards,
+Best Wishes,
 
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
@@ -921,7 +921,7 @@ Caption : ' .  $example_data->caption . '
 
 The example is under review. You will be notified when it has been approved.
 
-Best Regards,
+Best Wishes,
 
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
@@ -940,7 +940,7 @@ Your following example has been approved:
 Example number : ' . $example_data->number . '
 Caption : ' .  $example_data->caption . '
 
-Best Regards,
+Best Wishes,
 
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
@@ -961,7 +961,7 @@ Caption : ' .  $example_data->caption . '
 
 Reason for dis-approval : ' . $params['example_disapproved']['message'] . '
 
-Best Regards,
+Best Wishes,
 
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
@@ -977,7 +977,7 @@ Dear !user_name,
 You have uploaded following dependency files :
     ' . $dependency_files . '
 
-Best Regards,
+Best Wishes,
 
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
@@ -998,14 +998,14 @@ Example No.: ' . $params['feedback_received']['example_no'] . '
 Your feedback :
 ' . $params['feedback_received']['feedback'] . '
 
-Best Regards,
+Best Wishes,
 
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
     case 'standard':
-      $message['subject'] = $params['subject'];
-      $message['body'] = $params['body'];
+      $message['subject'] = $params['standard']['subject'];
+      $message['body'] = $params['standard']['body'];
       break;
   }
 }

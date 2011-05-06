@@ -414,10 +414,18 @@ function bulk_approval_form($form_state)
   }
   /************ END OF $_POST **************/
 
-  $form['run']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit')
-  );
+  if ($book_default_value > 0)
+  {
+    $form['run']['message'] = array(
+      '#type' => 'textarea',
+      '#title' => t('If Dis-Approved please specify reason for Dis-Approval'),
+    );
+  
+    $form['run']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit')
+    );
+  }
 
   return $form;
 }
@@ -442,6 +450,10 @@ function bulk_approval_form_submit($form, &$form_state)
         }
         drupal_set_message(t('Approved Entire Book (except already dis-approved examples).'), 'status');
 
+        /* email */
+        $email_subject = t('Your uploaded examples have been approved');
+        $email_body = t('Your all the uploaded examples for the book have been approved.');
+
       } else if ($form_state['values']['run']['unapprove_book'] == "1") {
 
         /* approving entire book */
@@ -452,6 +464,10 @@ function bulk_approval_form_submit($form, &$form_state)
         }
         drupal_set_message(t('Pending Review Entire Book.'), 'status');
 
+        /* email */
+        $email_subject = t('Your uploaded examples have been marked as pending');
+        $email_body = t('Your all the uploaded examples for the book have been marked as pending to be review. You will be able to see the exmaples after they have been approved by one of our reviewers.');
+
       } else if ($form_state['values']['run']['disapprove_book'] == "1") {
 
         /* approving entire book */
@@ -461,6 +477,14 @@ function bulk_approval_form_submit($form, &$form_state)
           db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d WHERE chapter_id = %d", $user->uid, $chapter_data->id);
         }
         drupal_set_message(t('Dis-Approved Entire Book.'), 'status');
+
+        /* email */
+        $email_subject = t('Your uploaded examples have been marked as dis-approved');
+        $email_body = t('Your all the uploaded examples for the book have been marked as dis-approved.
+
+Reason for dis-approval:
+
+' . $form_state['values']['run']['message']);
 
       } else if ($form_state['values']['run']['delete_book'] == "1") {
 
@@ -479,6 +503,10 @@ function bulk_approval_form_submit($form, &$form_state)
         /* deleting chapters */
         db_query("DELETE FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
         drupal_set_message(t('Deleted Entire Book.'), 'status');
+
+        /* email */
+        $email_subject = t('Your uploaded examples have been deleted');
+        $email_body = t('Your all the uploaded examples for the book have been deleted.');
 
       } else if ($form_state['values']['run']['delete_book_including_proposal'] == "1") {
 
@@ -506,20 +534,40 @@ function bulk_approval_form_submit($form, &$form_state)
 
         drupal_set_message(t('Deleted Entire Book Including Proposal.'), 'status');
 
+        /* email */
+        $email_subject = t('Your uploaded examples including the book have been deleted');
+        $email_body = t('Your all the uploaded examples including the book have been deleted permanently.');
+
       } else if ($form_state['values']['run']['approve_chapter'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d WHERE chapter_id = %d AND approval_status = 0", $user->uid, $form_state['values']['run']['chapter']);
         drupal_set_message(t('Approved Entire Chapter (except already dis-approved examples).'), 'status');
+
+        /* email */
+        $email_subject = t('Your uploaded examples have been approved');
+        $email_body = t('Your all the uploaded examples for the chapter have been approved.');
 
       } else if ($form_state['values']['run']['unapprove_chapter'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE chapter_id = %d", $form_state['values']['run']['chapter']);
         drupal_set_message(t('Pending Review Entire Chapter.'), 'status');
 
+        /* email */
+        $email_subject = t('Your uploaded examples have been marked as pending');
+        $email_body = t('Your all the uploaded examples for the chapter have been marked as pending to be review. You will be able to see the exmaples after they have been approved by one of our reviewers.');
+
       } else if ($form_state['values']['run']['disapprove_chapter'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d WHERE chapter_id = %d", $user->uid, $form_state['values']['run']['chapter']);
         drupal_set_message(t('Dis-Approved Entire Chapter.'), 'status');
+
+        /* email */
+        $email_subject = t('Your uploaded examples have been marked as dis-approved');
+        $email_body = t('Your all the uploaded examples for the book have been marked as dis-approved.
+
+Reason for dis-approval:
+
+' . $form_state['values']['run']['message']);
 
       } else if ($form_state['values']['run']['delete_chapter'] == "1") {
 
@@ -533,26 +581,62 @@ function bulk_approval_form_submit($form, &$form_state)
         db_query("DELETE FROM {textbook_companion_chapter} WHERE id = %d", $form_state['values']['run']['chapter']);
         drupal_set_message(t('Deleted Entire Chapter.'), 'status');
 
+        /* email */
+        $email_subject = t('Your uploaded examples have been deleted');
+        $email_body = t('Your all the uploaded examples for the chapter have been deleted permanently.');
+
       } else if ($form_state['values']['run']['approve_example'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d WHERE id = %d", $user->uid, $form_state['values']['run']['example']);
         drupal_set_message(t('Approved Example.'), 'status');
+
+        /* email */
+        $email_subject = t('Your uploaded example has been approved');
+        $email_body = t('Your uploaded example has been approved.');
        
       } else if ($form_state['values']['run']['unapprove_example'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE id = %d", $form_state['values']['run']['example']);
         drupal_set_message(t('Unapproved Example.'), 'status');
 
+        /* email */
+        $email_subject = t('Your uploaded example has been marked as pending');
+        $email_body = t('Your uploaded example has been marked as pending to be review. You will be able to see the exmaple after it have been approved by one of our reviewers.');
+
       } else if ($form_state['values']['run']['disapprove_example'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d WHERE id = %d", $user->uid, $form_state['values']['run']['example']);
         drupal_set_message(t('Dis-Approved Example.'), 'status');
 
+        /* email */
+        $email_subject = t('Your uploaded example has been marked as dis-approved');
+        $email_body = t('Your uploaded example has been marked as dis-approved.
+
+Reason for dis-approval:
+
+' . $form_state['values']['run']['message']);
+
       } else if ($form_state['values']['run']['delete_example'] == "1") {
 
         _delete_example($form_state['values']['run']['example']);
         drupal_set_message(t('Deleted Example.'), 'status');
+
+        /* email */
+        $email_subject = t('Your uploaded example has been deleted');
+        $email_body = t('Your uploaded example has been deleted permanently.');
+
       }
+
+      /* sending email */
+      if ($email_subject)
+      {
+        $email_to = variable_get('textbook_companion_emails', '') . ', ' . $user->mail;
+        $param['standard']['subject'] = $email_subject;
+        $param['standard']['body'] = $email_body;
+        if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+          drupal_set_message('Error sending email message.', 'error');
+      }
+
     } else {
       drupal_set_message(t('You do not have permission to bulk manage code.'), 'error');
     }
