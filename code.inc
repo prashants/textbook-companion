@@ -624,14 +624,21 @@ function upload_examples_edit_form($form_state)
         '#title' => t('Delete Existing Main or Source File'),
         '#description' => 'Check to delete the existing Main or Source file.',
     );
+    $form['sourcefile']['sourcefile1'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New Main or Source File'),
+        '#size' => 48,
+        '#description' => t("Upload new Main or Source file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
+        t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    );
+  } else {
+    $form['sourcefile']['sourcefile1'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New Main or Source File'),
+        '#size' => 48,
+        '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    );
   }
-  $form['sourcefile']['sourcefile1'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload New Main or Source File'),
-      '#size' => 48,
-      '#description' => t("Upload new Main or Source file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
-      t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
-  );
 
   $form['dep_files'] = array(
     '#type' => 'item',
@@ -705,14 +712,21 @@ function upload_examples_edit_form($form_state)
         '#title' => t('Delete Existing Result File 1'),
         '#description' => 'Check to delete the existing Result file.',
     );
+    $form['result']['result1'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New Result File 1'),
+        '#size' => 48,
+        '#description' => t("Upload new Result file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
+        t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    );
+  } else {
+    $form['result']['result1'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New Result File 1'),
+        '#size' => 48,
+        '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    );
   }
-  $form['result']['result1'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload New Result File 1'),
-      '#size' => 48,
-      '#description' => t("Upload new Result file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
-      t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
-  );
 
   $form['result']['br'] = array(
       '#type' => 'item',
@@ -731,15 +745,21 @@ function upload_examples_edit_form($form_state)
         '#title' => t('Delete Existing Result File 2'),
         '#description' => 'Check to delete the existing Result file.',
     );
+    $form['result']['result2'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New Result file 2'),
+        '#size' => 48,
+        '#description' => t("Upload new Result file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") . 
+        t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    );
+  } else {
+    $form['result']['result2'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New Result file 2'),
+        '#size' => 48,
+        '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    );
   }
-  $form['result']['result2'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload result file'),
-      '#size' => 48,
-      '#description' => t("Upload new Result file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") . 
-      t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
-  );
-
   $form['xcos'] = array(
     '#type' => 'fieldset',
     '#title' => t('XCOS Files'),
@@ -758,14 +778,21 @@ function upload_examples_edit_form($form_state)
         '#title' => t('Delete Existing xcos File 1'),
         '#description' => 'Check to delete the existing xcos file.',
     );
+    $form['xcos']['xcos1'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New xcos file 1'),
+        '#size' => 48,
+        '#description' => t("Upload new xcos file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
+        t('Allowed file extensions : ') . 'xcos,scicos',
+    );
+  } else {
+    $form['xcos']['xcos1'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New xcos file 1'),
+        '#size' => 48,
+        '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
+    );
   }
-  $form['xcos']['xcos1'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload New xcos file 1'),
-      '#size' => 48,
-      '#description' => t("Upload new xcos file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
-      t('Allowed file extensions : ') . 'xcos,scicos',
-  );
 
   $form['xcos']['br'] = array(
       '#type' => 'item',
@@ -784,14 +811,21 @@ function upload_examples_edit_form($form_state)
         '#title' => t('Delete Existing xcos File 2'),
         '#description' => 'Check to delete the existing xcos file.',
     );
+    $form['xcos']['xcos2'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New xcos file 2'),
+        '#size' => 48,
+        '#description' =>  t("Upload new xcos file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") . 
+        t('Allowed file extensions : ') . 'xcos,scicos',
+    );
+  } else {
+    $form['xcos']['xcos2'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload New xcos file 2'),
+        '#size' => 48,
+        '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
+    );
   }
-  $form['xcos']['xcos2'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload New xcos file 2'),
-      '#size' => 48,
-      '#description' =>  t("Upload new xcos file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") . 
-      t('Allowed file extensions : ') . 'xcos,scicos',
-  );
 
   $form['submit'] = array(
     '#type' => 'submit',
