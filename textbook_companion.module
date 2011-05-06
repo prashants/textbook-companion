@@ -802,7 +802,7 @@ Publisher and Place : ' . $preference3_data->publisher . '
 Edition : ' . $preference3_data->edition . '
 Year of publication : ' . $preference3_data->year . '
 
-Your proposal is under review and you will soon receive an email from us you regarding the same.
+Your proposal is under review and you will soon receive an email from us regarding the same.
 
 Best Regards,
 
