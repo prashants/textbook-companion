@@ -114,7 +114,7 @@ function list_examples()
 
     if ($example_data->approval_status == 0)
     {
-      $example_rows[] = array('data' => array($example_data->number, $example_data->caption, $approval_status, $example_files, l('Delete', 'textbook_companion/code/delete/' . $example_data->id, array('attributes' => array('onClick' => 'return confirm("Are you sure you want to delete the example?")')))), 'valign' => 'top');
+      $example_rows[] = array('data' => array($example_data->number, $example_data->caption, $approval_status, $example_files, l('Edit', 'textbook_companion/code/edit/' . $example_data->id) . ' | ' . l('Delete', 'textbook_companion/code/delete/' . $example_data->id, array('attributes' => array('onClick' => 'return confirm("Are you sure you want to delete the example?")')))), 'valign' => 'top');
     } else {
       $example_rows[] = array('data' => array($example_data->number, $example_data->caption, $approval_status, $example_files, l('Download', 'download/example/' . $example_data->id)), 'valign' => 'top');
     }

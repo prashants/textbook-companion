@@ -277,10 +277,14 @@ function bulk_approval_form($form_state)
     $form['run']['delete_book'] = array(
       '#type'  => 'checkbox',
       '#title' => t('Delete Entire Book'),
+      '#prefix' => '<div style="color:red;"><strong>',
+      '#suffix' => '</strong></div>',
     );
     $form['run']['delete_book_including_proposal'] = array(
       '#type'  => 'checkbox',
       '#title' => t('Delete Entire Book Including Proposal'),
+      '#prefix' => '<div style="color:red;"><strong>',
+      '#suffix' => '</strong></div>',
     );
 
     $form['run']['chapter'] = array(
@@ -322,6 +326,8 @@ function bulk_approval_form($form_state)
       $form['run']['delete_chapter'] = array(
         '#type'  => 'checkbox',
         '#title' => t('Delete Entire Chapter'),
+        '#prefix' => '<div style="color:red;"><strong>',
+        '#suffix' => '</strong></div>',
       );
 
       $form['run']['example'] = array(
@@ -409,6 +415,8 @@ function bulk_approval_form($form_state)
       $form['run']['delete_example'] = array(
         '#type'  => 'checkbox',
         '#title' => t('Delete Example'),
+        '#prefix' => '<div style="color:red;"><strong>',
+        '#suffix' => '</strong></div>',
       );
     }
   }
