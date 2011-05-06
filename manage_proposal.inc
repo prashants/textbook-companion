@@ -524,7 +524,7 @@ function proposal_change_form($form_state)
     '#size' => 30,
     '#maxlength' => 64,
     '#required' => TRUE,
-    '#default_value' => $proposal_data->university,
+    '#default_value' => $proposal_data->faculty,
   );
   $form['reviewer'] = array(
     '#type' => 'textfield',
