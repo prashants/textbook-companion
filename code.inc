@@ -92,7 +92,8 @@ function upload_examples_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Example No'),
     '#size' => 5,
-    '#maxlength' => 5,
+    '#maxlength' => 10,
+    '#description' => t("Example number should be separated by dots only.<br />Example: 1.1.a &nbsp;or&nbsp; 1.1.1"),
     '#required' => TRUE,
   );
   $form['example_caption'] = array(
@@ -119,7 +120,8 @@ function upload_examples_form($form_state)
       '#type' => 'file',
       '#title' => t('Upload main or source file'),
       '#size' => 48,
-      '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+      '#description' => t('Separate filenames with underscore. No spaces or any special characters allowed in filename.') . '<br />' .
+      t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
   );
 
   $form['dep_files'] = array(
@@ -178,13 +180,15 @@ function upload_examples_form($form_state)
       '#type' => 'file',
       '#title' => t('Upload result file'),
       '#size' => 48,
-      '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+      '#description' => t('Separate filenames with underscore. No spaces or any special characters allowed in filename.') . '<br />' .
+      t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
   );
   $form['result']['result2'] = array(
       '#type' => 'file',
       '#title' => t('Upload result file'),
       '#size' => 48,
-      '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+      '#description' => t('Separate filenames with underscore. No spaces or any special characters allowed in filename.') . '<br />' .
+      t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
   );
 
   $form['xcos'] = array(
@@ -197,13 +201,15 @@ function upload_examples_form($form_state)
       '#type' => 'file',
       '#title' => t('Upload xcos file'),
       '#size' => 48,
-      '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
+      '#description' => t('Separate filenames with underscore. No spaces or any special characters allowed in filename.') . '<br />' .
+      t('Allowed file extensions : ') . 'xcos,scicos',
   );
   $form['xcos']['xcos2'] = array(
       '#type' => 'file',
       '#title' => t('Upload xcos file'),
       '#size' => 48,
-      '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
+      '#description' => t('Separate filenames with underscore. No spaces or any special characters allowed in filename.') . '<br />' .
+      t('Allowed file extensions : ') . 'xcos,scicos',
   );
 
   $form['submit'] = array(
@@ -220,6 +226,15 @@ function upload_examples_form($form_state)
 
 function upload_examples_form_validate($form, &$form_state)
 {
+  if (!check_name($form_state['values']['name']))
+    form_set_error('name', t('Title of the Chapter can contain only alphabets, numbers and spaces.'));
+
+  if (!check_name($form_state['values']['example_caption']))
+    form_set_error('example_caption', t('Example Caption can contain only alphabets, numbers and spaces.'));
+
+  if (!check_chapter_number($form_state['values']['example_number']))
+    form_set_error('example_number', t('Invalid Example Number. Example Number can contain only alphabets and numbers sepereated by dot.'));
+
   if (isset($_FILES['files']))
   {
     /* check if atleast one source or result file is uploaded */  
