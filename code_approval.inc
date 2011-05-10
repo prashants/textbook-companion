@@ -159,11 +159,12 @@ function code_approval_form_submit($form, &$form_state)
         drupal_set_message('Error sending email message.', 'error');
 
     } else if ($ex_data['approved'] == "1") {
-      db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d, approval_date = %d WHERE id = %d", $user->uid, time(), $ex_data['example_id']);
+      delete_example($ex_data['example_id']);
 
       /* sending email */
       $email_to = $user_data->mail . ', ' . variable_get('textbook_companion_emails', '');
-      $param['example_disapproved']['example_id'] = $ex_data['example_id'];
+      $param['example_disapproved']['example_number'] = $example_data->number;
+      $param['example_disapproved']['example_caption'] = $example_data->caption;
       $param['example_disapproved']['user_id'] = $user_data->uid;
       $param['example_disapproved']['message'] = $ex_data['message'];
       if (!drupal_mail('textbook_companion', 'example_disapproved', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
@@ -626,8 +627,13 @@ Reason for dis-approval:
 
       } else if ($form_state['values']['run']['delete_example'] == "1") {
 
-        _delete_example($form_state['values']['run']['example']);
-        drupal_set_message(t('Deleted Example.'), 'status');
+        if (delete_example($form_state['values']['run']['example']))
+        {
+          drupal_set_message(t('Deleted Example.'), 'status');
+        } else {
+          drupal_set_message(t('Error Deleting Example.'), 'error');
+          
+        }
 
         /* email */
         $email_subject = t('Your uploaded example has been deleted');

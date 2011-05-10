@@ -946,8 +946,6 @@ Best Wishes,
       break;
 
     case 'example_disapproved':
-      $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $params['example_disapproved']['example_id']);
-      $example_data = db_fetch_object($example_q);
       $user_data = user_load($params['example_disapproved']['user_id']);
 
       $message['subject'] = t('[!site_name] Your uploaded example has been disapproved', array('!site_name' => variable_get('site_name', '')), $language->language);
@@ -956,8 +954,8 @@ Dear !user_name,
 
 Your following example has been disapproved:
 
-Example number : ' . $example_data->number . '
-Caption : ' .  $example_data->caption . '
+Example number : ' . $params['example_disapproved']['example_number'] . '
+Caption : ' . $params['example_disapproved']['example_caption'] . '
 
 Reason for dis-approval : ' . $params['example_disapproved']['message'] . '
 
@@ -1079,3 +1077,67 @@ function textbook_companion_path() {
   return $_SERVER['DOCUMENT_ROOT'] . base_path() . 'uploads/';
 }
 
+/****************************** DELETION FUNCTIONS ****************************/
+
+function delete_example($example_id)
+{
+  $root_path = textbook_companion_path();
+
+  /* deleting example files */
+  $err = FALSE;
+  $ch_path = '';
+  if ($example_id <= 0)
+  {
+    drupal_set_message(t('Invalid example'), 'error');
+    $err = TRUE;
+    return $err;
+  }
+
+  $examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
+  while ($examples_files_data = db_fetch_object($examples_files_q))
+  {
+    if (!$ch_path)
+      $ch_path = $examples_files_data->filepath;
+    if (!unlink($root_path . $examples_files_data->filepath))
+    {
+      $err = TRUE;
+      drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
+
+      /* sending email to admins */
+      $email_to = variable_get('textbook_companion_emails', '');
+      $param['standard']['subject'] = "[ERROR] Error deleting example file";
+      $param['standard']['body'] = "Error deleting example id " . $examples_files_data->id . " file id " .  $cur_examples_files_data->id . " file path " . $cur_examples_files_data->filepath;
+      if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+        drupal_set_message('Error sending email message.', 'error');
+
+    } else {
+      /* deleting example files database entries */
+      db_query("DELETE FROM {textbook_companion_example_files} WHERE id = %d", $examples_files_data->id);
+    }
+  }
+
+  /* removing example folder */
+  $ch_path_arr = explode('/', $ch_path);
+  if (!$err)
+  {
+    $dir_path = $root_path . $ch_path_arr[0] . '/' . $ch_path_arr[1] . '/' . $ch_path_arr[2];
+    $res = rmdir($dir_path);
+    if (!$res)
+    {
+      drupal_set_message(t('Error deleting folder !folder', array('!folder' => $dir_path)), 'error');
+
+      /* sending email to admins */
+      $email_to = variable_get('textbook_companion_emails', '');
+      $param['standard']['subject'] = "[ERROR] Error deleting folder";
+      $param['standard']['body'] = "Error deleting folder " . $dir_path;
+      if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+        drupal_set_message('Error sending email message.', 'error');
+    }
+  }
+
+  /* deleting example dependency database entries */
+  db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
+  if (!$err)
+    db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $example_id);
+  return $err;
+}
