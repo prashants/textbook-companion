@@ -1106,7 +1106,10 @@ function delete_example($example_id)
       /* sending email to admins */
       $email_to = variable_get('textbook_companion_emails', '');
       $param['standard']['subject'] = "[ERROR] Error deleting example file";
-      $param['standard']['body'] = "Error deleting example id " . $examples_files_data->id . " file id " .  $cur_examples_files_data->id . " file path " . $cur_examples_files_data->filepath;
+      $param['standard']['body'] = "Error deleting example files :
+        example id : " . $example_id . "
+        file id : " .  $examples_files_data->id . "
+        file path : " . $examples_files_data->filepath;
       if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
         drupal_set_message('Error sending email message.', 'error');
 
