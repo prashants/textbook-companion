@@ -865,39 +865,68 @@ function _upload_examples_delete()
   $example_id = arg(3);
 
   /* check if example exists */
-  if (!$preference_data = db_fetch_object(db_query("SELECT preference.id as preference_id FROM {textbook_companion_proposal} proposal JOIN {textbook_companion_preference} preference ON proposal.id = preference.proposal_id WHERE proposal.uid = %d AND preference.approval_status = 1 ORDER BY preference.id DESC LIMIT 1", $user->uid)))
+  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $example_id);
+  $example_data = db_fetch_object($example_q);
+  if (!$example_data)
+  {
+    drupal_set_message('Invalid example.', 'error');
+    drupal_goto('textbook_companion/code');
+    return;
+  }
+  if ($example_data->approval_status != 0)
+  {
+    drupal_set_message('You cannnot delete an example after it has been approved. Please contact site administrator if you want to delete this example.', 'error');
+    drupal_goto('textbook_companion/code');
+    return;
+  }
+
+  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d LIMIT 1", $example_data->chapter_id);
+  $chapter_data = db_fetch_object($chapter_q);
+  if (!$chapter_data)
   {
     drupal_set_message('You do not have permission to delete this example.', 'error');
     drupal_goto('textbook_companion/code');
     return;
   }
-  if (!$example_data = db_fetch_object(db_query("SELECT example.approval_status as example_approval_status FROM {textbook_companion_chapter} chapter JOIN {textbook_companion_example} example ON chapter.id = example.chapter_id WHERE chapter.preference_id = %d AND example.id = %d ORDER BY example.id DESC LIMIT 1", $preference_data->preference_id, $example_id)))
+
+  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d LIMIT 1", $chapter_data->preference_id);
+  $preference_data = db_fetch_object($preference_q);
+  if (!$preference_data)
   {
     drupal_set_message('You do not have permission to delete this example.', 'error');
     drupal_goto('textbook_companion/code');
     return;
   }
-  if ($example_data->example_approval_status != 0)
+
+  $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d AND uid = %d LIMIT 1", $preference_data->proposal_id, $user->uid);
+  $proposal_data = db_fetch_object($proposal_q);
+  if (!$proposal_data)
   {
-    drupal_set_message('You cannnot delete an example after it has been approved.', 'error');
+    drupal_set_message('You do not have permission to delete this example.', 'error');
     drupal_goto('textbook_companion/code');
     return;
   }
 
   /* deleting example files */
-  $cur_examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
-  while ($cur_examples_files_data = db_fetch_object($cur_examples_files_q))
+  if (delete_example($example_data->id))
   {
-    if (!unlink($root_path . $cur_examples_files_data->filepath))
-      drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
-  }
-  /* deleting example database entries */
-  db_query("DELETE FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
-  db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $example_id);
-  /* deleting dependency database entries */
-  db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
+    drupal_set_message('Example deleted.', 'status');
 
-  drupal_set_message('Example deleted.', 'status');
+    /* sending email */
+    $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');
+    $param['example_deleted_user']['book_title'] = $preference_data->book;
+    $param['example_deleted_user']['chapter_title'] = $chapter_data->name;
+    $param['example_deleted_user']['example_number'] = $example_data->number;
+    $param['example_deleted_user']['example_caption'] = $example_data->caption;
+
+    $param['example_deleted_user']['user_id'] = $user->uid;
+
+    if (!drupal_mail('textbook_companion', 'example_deleted_user', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+      drupal_set_message('Error sending email message.', 'error');
+  } else {
+    drupal_set_message('Error deleting example.', 'status');
+  }
+
   drupal_goto('textbook_companion/code');
   return;
 }

@@ -964,6 +964,25 @@ Best Wishes,
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
+    case 'example_deleted_user':
+      $user_data = user_load($params['example_deleted_user']['user_id']);
+
+      $message['subject'] = t('[!site_name] User has deleted pending example', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+Your following pending example has been deleted :
+
+Title of the Book : ' . $params['example_deleted_user']['book_title'] . '
+Title of the Chapter : ' . $params['example_deleted_user']['chapter_title'] . '
+Example number : ' . $params['example_deleted_user']['example_number'] . '
+Caption : ' . $params['example_deleted_user']['example_caption'] . '
+
+Best Wishes,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      break;
+
     case 'dependency_uploaded':
       $user_data = user_load($params['dependency_uploaded']['user_id']);
       $dependency_files = implode(',', $params['dependency_uploaded']['dependency_names']);
@@ -1084,13 +1103,12 @@ function delete_example($example_id)
   $root_path = textbook_companion_path();
 
   /* deleting example files */
-  $err = FALSE;
+  $status = TRUE;
   $ch_path = '';
   if ($example_id <= 0)
   {
     drupal_set_message(t('Invalid example'), 'error');
-    $err = TRUE;
-    return $err;
+    return FALSE;
   }
 
   $examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
@@ -1100,7 +1118,7 @@ function delete_example($example_id)
       $ch_path = $examples_files_data->filepath;
     if (!unlink($root_path . $examples_files_data->filepath))
     {
-      $err = TRUE;
+      $status = FALSE;
       drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
 
       /* sending email to admins */
@@ -1121,7 +1139,7 @@ function delete_example($example_id)
 
   /* removing example folder */
   $ch_path_arr = explode('/', $ch_path);
-  if (!$err)
+  if ($status)
   {
     $dir_path = $root_path . $ch_path_arr[0] . '/' . $ch_path_arr[1] . '/' . $ch_path_arr[2];
     $res = rmdir($dir_path);
@@ -1135,12 +1153,61 @@ function delete_example($example_id)
       $param['standard']['body'] = "Error deleting folder " . $dir_path;
       if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
         drupal_set_message('Error sending email message.', 'error');
+      $status = FALSE;
     }
+  } else {
+    return FALSE;
   }
 
   /* deleting example dependency database entries */
   db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
-  if (!$err)
+  if ($status)
     db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $example_id);
-  return $err;
+  return $status;
+}
+
+function delete_chapter($chapter_id)
+{
+  $status = TRUE;
+  $root_path = textbook_companion_path();
+
+  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d", $chapter_id);
+  $chapter_data = db_fetch_object($chapter_q);
+  if (!$chapter_data)
+  {
+    drupal_set_message('Invalid chapter.', 'error');
+    return FALSE;
+  }
+
+  /* deleting examples */
+  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_id);
+  while ($example_data = db_fetch_object($example_q))
+  {
+    if (!delete_example($example_data->id))
+      $status = FALSE;
+  }
+
+  if ($status)
+  {
+    $dir_path = $root_path . $chapter_data->preference_id . '/CH' . $chapter_data->number;
+
+    $res = rmdir($dir_path);
+    if (!$res)
+    {
+      drupal_set_message(t('Error deleting folder !folder', array('!folder' => $dir_path)), 'error');
+
+      /* sending email to admins */
+      $email_to = variable_get('textbook_companion_emails', '');
+      $param['standard']['subject'] = "[ERROR] Error deleting folder";
+      $param['standard']['body'] = "Error deleting folder " . $dir_path;
+      if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+        drupal_set_message('Error sending email message.', 'error');
+      return FALSE;
+    } else {
+      /* deletion chapter details from database */
+      db_query("DELETE FROM {textbook_companion_chapter} WHERE id = %d", $chapter_id);
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
