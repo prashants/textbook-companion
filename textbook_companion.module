@@ -207,7 +207,7 @@ function textbook_companion_menu()
   );
 
   $items['textbook_run'] = array(
-    'title' => 'Run Code',
+    'title' => 'Download Codes',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('textbook_companion_run_form'),
     'access arguments' => array('access content'),
@@ -281,7 +281,7 @@ function textbook_companion_menu()
     'description' => 'Generate Book From Latex Script', 
     'page callback' => 'textbook_companion_download_book',
     'access arguments' => array('generate book'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
     'file' => 'latex.inc',
   );
 

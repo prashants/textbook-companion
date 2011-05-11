@@ -222,10 +222,10 @@ function textbook_companion_run_form($form_state)
         '#title' => 'List of example files',
         '#value' => $example_files,
       );
-      $form['run']['submit'] = array(
-        '#type' => 'submit',
-        '#value' => t('Run')
-      );
+      //$form['run']['submit'] = array(
+      //  '#type' => 'submit',
+      //  '#value' => t('Run')
+      //);
       if (user_access('create feedback'))
       {
         $form['run']['feedback'] = array(
