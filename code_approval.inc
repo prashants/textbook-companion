@@ -171,7 +171,7 @@ function code_approval_form_submit($form, &$form_state)
         drupal_set_message('Error sending email message.', 'error');
     }
   }
-  drupal_set_message('Approval status updated.', 'status');
+  drupal_set_message('Updated successfully.', 'status');
   drupal_goto('code_approval');
 }
 
