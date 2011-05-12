@@ -448,7 +448,7 @@ function bulk_approval_form_submit($form, &$form_state)
         {
           db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d WHERE chapter_id = %d AND approval_status = 0", $user->uid, $chapter_data->id);
         }
-        drupal_set_message(t('Approved Entire Book (except already dis-approved examples).'), 'status');
+        drupal_set_message(t('Approved Entire Book.'), 'status');
 
         /* email */
         $email_subject = t('Your uploaded examples have been approved');
@@ -470,73 +470,43 @@ function bulk_approval_form_submit($form, &$form_state)
 
       } else if ($form_state['values']['run']['disapprove_book'] == "1") {
 
-        /* approving entire book */
-        $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
-        while ($chapter_data = db_fetch_object($chapter_q))
+        if (delete_book($form_state['values']['run']['book']))
         {
-          db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d WHERE chapter_id = %d", $user->uid, $chapter_data->id);
+          drupal_set_message(t('Dis-Approved and Deleted Entire Book.'), 'status');
+        } else {
+          drupal_set_message(t('Error Dis-Approving and Deleting Entire Book.'), 'error');
         }
-        drupal_set_message(t('Dis-Approved Entire Book.'), 'status');
 
         /* email */
         $email_subject = t('Your uploaded examples have been marked as dis-approved');
-        $email_body = t('Your all the uploaded examples for the book have been marked as dis-approved.
+        $email_body = t('Your all the uploaded examples for the whole book have been marked as dis-approved.
 
 Reason for dis-approval:
 
 ' . $form_state['values']['run']['message']);
 
-      } else if ($form_state['values']['run']['delete_book'] == "1") {
-
-        /* deleting entire book */
-        $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
-        while ($chapter_data = db_fetch_object($chapter_q))
-        {
-          $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
-          while ($example_data = db_fetch_object($example_q))
-          {
-            _delete_example($example_data->id);
-          }
-          /* delete example database entry */
-          db_query("DELETE FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
-        }
-        /* deleting chapters */
-        db_query("DELETE FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
-        drupal_set_message(t('Deleted Entire Book.'), 'status');
-
-        /* email */
-        $email_subject = t('Your uploaded examples have been deleted');
-        $email_body = t('Your all the uploaded examples for the book have been deleted.');
-
       } else if ($form_state['values']['run']['delete_book_including_proposal'] == "1") {
 
-        /* deleting entire book including proposal */
-        $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
-        while ($chapter_data = db_fetch_object($chapter_q))
+        if (delete_book($form_state['values']['run']['book']))
         {
-          $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
-          while ($example_data = db_fetch_object($example_q))
-          {
-            _delete_example($example_data->id);
-          }
-          /* delete example database entry */
-          db_query("DELETE FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
+          drupal_set_message(t('Dis-Approved and Deleted Entire Book.'), 'status');
+
+          /* deleting preference and proposal */
+          $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $form_state['values']['run']['book']);
+          $preference_data = db_fetch_object($preference_q);
+          $proposal_id = $preference_data->proposal_id;
+          db_query("DELETE FROM {textbook_companion_preference} WHERE proposal_id = %d", $proposal_id);
+          db_query("DELETE FROM {textbook_companion_proposal} WHERE id = %d", $proposal_id);
+  
+          drupal_set_message(t('Deleted Entire Book Including Proposal.'), 'status');
+ 
+          /* email */
+          $email_subject = t('Your uploaded examples including the book proposal have been deleted');
+          $email_body = t('Your all the uploaded examples including the book have been deleted permanently.');
+
+        } else {
+          drupal_set_message(t('Error Dis-Approving and Deleting Entire Book.'), 'error');
         }
-        /* deleting chapters */
-        db_query("DELETE FROM {textbook_companion_chapter} WHERE preference_id = %d", $form_state['values']['run']['book']);
-
-        /* deleting preference and proposal */
-        $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $form_state['values']['run']['book']);
-        $preference_data = db_fetch_object($preference_q);
-        $proposal_id = $preference_data->proposal_id;
-        db_query("DELETE FROM {textbook_companion_preference} WHERE proposal_id = %d", $proposal_id);
-        db_query("DELETE FROM {textbook_companion_proposal} WHERE id = %d", $proposal_id);
-
-        drupal_set_message(t('Deleted Entire Book Including Proposal.'), 'status');
-
-        /* email */
-        $email_subject = t('Your uploaded examples including the book have been deleted');
-        $email_body = t('Your all the uploaded examples including the book have been deleted permanently.');
 
       } else if ($form_state['values']['run']['approve_chapter'] == "1") {
 
@@ -550,7 +520,7 @@ Reason for dis-approval:
       } else if ($form_state['values']['run']['unapprove_chapter'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE chapter_id = %d", $form_state['values']['run']['chapter']);
-        drupal_set_message(t('Pending Review Entire Chapter.'), 'status');
+        drupal_set_message(t('Entire Chapter marked as Pending Review.'), 'status');
 
         /* email */
         $email_subject = t('Your uploaded examples have been marked as pending');
@@ -562,12 +532,12 @@ Reason for dis-approval:
         {
           drupal_set_message(t('Dis-Approved and Deleted Entire Chapter.'), 'status');
         } else {
-          drupal_set_message(t('Error Dis-Approving and Deleting Entire Chapter.'), 'status');
+          drupal_set_message(t('Error Dis-Approving and Deleting Entire Chapter.'), 'error');
         }
 
         /* email */
-        $email_subject = t('Your uploaded example for entire chapter has been marked as dis-approved');
-        $email_body = t('Your uploaded example for the chapter has been marked as dis-approved.
+        $email_subject = t('Your uploaded example have been marked as dis-approved');
+        $email_body = t('Your uploaded example for the entire chapter have been marked as dis-approved.
 
 Reason for dis-approval:
 
@@ -576,7 +546,7 @@ Reason for dis-approval:
       } else if ($form_state['values']['run']['approve_example'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d WHERE id = %d", $user->uid, $form_state['values']['run']['example']);
-        drupal_set_message(t('Approved Example.'), 'status');
+        drupal_set_message(t('Example approved.'), 'status');
 
         /* email */
         $email_subject = t('Your uploaded example has been approved');
@@ -585,7 +555,7 @@ Reason for dis-approval:
       } else if ($form_state['values']['run']['unapprove_example'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE id = %d", $form_state['values']['run']['example']);
-        drupal_set_message(t('Unapproved Example.'), 'status');
+        drupal_set_message(t('Example marked as Pending Review.'), 'status');
 
         /* email */
         $email_subject = t('Your uploaded example has been marked as pending');
@@ -597,7 +567,7 @@ Reason for dis-approval:
         {
           drupal_set_message(t('Example Dis-Approved and Deleted.'), 'status');
         } else {
-          drupal_set_message(t('Error Dis-Approving and Deleting Example.'), 'status');
+          drupal_set_message(t('Error Dis-Approving and Deleting Example.'), 'error');
         }
 
         /* email */
@@ -609,7 +579,8 @@ Reason for dis-approval:
 ' . $form_state['values']['run']['message']);
 
       }
-      /* sending email when everything done */
+
+      /****** sending email when everything done ******/
       if ($email_subject)
       {
         $email_to = variable_get('textbook_companion_emails', '') . ', ' . $user->mail;
@@ -658,20 +629,3 @@ function _list_of_examples($chapter_id = 0)
   return $book_examples;
 }
 
-function _delete_example($exmaple_id)
-{
-  $root_path = textbook_companion_path();
-
-  /* deleting example files */
-  $examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
-  while ($examples_files_data = db_fetch_object($examples_files_q))
-  {
-    if (!unlink($root_path . $examples_files_data->filepath))
-      drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
-  }
-  /* deleting example files database entries */
-  db_query("DELETE FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
-  /* deleting example dependency database entries */
-  db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
-  db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $example_id);
-}

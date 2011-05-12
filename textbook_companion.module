@@ -1188,10 +1188,12 @@ function delete_example($example_id)
     return FALSE;
   }
 
-  /* deleting example dependency database entries */
-  db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
+  /* deleting example dependency and exmaple database entries */
   if ($status)
+  {
+    db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
     db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $example_id);
+  }
   return $status;
 }
 
@@ -1249,7 +1251,6 @@ function delete_chapter($chapter_id)
 
 function delete_book($book_id)
 {
-  $book_status = TRUE;
   $status = TRUE;
   $root_path = textbook_companion_path();
 
@@ -1259,44 +1260,16 @@ function delete_book($book_id)
   {
     drupal_set_message('Invalid book.', 'error');
     return FALSE;
-  } else {
-    $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $preference_data->id);
-    while ($chapter_data = db_fetch_object($chapter_q))
+  }
+
+  /* delete chapters */
+  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d", $preference_data->id);
+  while ($chapter_data = db_fetch_object($chapter_q))
+  {
+    if (!delete_chapter($chapter_data->id))
     {
-      $status = TRUE;
-
-      /* deleting examples */
-      $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
-      while ($example_data = db_fetch_object($example_q))
-      {
-        if (!delete_example($example_data->id))
-          $book_status = FALSE;
-          $status = FALSE;
-      }
-
-      if ($status)
-      {
-        $dir_path = $root_path . $chapter_data->preference_id . '/CH' . $chapter_data->number;
-    
-        $res = rmdir($dir_path);
-        if (!$res)
-        {
-          drupal_set_message(t('Error deleting folder !folder', array('!folder' => $dir_path)), 'error');
-    
-          /* sending email to admins */
-          $email_to = variable_get('textbook_companion_emails', '');
-          $param['standard']['subject'] = "[ERROR] Error deleting folder";
-          $param['standard']['body'] = "Error deleting folder " . $dir_path;
-          if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
-            drupal_set_message('Error sending email message.', 'error');
-          return FALSE;
-        } else {
-          /* deletion chapter details from database */
-          db_query("DELETE FROM {textbook_companion_chapter} WHERE id = %d", $chapter_id);
-          return TRUE;
-        }
-      }
+      $status = FALSE;
     }
   }
-  return FALSE;
+  return $status;
 }
