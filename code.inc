@@ -353,20 +353,27 @@ function upload_examples_form_submit($form, &$form_state) {
       drupal_set_message(t("Example already approved. Cannot overwrite it."), 'error');
       drupal_goto('textbook_companion/code');
       return;
+    } else if ($cur_example_d->approval_status == 0) {
+      drupal_set_message(t("Example is under pending review. Delete the example and reupload it."), 'error');
+      drupal_goto('textbook_companion/code');
+      return;
     } else {
-      /* deleting old example files */
-      $cur_examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $cur_example_d->id);
-      while ($cur_examples_files_data = db_fetch_object($cur_examples_files_q))
-      {
-        if (!unlink($root_path . $cur_examples_files_data->filepath))
-          drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
-      }
-      /* deleting old example database entries */
-      db_query("DELETE FROM {textbook_companion_example_files} WHERE example_id = %d", $cur_example_d->id);
-      db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $cur_example_d->id);
-      /* deleting old dependency database entries */
-      db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $cur_example_d->id);
-      drupal_set_message(t("Example overwritten."), 'status');
+      drupal_set_message(t("Error uploading example. Please contact administrator."), 'error');
+      drupal_goto('textbook_companion/code');
+      return;
+      // /* deleting old example files */
+      // $cur_examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $cur_example_d->id);
+      // while ($cur_examples_files_data = db_fetch_object($cur_examples_files_q))
+      // {
+        // if (!unlink($root_path . $cur_examples_files_data->filepath))
+          // drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
+      // }
+      // /* deleting old example database entries */
+      // db_query("DELETE FROM {textbook_companion_example_files} WHERE example_id = %d", $cur_example_d->id);
+      // db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $cur_example_d->id);
+      // /* deleting old dependency database entries */
+      // db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $cur_example_d->id);
+      // drupal_set_message(t("Example overwritten."), 'status');
     }
   }
 

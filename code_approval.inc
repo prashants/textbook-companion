@@ -159,16 +159,19 @@ function code_approval_form_submit($form, &$form_state)
         drupal_set_message('Error sending email message.', 'error');
 
     } else if ($ex_data['approved'] == "1") {
-      delete_example($ex_data['example_id']);
-
-      /* sending email */
-      $email_to = $user_data->mail . ', ' . variable_get('textbook_companion_emails', '');
-      $param['example_disapproved']['example_number'] = $example_data->number;
-      $param['example_disapproved']['example_caption'] = $example_data->caption;
-      $param['example_disapproved']['user_id'] = $user_data->uid;
-      $param['example_disapproved']['message'] = $ex_data['message'];
-      if (!drupal_mail('textbook_companion', 'example_disapproved', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
-        drupal_set_message('Error sending email message.', 'error');
+      if (delete_example($ex_data['example_id']))
+      {
+        /* sending email */
+        $email_to = $user_data->mail . ', ' . variable_get('textbook_companion_emails', '');
+        $param['example_disapproved']['example_number'] = $example_data->number;
+        $param['example_disapproved']['example_caption'] = $example_data->caption;
+        $param['example_disapproved']['user_id'] = $user_data->uid;
+        $param['example_disapproved']['message'] = $ex_data['message'];
+        if (!drupal_mail('textbook_companion', 'example_disapproved', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+          drupal_set_message('Error sending email message.', 'error');
+      } else {
+        drupal_set_message('Error disapproving and deleting example. Please contact administrator.', 'error');
+      }
     }
   }
   drupal_set_message('Updated successfully.', 'status');
@@ -182,6 +185,11 @@ function code_approval_form_submit($form, &$form_state)
 
 function bulk_approval_form($form_state)
 {
+
+  drupal_set_message('Not yet implemented', 'error');
+  drupal_goto('code_approval');
+  return;
+
   $form['#redirect'] = FALSE;
 
   ahah_helper_register($form, $form_state);
@@ -273,11 +281,7 @@ function bulk_approval_form($form_state)
     );
     $form['run']['disapprove_book'] = array(
       '#type'  => 'checkbox',
-      '#title' => t('Dis-Approve Entire Book'),
-    );
-    $form['run']['delete_book'] = array(
-      '#type'  => 'checkbox',
-      '#title' => t('Delete Entire Book'),
+      '#title' => t('Dis-Approve Entire Book (This will delete all the examples in the book)'),
       '#prefix' => '<div style="color:red;"><strong>',
       '#suffix' => '</strong></div>',
     );
@@ -322,11 +326,7 @@ function bulk_approval_form($form_state)
       );
       $form['run']['disapprove_chapter'] = array(
         '#type'  => 'checkbox',
-        '#title' => t('Dis-Approve Entire Chapter'),
-      );
-      $form['run']['delete_chapter'] = array(
-        '#type'  => 'checkbox',
-        '#title' => t('Delete Entire Chapter'),
+        '#title' => t('Dis-Approve Entire Chapter (This will delete all the examples in the chapter)'),
         '#prefix' => '<div style="color:red;"><strong>',
         '#suffix' => '</strong></div>',
       );
@@ -411,11 +411,7 @@ function bulk_approval_form($form_state)
       );
       $form['run']['disapprove_example'] = array(
         '#type'  => 'checkbox',
-        '#title' => t('Dis-approve Example'),
-      );
-      $form['run']['delete_example'] = array(
-        '#type'  => 'checkbox',
-        '#title' => t('Delete Example'),
+        '#title' => t('Dis-approve Example (This will delete the example)'),
         '#prefix' => '<div style="color:red;"><strong>',
         '#suffix' => '</strong></div>',
       );
@@ -614,8 +610,12 @@ Reason for dis-approval:
 
       } else if ($form_state['values']['run']['disapprove_example'] == "1") {
 
-        db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d WHERE id = %d", $user->uid, $form_state['values']['run']['example']);
-        drupal_set_message(t('Dis-Approved Example.'), 'status');
+        if (delete_example($form_state['values']['run']['example']))
+        {
+          drupal_set_message(t('Dis-Approved Example.'), 'status');
+        } else {
+          drupal_set_message(t('Error Dis-Approving Example.'), 'status');
+        }
 
         /* email */
         $email_subject = t('Your uploaded example has been marked as dis-approved');
@@ -625,21 +625,8 @@ Reason for dis-approval:
 
 ' . $form_state['values']['run']['message']);
 
-      } else if ($form_state['values']['run']['delete_example'] == "1") {
-
-        if (delete_example($form_state['values']['run']['example']))
-        {
-          drupal_set_message(t('Deleted Example.'), 'status');
-        } else {
-          drupal_set_message(t('Error Deleting Example.'), 'error');
-          
-        }
-
-        /* email */
-        $email_subject = t('Your uploaded example has been deleted');
-        $email_body = t('Your uploaded example has been deleted permanently.');
-
       }
+
 
       /* sending email */
       if ($email_subject)
