@@ -1204,7 +1204,7 @@ function delete_chapter($chapter_id)
     $res = rmdir($dir_path);
     if (!$res)
     {
-      drupal_set_message(t('Error deleting folder !folder', array('!folder' => $dir_path)), 'error');
+      drupal_set_message(t('Error deleting chapter folder !folder', array('!folder' => $dir_path)), 'error');
 
       /* sending email to admins */
       $email_to = variable_get('textbook_companion_emails', '');
@@ -1214,7 +1214,7 @@ function delete_chapter($chapter_id)
         drupal_set_message('Error sending email message.', 'error');
       return FALSE;
     } else {
-      /* deletion chapter details from database */
+      /* deleting chapter details from database */
       db_query("DELETE FROM {textbook_companion_chapter} WHERE id = %d", $chapter_id);
       return TRUE;
     }

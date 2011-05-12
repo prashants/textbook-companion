@@ -185,11 +185,6 @@ function code_approval_form_submit($form, &$form_state)
 
 function bulk_approval_form($form_state)
 {
-
-  drupal_set_message('Not yet implemented', 'error');
-  drupal_goto('code_approval');
-  return;
-
   $form['#redirect'] = FALSE;
 
   ahah_helper_register($form, $form_state);
@@ -559,36 +554,24 @@ Reason for dis-approval:
 
         /* email */
         $email_subject = t('Your uploaded examples have been marked as pending');
-        $email_body = t('Your all the uploaded examples for the chapter have been marked as pending to be review. You will be able to see the exmaples after they have been approved by one of our reviewers.');
+        $email_body = t('Your all the uploaded examples for the chapter have been marked as pending to be review.');
 
       } else if ($form_state['values']['run']['disapprove_chapter'] == "1") {
 
-        db_query("UPDATE {textbook_companion_example} SET approval_status = 2, approver_uid = %d WHERE chapter_id = %d", $user->uid, $form_state['values']['run']['chapter']);
-        drupal_set_message(t('Dis-Approved Entire Chapter.'), 'status');
+        if (delete_chapter($form_state['values']['run']['chapter']))
+        {
+          drupal_set_message(t('Dis-Approved and Deleted Entire Chapter.'), 'status');
+        } else {
+          drupal_set_message(t('Error Dis-Approving and Deleting Entire Chapter.'), 'status');
+        }
 
         /* email */
-        $email_subject = t('Your uploaded examples have been marked as dis-approved');
-        $email_body = t('Your all the uploaded examples for the book have been marked as dis-approved.
+        $email_subject = t('Your uploaded example for entire chapter has been marked as dis-approved');
+        $email_body = t('Your uploaded example for the chapter has been marked as dis-approved.
 
 Reason for dis-approval:
 
 ' . $form_state['values']['run']['message']);
-
-      } else if ($form_state['values']['run']['delete_chapter'] == "1") {
-
-        $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $form_state['values']['run']['chapter']);
-        while ($example_data = db_fetch_object($example_q))
-        {
-          _delete_example($example_data->id);
-        }
-        /* delete example database entry */
-        db_query("DELETE FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
-        db_query("DELETE FROM {textbook_companion_chapter} WHERE id = %d", $form_state['values']['run']['chapter']);
-        drupal_set_message(t('Deleted Entire Chapter.'), 'status');
-
-        /* email */
-        $email_subject = t('Your uploaded examples have been deleted');
-        $email_body = t('Your all the uploaded examples for the chapter have been deleted permanently.');
 
       } else if ($form_state['values']['run']['approve_example'] == "1") {
 
@@ -598,7 +581,7 @@ Reason for dis-approval:
         /* email */
         $email_subject = t('Your uploaded example has been approved');
         $email_body = t('Your uploaded example has been approved.');
-       
+
       } else if ($form_state['values']['run']['unapprove_example'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 0 WHERE id = %d", $form_state['values']['run']['example']);
@@ -606,15 +589,15 @@ Reason for dis-approval:
 
         /* email */
         $email_subject = t('Your uploaded example has been marked as pending');
-        $email_body = t('Your uploaded example has been marked as pending to be review. You will be able to see the exmaple after it have been approved by one of our reviewers.');
+        $email_body = t('Your uploaded example has been marked as pending to be review.');
 
       } else if ($form_state['values']['run']['disapprove_example'] == "1") {
 
         if (delete_example($form_state['values']['run']['example']))
         {
-          drupal_set_message(t('Dis-Approved Example.'), 'status');
+          drupal_set_message(t('Example Dis-Approved and Deleted.'), 'status');
         } else {
-          drupal_set_message(t('Error Dis-Approving Example.'), 'status');
+          drupal_set_message(t('Error Dis-Approving and Deleting Example.'), 'status');
         }
 
         /* email */
@@ -626,9 +609,7 @@ Reason for dis-approval:
 ' . $form_state['values']['run']['message']);
 
       }
-
-
-      /* sending email */
+      /* sending email when everything done */
       if ($email_subject)
       {
         $email_to = variable_get('textbook_companion_emails', '') . ', ' . $user->mail;
