@@ -1127,10 +1127,18 @@ function delete_example($example_id)
   {
     if (!$ch_path)
       $ch_path = $examples_files_data->filepath;
+
+    if (!file_exists($root_path . $examples_files_data->filepath))
+    {
+      $status = FALSE;
+      drupal_set_message(t('Error deleting !file. File does not exists.', array('!file' => $examples_files_data->filepath)), 'error');
+      continue;
+    }
+
     if (!unlink($root_path . $examples_files_data->filepath))
     {
       $status = FALSE;
-      drupal_set_message(t('Error deleting !file', array('!file' => $cur_examples_files_data->filepath)), 'error');
+      drupal_set_message(t('Error deleting !file', array('!file' => $examples_files_data->filepath)), 'error');
 
       /* sending email to admins */
       $email_to = variable_get('textbook_companion_emails', '');
@@ -1151,19 +1159,30 @@ function delete_example($example_id)
   $ch_path_arr = explode('/', $ch_path);
   if ($status)
   {
-    $dir_path = $root_path . $ch_path_arr[0] . '/' . $ch_path_arr[1] . '/' . $ch_path_arr[2];
-    $res = rmdir($dir_path);
-    if (!$res)
+    if (!($ch_path_arr[0] || $ch_path_arr[1] || $ch_path_arr[2]))
     {
-      drupal_set_message(t('Error deleting folder !folder', array('!folder' => $dir_path)), 'error');
-
-      /* sending email to admins */
-      $email_to = variable_get('textbook_companion_emails', '');
-      $param['standard']['subject'] = "[ERROR] Error deleting folder";
-      $param['standard']['body'] = "Error deleting folder " . $dir_path . " by " . $user->uid . " at " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-      if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
-        drupal_set_message('Error sending email message.', 'error');
-      $status = FALSE;
+      drupal_set_message(t('Error deleting example folder. Invalid folder !folder for example id !ex_id.', array('!folder' => $dir_path, '!ex_id' => $example_id)), 'error');
+      return FALSE;
+    }
+    $dir_path = $root_path . $ch_path_arr[0] . '/' . $ch_path_arr[1] . '/' . $ch_path_arr[2];
+    if (is_dir($dir_path))
+    {
+      $res = rmdir($dir_path);
+      if (!$res)
+      {
+        drupal_set_message(t('Error deleting folder !folder', array('!folder' => $dir_path)), 'error');
+  
+        /* sending email to admins */
+        $email_to = variable_get('textbook_companion_emails', '');
+        $param['standard']['subject'] = "[ERROR] Error deleting folder";
+        $param['standard']['body'] = "Error deleting folder " . $dir_path . " by " . $user->uid . " at " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+          drupal_set_message('Error sending email message.', 'error');
+        $status = FALSE;
+      }
+    } else {
+      drupal_set_message(t('Cannot delete example folder. !folder does not exists.', array('!folder' => $dir_path)), 'error');
+      return FALSE;
     }
   } else {
     return FALSE;
@@ -1201,22 +1220,28 @@ function delete_chapter($chapter_id)
   {
     $dir_path = $root_path . $chapter_data->preference_id . '/CH' . $chapter_data->number;
 
-    $res = rmdir($dir_path);
-    if (!$res)
+    if (is_dir($dir_path))
     {
-      drupal_set_message(t('Error deleting chapter folder !folder', array('!folder' => $dir_path)), 'error');
-
-      /* sending email to admins */
-      $email_to = variable_get('textbook_companion_emails', '');
-      $param['standard']['subject'] = "[ERROR] Error deleting folder";
-      $param['standard']['body'] = "Error deleting folder " . $dir_path;
-      if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
-        drupal_set_message('Error sending email message.', 'error');
-      return FALSE;
+      $res = rmdir($dir_path);
+      if (!$res)
+      {
+        drupal_set_message(t('Error deleting chapter folder !folder', array('!folder' => $dir_path)), 'error');
+  
+        /* sending email to admins */
+        $email_to = variable_get('textbook_companion_emails', '');
+        $param['standard']['subject'] = "[ERROR] Error deleting folder";
+        $param['standard']['body'] = "Error deleting folder " . $dir_path;
+        if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+          drupal_set_message('Error sending email message.', 'error');
+        return FALSE;
+      } else {
+        /* deleting chapter details from database */
+        db_query("DELETE FROM {textbook_companion_chapter} WHERE id = %d", $chapter_id);
+        return TRUE;
+      }
     } else {
-      /* deleting chapter details from database */
-      db_query("DELETE FROM {textbook_companion_chapter} WHERE id = %d", $chapter_id);
-      return TRUE;
+      drupal_set_message(t('Cannot delete chapter folder. !folder does not exists.', array('!folder' => $dir_path)), 'error');
+      return FALSE;
     }
   }
   return FALSE;

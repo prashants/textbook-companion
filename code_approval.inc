@@ -541,7 +541,7 @@ Reason for dis-approval:
       } else if ($form_state['values']['run']['approve_chapter'] == "1") {
 
         db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d WHERE chapter_id = %d AND approval_status = 0", $user->uid, $form_state['values']['run']['chapter']);
-        drupal_set_message(t('Approved Entire Chapter (except already dis-approved examples).'), 'status');
+        drupal_set_message(t('Approved Entire Chapter.'), 'status');
 
         /* email */
         $email_subject = t('Your uploaded examples have been approved');
