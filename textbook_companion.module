@@ -1110,6 +1110,7 @@ function textbook_companion_path() {
 
 function delete_example($example_id)
 {
+  global $user;
   $root_path = textbook_companion_path();
 
   /* deleting example files */
@@ -1134,13 +1135,12 @@ function delete_example($example_id)
       /* sending email to admins */
       $email_to = variable_get('textbook_companion_emails', '');
       $param['standard']['subject'] = "[ERROR] Error deleting example file";
-      $param['standard']['body'] = "Error deleting example files :
+      $param['standard']['body'] = "Error deleting example files by " . $user->uid . " at " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . " :
         example id : " . $example_id . "
         file id : " .  $examples_files_data->id . "
         file path : " . $examples_files_data->filepath;
       if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
         drupal_set_message('Error sending email message.', 'error');
-
     } else {
       /* deleting example files database entries */
       db_query("DELETE FROM {textbook_companion_example_files} WHERE id = %d", $examples_files_data->id);
@@ -1160,7 +1160,7 @@ function delete_example($example_id)
       /* sending email to admins */
       $email_to = variable_get('textbook_companion_emails', '');
       $param['standard']['subject'] = "[ERROR] Error deleting folder";
-      $param['standard']['body'] = "Error deleting folder " . $dir_path;
+      $param['standard']['body'] = "Error deleting folder " . $dir_path . " by " . $user->uid . " at " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
       if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
         drupal_set_message('Error sending email message.', 'error');
       $status = FALSE;
