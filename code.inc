@@ -342,9 +342,10 @@ function upload_examples_form_submit($form, &$form_state) {
     $chapter_id = db_last_insert_id('textbook_companion_chapter', 'id');
   } else {
     $chapter_id = $chapter_row->id;
+    db_query("UPDATE {textbook_companion_chapter} SET name = '%s' WHERE id = %d", $form_state['values']['name'], $chapter_id);
   }
 
-  /*  get example details - dont allow if already example present and status is approved */
+  /*  get example details - dont allow if already example present */
   $cur_example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d AND number = '%s'", $chapter_id, $form_state['values']['example_number']);
   if ($cur_example_d = db_fetch_object($cur_example_q))
   {
