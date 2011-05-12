@@ -1070,7 +1070,7 @@ function textbook_companion_ajax()
       if ($example_data->approval_status == 1)
         echo 'Warning! Example already approved. You cannot upload the same example again.';
       else
-        echo 'Warning! Example already uploaded. Uploading the example again will overwrite it.';
+        echo 'Warning! Example already uploaded. Delete the example and reupload it.';
       return;
     }
   }
