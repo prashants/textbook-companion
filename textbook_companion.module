@@ -1112,22 +1112,28 @@ function delete_example($example_id)
 {
   global $user;
   $root_path = textbook_companion_path();
-
-  /* deleting example files */
   $status = TRUE;
-  $ch_path = '';
-  if ($example_id <= 0)
+
+  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d", $example_id);
+  $example_data = db_fetch_object($example_q);
+  if (!$example_data)
   {
-    drupal_set_message(t('Invalid example'), 'error');
+    drupal_set_message(t('Invalid example.'), 'error');
     return FALSE;
   }
 
+  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d", $example_data->chapter_id);
+  $chapter_data = db_fetch_object($chapter_q);
+  if (!$chapter_data)
+  {
+    drupal_set_message(t('Invalid example chapter.'), 'error');
+    return FALSE;
+  }
+
+  /* deleting example files */
   $examples_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
   while ($examples_files_data = db_fetch_object($examples_files_q))
   {
-    if (!$ch_path)
-      $ch_path = $examples_files_data->filepath;
-
     if (!file_exists($root_path . $examples_files_data->filepath))
     {
       $status = FALSE;
@@ -1135,6 +1141,7 @@ function delete_example($example_id)
       continue;
     }
 
+    /* removing example file */
     if (!unlink($root_path . $examples_files_data->filepath))
     {
       $status = FALSE;
@@ -1155,45 +1162,35 @@ function delete_example($example_id)
     }
   }
 
+  if (!$status)
+    return FALSE;
+
   /* removing example folder */
-  $ch_path_arr = explode('/', $ch_path);
-  if ($status)
+  $ex_path = $chapter_data->preference_id . '/' . 'CH' . $chapter_data->number . '/' . 'EX' . $example_data->number;
+  $dir_path = $root_path . $ex_path;
+  if (is_dir($dir_path))
   {
-    if (!($ch_path_arr[0] || $ch_path_arr[1] || $ch_path_arr[2]))
+    if (!rmdir($dir_path))
     {
-      drupal_set_message(t('Error deleting example folder. Invalid folder !folder for example id !ex_id.', array('!folder' => $dir_path, '!ex_id' => $example_id)), 'error');
-      return FALSE;
-    }
-    $dir_path = $root_path . $ch_path_arr[0] . '/' . $ch_path_arr[1] . '/' . $ch_path_arr[2];
-    if (is_dir($dir_path))
-    {
-      $res = rmdir($dir_path);
-      if (!$res)
-      {
-        drupal_set_message(t('Error deleting folder !folder', array('!folder' => $dir_path)), 'error');
-  
-        /* sending email to admins */
-        $email_to = variable_get('textbook_companion_emails', '');
-        $param['standard']['subject'] = "[ERROR] Error deleting folder";
-        $param['standard']['body'] = "Error deleting folder " . $dir_path . " by " . $user->uid . " at " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
-          drupal_set_message('Error sending email message.', 'error');
-        $status = FALSE;
-      }
-    } else {
-      drupal_set_message(t('Cannot delete example folder. !folder does not exists.', array('!folder' => $dir_path)), 'error');
+      drupal_set_message(t('Error deleting folder !folder', array('!folder' => $dir_path)), 'error');
+
+      /* sending email to admins */
+      $email_to = variable_get('textbook_companion_emails', '');
+      $param['standard']['subject'] = "[ERROR] Error deleting folder";
+      $param['standard']['body'] = "Error deleting folder " . $dir_path . " by " . $user->uid . " at " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+      if (!drupal_mail('textbook_companion', 'standard', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+        drupal_set_message('Error sending email message.', 'error');
       return FALSE;
     }
   } else {
+    drupal_set_message(t('Cannot delete example folder. !folder does not exists.', array('!folder' => $dir_path)), 'error');
     return FALSE;
   }
 
   /* deleting example dependency and exmaple database entries */
-  if ($status)
-  {
-    db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
-    db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $example_id);
-  }
+  db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_id);
+  db_query("DELETE FROM {textbook_companion_example} WHERE id = %d", $example_id);
+
   return $status;
 }
 
