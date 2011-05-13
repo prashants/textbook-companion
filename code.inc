@@ -415,6 +415,12 @@ function upload_examples_form_submit($form, &$form_state) {
       else
         $file_type = 'U';
 
+      if (file_exists($root_path . $dest_path . $_FILES['files']['name'][$file_form_name]))
+      {
+        drupal_set_message(t("Error uploading file. File !filename already exists.", array('!filename' => $_FILES['files']['name'][$file_form_name])), 'error');
+        return;
+      }
+
       /* uploading file */
       if (move_uploaded_file($_FILES['files']['tmp_name'][$file_form_name], $root_path . $dest_path . $_FILES['files']['name'][$file_form_name]))
       {
