@@ -434,6 +434,7 @@ function bulk_approval_form($form_state)
 function bulk_approval_form_submit($form, &$form_state)
 {
 	global $user;
+  $root_path = textbook_companion_path();
 
 	if ($form_state['clicked_button']['#value'] == 'Submit')
 	{
@@ -487,9 +488,31 @@ Reason for dis-approval:
 
       } else if ($form_state['values']['run']['delete_book_including_proposal'] == "1") {
 
+        /* check if dependency files are present */
+        $dep_q = db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE preference_id = %d", $form_state['values']['run']['book']);
+        if ($dep_data = db_fetch_object($dep_q))
+        {
+          drupal_set_message(t("Cannot delete book since it has dependency files that can be used by others. First delete the dependency files before deleing the Book."), 'error');
+          return;
+        }
+
         if (delete_book($form_state['values']['run']['book']))
         {
-          drupal_set_message(t('Dis-Approved and Deleted Entire Book.'), 'status');
+          drupal_set_message(t('Dis-Approved and Deleted Entire Book examples.'), 'status');
+
+          $dir_path = $root_path . $form_state['values']['run']['book'];
+          if (is_dir($dir_path))
+          {
+            $res = rmdir($dir_path);
+            if (!$res)
+            {
+              drupal_set_message(t("Cannot delete Book directory : " . $dir_path . ". Please contact administrator."), 'error');
+              return;
+            }
+          } else {
+            drupal_set_message(t("Invalid Book directory : " . $dir_path . ". Please contact administrator."), 'error');
+            return;
+          }
 
           /* deleting preference and proposal */
           $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $form_state['values']['run']['book']);
@@ -497,9 +520,9 @@ Reason for dis-approval:
           $proposal_id = $preference_data->proposal_id;
           db_query("DELETE FROM {textbook_companion_preference} WHERE proposal_id = %d", $proposal_id);
           db_query("DELETE FROM {textbook_companion_proposal} WHERE id = %d", $proposal_id);
-  
-          drupal_set_message(t('Deleted Entire Book Including Proposal.'), 'status');
- 
+
+          drupal_set_message(t('Deleted Book Proposal.'), 'status');
+
           /* email */
           $email_subject = t('Your uploaded examples including the book proposal have been deleted');
           $email_body = t('Your all the uploaded examples including the book have been deleted permanently.');
