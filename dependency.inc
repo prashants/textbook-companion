@@ -6,11 +6,45 @@ function upload_dependency_form($form_state)
   global $user;
 
   /* get approved book details */
-  $result = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book, pro.full_name as pro_full_name FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pre.approval_status = 1 AND pro.uid = %d", $user->uid);
-  $row = db_fetch_object($result);
-  if (!$row)
+  $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE uid = %d ORDER BY id DESC LIMIT 1", $user->uid);
+  $proposal_data = db_fetch_object($proposal_q);
+  if (!$proposal_data)
   {
-    drupal_set_message("Your book proposal has not been approved. You will receive a email from us when your proposal is approved.", 'error');
+    drupal_set_message("Please submit a " . l('proposal', 'proposal') . ".", 'error');
+    drupal_goto('');
+  }
+  if ($proposal_data->proposal_status  != 1)
+  {
+    switch ($proposal_data->proposal_status )
+    {
+    case 0:
+      drupal_set_message(t('We have already received your proposal. We will get back to you soon.'), 'status');
+      drupal_goto('');
+      return;
+      break;
+    case 2:
+      drupal_set_message(t('Your proposal has been dis-approved. Please create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'error');
+      drupal_goto('');
+      return;
+      break;
+    case 3:
+      drupal_set_message(t('Congratulations! You have completed your last book proposal. You have to create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'status');
+      drupal_goto('');
+      return;
+      break;
+    default:
+       drupal_set_message(t('Invalid proposal state. Please contact site administrator for further information.'), 'error');
+       drupal_goto('');
+       return;
+       break;
+    }
+  }
+
+  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND approval_status = 1 LIMIT 1", $proposal_data->id);
+  $preference_data = db_fetch_object($preference_q);
+  if (!$preference_data)
+  {
+    drupal_set_message(t('Invalid Book Preference status. Please contact site administrator for further information.'), 'error');
     drupal_goto('');
     return;
   }
@@ -19,18 +53,18 @@ function upload_dependency_form($form_state)
 
   $form['book_details']['book'] = array(
     '#type' => 'item',
-    '#value' => $row->pre_book,
+    '#value' => $preference_data->book,
     '#title' => t('Title of the Book'),
   );
   $form['contributor_name'] = array(
     '#type' => 'item',
-    '#value' => $row->pro_full_name,
+    '#value' => $proposal_data->full_name,
     '#title' => t('Contributor Name'),
   );
 
   $form['existing_depfile'] = array(
     '#type' => 'item',
-    '#value' => _list_existing_dependency($row->pre_id),
+    '#value' => _list_existing_dependency($preference_data->id),
     '#title' => t('List of existing dependency files for this book'),
   );
 
@@ -43,7 +77,7 @@ function upload_dependency_form($form_state)
   $form['depfile']['depfile1'] = array(
       '#type' => 'file',
       '#title' => t('Upload dependency file'),
-      '#description' => t("Allowed file extensions : ") . variable_get('textbook_companion_extensions', ''),
+      '#description' => t("Allowed file extensions : ") . variable_get('textbook_companion_dependency_extensions', ''),
   );
   $form['depfile']['depfile1_caption'] = array(
       '#type' => 'textfield',
@@ -55,38 +89,7 @@ function upload_dependency_form($form_state)
       '#type' => 'textarea',
       '#title' => t('Brief Description of the dependency file'),
   );
-/*
-  $form['depfile']['depfile2_caption'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Caption for dependency file 2'),
-      '#size' => 15,
-  );
-  $form['depfile']['depfile2'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload dependency file 2'),
-      '#size' => 48,
-      '#description' => t("Allowed file extensions : ") . variable_get('textbook_companion_extensions', ''),
-  );
-  $form['depfile']['depfile2_description'] = array(
-      '#type' => 'textarea',
-      '#title' => t('Brief Description of the Dependency file 2'),
-  );
-  $form['depfile']['depfile3_caption'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Caption for dependency file 3'),
-      '#size' => 15,
-  );
-  $form['depfile']['depfile3'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload dependency file 3'),
-      '#size' => 48,
-      '#description' => t("Allowed file extensions : ") . variable_get('textbook_companion_extensions', ''),
-  );
-  $form['depfile']['depfile3_description'] = array(
-      '#type' => 'textarea',
-      '#title' => t('Brief Description of the Dependency file 3'),
-  );
-*/
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit')
@@ -110,14 +113,14 @@ function upload_dependency_form_validate($form, &$form_state)
   if (isset($_FILES['files']))
   {
     /* check for valid filename extensions */  
-    $allowed_extensions = explode(',' , variable_get('textbook_companion_extensions', ''));
+    $allowed_extensions = explode(',' , variable_get('textbook_companion_dependency_extensions', ''));
     foreach ($_FILES['files']['name'] as $file_form_name => $file_name)
     {
       if ($file_name)
       {
          $temp_extension = end(explode('.', strtolower($_FILES['files']['name'][$file_form_name])));
          if (!in_array($temp_extension, $allowed_extensions))
-           form_set_error($file_form_name, t('Only ' . variable_get('textbook_companion_extensions', '') . ' extensions can be uploaded.'));
+           form_set_error($file_form_name, t('Only ' . variable_get('textbook_companion_dependency_extensions', '') . ' extensions can be uploaded.'));
          if ($_FILES['files']['size'][$file_form_name] <= 0)
            form_set_error($file_form_name, t('File size cannot be zero.'));
 
@@ -139,10 +142,51 @@ function upload_dependency_form_submit($form, &$form_state) {
 
   $root_path = textbook_companion_path();
 
-  /* get book details */
-  $book_result = db_query("SELECT pro.id as pro_id, pre.id as pre_id, pre.book as pre_book FROM {textbook_companion_proposal} pro JOIN {textbook_companion_preference} pre ON pro.id = pre.proposal_id WHERE pro.proposal_status = 1 AND pre.approval_status = 1 AND pro.uid = %d", $user->uid);
-  $book_row = db_fetch_object($book_result);
-  $preference_id = $book_row->pre_id;
+  /* get approved book details */
+  $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE uid = %d ORDER BY id DESC LIMIT 1", $user->uid);
+  $proposal_data = db_fetch_object($proposal_q);
+  if (!$proposal_data)
+  {
+    drupal_set_message("Please submit a " . l('proposal', 'proposal') . ".", 'error');
+    drupal_goto('');
+  }
+  if ($proposal_data->proposal_status  != 1)
+  {
+    switch ($proposal_data->proposal_status )
+    {
+    case 0:
+      drupal_set_message(t('We have already received your proposal. We will get back to you soon.'), 'status');
+      drupal_goto('');
+      return;
+      break;
+    case 2:
+      drupal_set_message(t('Your proposal has been dis-approved. Please create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'error');
+      drupal_goto('');
+      return;
+      break;
+    case 3:
+      drupal_set_message(t('Congratulations! You have completed your last book proposal. You have to create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'status');
+      drupal_goto('');
+      return;
+      break;
+    default:
+       drupal_set_message(t('Invalid proposal state. Please contact site administrator for further information.'), 'error');
+       drupal_goto('');
+       return;
+       break;
+    }
+  }
+
+  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND approval_status = 1 LIMIT 1", $proposal_data->id);
+  $preference_data = db_fetch_object($preference_q);
+  if (!$preference_data)
+  {
+    drupal_set_message(t('Invalid Book Preference status. Please contact site administrator for further information.'), 'error');
+    drupal_goto('');
+    return;
+  }
+
+  $preference_id = $preference_data->id;
 
   $dest_path = $preference_id . '/';
   if (!is_dir($root_path . $dest_path))

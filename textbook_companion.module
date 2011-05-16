@@ -1270,3 +1270,4 @@ function delete_book($book_id)
   }
   return $status;
 }
+

@@ -9,7 +9,10 @@ function textbook_companion_install() {
   drupal_install_schema('textbook_companion');
   variable_set('textbook_companion_emails', '');
   variable_set('textbook_companion_from_email', '');
-  variable_set('textbook_companion_extensions', '');
+  variable_set('textbook_companion_source_extensions', '');
+  variable_set('textbook_companion_dependency_extensions', '');
+  variable_set('textbook_companion_result_extensions', '');
+  variable_set('textbook_companion_xcos_extensions', '');
 }
 
 /**
@@ -21,7 +24,10 @@ function textbook_companion_uninstall() {
   // Remove variables
   variable_del('textbook_companion_emails');
   variable_del('textbook_companion_from_email');
-  variable_del('textbook_companion_extensions');
+  variable_del('textbook_companion_source_extensions', '');
+  variable_del('textbook_companion_dependency_extensions', '');
+  variable_del('textbook_companion_result_extensions', '');
+  variable_del('textbook_companion_xcos_extensions', '');
 }
 
 /**
