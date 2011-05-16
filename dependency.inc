@@ -5,7 +5,7 @@ function upload_dependency_form($form_state)
 {
   global $user;
 
-  /* get approved book details */
+  /************************ start approve book details ************************/
   $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE uid = %d ORDER BY id DESC LIMIT 1", $user->uid);
   $proposal_data = db_fetch_object($proposal_q);
   if (!$proposal_data)
@@ -48,6 +48,7 @@ function upload_dependency_form($form_state)
     drupal_goto('');
     return;
   }
+  /************************ end approve book details **************************/
 
   $form['#attributes'] = array('enctype' => "multipart/form-data");
 

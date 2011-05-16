@@ -6,7 +6,7 @@ function textbook_companion_download_full_chapter()
   $chapter_id = arg(2);
   $root_path = textbook_companion_path();
   $APPROVE_PATH = 'APPROVED/';
-  $UNAPPROVE_PATH = 'UNAPPROVED/';
+  $PENDING_PATH = 'PENDING/';
 
   /* get example data */
   $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d", $chapter_id);
@@ -49,14 +49,14 @@ function textbook_companion_download_full_chapter()
     $example_dependency_files_q = db_query("SELECT * FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_row->id);
     while ($example_files_row = db_fetch_object($example_files_q))
     {
-      $zip->addFile($root_path . $example_files_row->filepath, $UNAPPROVE_PATH . $CH_PATH . $EX_PATH . $example_files_row->filename);
+      $zip->addFile($root_path . $example_files_row->filepath, $PENDING_PATH . $CH_PATH . $EX_PATH . $example_files_row->filename);
     }
     /* dependency files */
     while ($example_dependency_files_row = db_fetch_object($example_dependency_files_q))
     {
       $dependency_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $example_dependency_files_row->dependency_id));
       if ($dependency_file_data)
-        $zip->addFile($root_path . $dependency_file_data->filepath, $UNAPPROVE_PATH . $CH_PATH . $EX_PATH . 'DEPENDENCIES/' . $dependency_file_data->filename);
+        $zip->addFile($root_path . $dependency_file_data->filepath, $PENDING_PATH . $CH_PATH . $EX_PATH . 'DEPENDENCIES/' . $dependency_file_data->filename);
     }
   }
 
@@ -82,7 +82,7 @@ function textbook_companion_download_full_book()
   $book_id = arg(2);
   $root_path = textbook_companion_path();
   $APPROVE_PATH = 'APPROVED/';
-  $UNAPPROVE_PATH = 'UNAPPROVED/';
+  $PENDING_PATH = 'PENDING/';
 
   /* get example data */
   $book_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $book_id);
@@ -129,14 +129,14 @@ function textbook_companion_download_full_book()
       $example_dependency_files_q = db_query("SELECT * FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_row->id);
       while ($example_files_row = db_fetch_object($example_files_q))
       {
-        $zip->addFile($root_path . $example_files_row->filepath, $BK_PATH . $UNAPPROVE_PATH . $CH_PATH . $EX_PATH . $example_files_row->filename);
+        $zip->addFile($root_path . $example_files_row->filepath, $BK_PATH . $PENDING_PATH . $CH_PATH . $EX_PATH . $example_files_row->filename);
       }
       /* dependency files */
       while ($example_dependency_files_row = db_fetch_object($example_dependency_files_q))
       {
         $dependency_file_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE id = %d LIMIT 1", $example_dependency_files_row->dependency_id));
         if ($dependency_file_data)
-          $zip->addFile($root_path . $dependency_file_data->filepath, $BK_PATH . $UNAPPROVE_PATH . $CH_PATH . $EX_PATH . 'DEPENDENCIES/' . $dependency_file_data->filename);
+          $zip->addFile($root_path . $dependency_file_data->filepath, $BK_PATH . $PENDING_PATH . $CH_PATH . $EX_PATH . 'DEPENDENCIES/' . $dependency_file_data->filename);
       }
     }
   }
