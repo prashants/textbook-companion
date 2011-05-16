@@ -158,6 +158,15 @@ function textbook_companion_menu()
     'type' => MENU_CALLBACK,
     'file' => 'code.inc',
   );
+  $items['textbook_companion/code/chapter/edit'] = array(
+    'title' => 'Edit Chapter Title',
+    'description' => 'Edit Chapter Title',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('edit_chapter_title_form'),
+    'access arguments' => array('upload code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'editcode.inc',
+  );
   $items['textbook_companion/code/list_examples'] = array(
     'title' => 'List Examples',
     'description' => 'List Examples', 

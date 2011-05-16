@@ -52,7 +52,7 @@ function list_chapters()
 
   $return_html = '<br />';
   $return_html .= '<strong>Title of the Book:</strong><br />' . $preference_data->book . '<br /><br />';
-  $return_html .= '<strong>Contributor Name:</strong><br />' . $preference_data->full_name . '<br /><br />';
+  $return_html .= '<strong>Contributor Name:</strong><br />' . $proposal_data->full_name . '<br /><br />';
   $return_html .= l('Upload Example Code', 'textbook_companion/code/upload') . '<br />';
 
   /* get chapter list */
@@ -63,7 +63,7 @@ function list_chapters()
     /* get example list */
     $example_q = db_query("SELECT count(*) as example_count FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_data->id);
     $example_data = db_fetch_object($example_q);
-    $chapter_rows[] = array($chapter_data->number, $chapter_data->name, $example_data->example_count, l('View', 'textbook_companion/code/list_examples/' . $chapter_data->id));
+    $chapter_rows[] = array($chapter_data->number, $chapter_data->name . ' (' . l('Edit', 'textbook_companion/code/chapter/edit/' . $chapter_data->id) . ')', $example_data->example_count, l('View', 'textbook_companion/code/list_examples/' . $chapter_data->id));
   }
 
   /* check if there are any chapters */                                   
