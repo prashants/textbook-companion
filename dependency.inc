@@ -246,7 +246,6 @@ function upload_dependency_form_submit($form, &$form_state) {
   drupal_goto('textbook_companion/code/upload_dep');
 }
 
-
 function _list_existing_dependency($book_id)
 {
   $return_html = '<ul>';
