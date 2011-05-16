@@ -10,10 +10,6 @@ function upload_examples_edit_form($form_state)
   global $user;
   $example_id = arg(3);
 
-  drupal_set_message('Not yet implemented', 'error');
-  drupal_goto('textbook_companion/code');
-  return;
-
   /* get example details */
   $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $example_id);
   $example_data = db_fetch_object($example_q);
