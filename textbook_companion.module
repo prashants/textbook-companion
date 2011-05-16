@@ -148,7 +148,7 @@ function textbook_companion_menu()
     'page arguments' => array('upload_examples_edit_form'),
     'access arguments' => array('upload code'),
     'type' => MENU_CALLBACK,
-    'file' => 'code.inc',
+    'file' => 'editcode.inc',
   );
   $items['textbook_companion/code/delete'] = array(
     'title' => 'Delete Example',
