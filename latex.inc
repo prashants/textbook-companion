@@ -97,6 +97,7 @@ function _latex_generate_files($preference_id)
 
   /**************************** WRITE TO FILES ********************************/
   $root_path = textbook_companion_path();
+  $dir_path = $root_path . "latex/";
   $download_filename = $preference_data->book . "_" . $preference_data->author;
   $book_filename = "tmp_" . $preference_data->id . "_book.txt";
   $contributor_filename = "tmp_" . $preference_data->id . "_contributor.txt";
@@ -104,46 +105,46 @@ function _latex_generate_files($preference_id)
   $latex_dep_filename = "tmp_" . $preference_data->id . "_dep_data.txt";
   $pdf_filename = "tmp_" . $preference_data->id . ".pdf";
 
-  $fb = fopen($root_path . $book_filename, 'w');
+  $fb = fopen($dir_path . $book_filename, 'w');
   fwrite($fb, $book_filedata);
   fclose($fb);
 
-  $fc = fopen($root_path . $contributor_filename, 'w');
+  $fc = fopen($dir_path . $contributor_filename, 'w');
   fwrite($fc, $contributor_filedata);
   fclose($fc);
 
-  $fl = fopen($root_path . $latex_filename, 'w');
+  $fl = fopen($dir_path . $latex_filename, 'w');
   fwrite($fl, $latex_filedata);
   fclose($fl);
 
-  $fd = fopen($root_path . $latex_dep_filename, 'w');
+  $fd = fopen($dir_path . $latex_dep_filename, 'w');
   fwrite($fd, $latex_dep_filedata);
   fclose($fd);
 
-  _latex_run_script($book_filename, $contributor_filename, $latex_filename, $pdf_filename);
+  _latex_run_script($book_filename, $contributor_filename, $latex_filename, $latex_dep_filename, $pdf_filename);
 
   /*********************** DELETING TEMPORARY FILES ***************************/
-  //unlink($root_path . $book_filename);
-  //unlink($root_path . $contributor_filename);
-  //unlink($root_path . $latex_filename);
-  //unlink($root_path . $latex_dep_filename);
-  //unlink($root_path . $pdf_filename);
+  //unlink($dir_path . $book_filename);
+  //unlink($dir_path . $contributor_filename);
+  //unlink($dir_path . $latex_filename);
+  //unlink($dir_path . $latex_dep_filename);
+  //unlink($dir_path . $pdf_filename);
 }
 
 function _latex_copy_script_file()
 {
 }
 
-function _latex_run_script($book_filename, $contributor_filename, $latex_filename, $pdf_filename)
+function _latex_run_script($book_filename, $contributor_filename, $latex_filename, $latex_dep_filename, $pdf_filename)
 {
   $root_path = textbook_companion_path();
   $ret = 0;
 
   chdir("uploads");
+  chdir("latex");
 
-  $sh_command = "./pdf_creator.sh " . $book_filename . " " . $contributor_filename . " " . $latex_filename;
+  $sh_command = "./pdf_creator.sh " . $book_filename . " " . $contributor_filename . " " . $latex_filename . " " . $latex_dep_filename;
   $script_output = system($sh_command, $ret);
-  var_dump($script_output); die();
 
   if ($ret == 0)
     return TRUE;
