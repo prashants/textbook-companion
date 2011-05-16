@@ -63,7 +63,7 @@ function upload_examples_form($form_state)
       });
     });
     $('#edit-example-number').change(function() {
-      $.get('" . base_path() . "textbook_companion/ajax/example_exists/' + $('#edit-number').val() + '/' + $('#edit-example-number').val(), function(data) {
+      $.get('" . base_path() . "textbook_companion/ajax/example_exists/' + $('#edit-number').val() + '/' + " . $preference_data->id . " + '/' + $('#edit-example-number').val(), function(data) {
         if (data) {
           alert(data);
         }

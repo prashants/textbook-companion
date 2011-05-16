@@ -1053,9 +1053,11 @@ function textbook_companion_ajax()
     }
   } else if ($query_type == 'example_exists') {
     $chapter_number = arg(3);
-    $example_number = arg(4);
+    $preference_id = arg(4);
+    $example_number = arg(5);
 
-    $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE number = %d LIMIT 1", $chapter_number);
+    $chapter_id = 0;
+    $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE number = %d AND preference_id = %d LIMIT 1", $chapter_number, $preference_id);
     if (!$chapter_data = db_fetch_object($chapter_q))
     {
       echo '';
