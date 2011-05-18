@@ -26,33 +26,33 @@ function upload_examples_edit_form($form_state)
     return;
   }
 
-  /* get examples files */
-  $source_file = "";
-  $result1_file = "";
-  $result2_file = "";
-  $xcos1_file = "";
-  $xcos2_file = "";
-
-  $example_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
-  while ($example_files_data = db_fetch_object($example_files_q))
-  {
-    if ($example_files_data->filetype == "S")
-      $source_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id); 
-    if ($example_files_data->filetype == "R")
-    {
-      if (strlen($result1_file) == 0)
-        $result1_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id);
-      else
-        $result2_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id);
-    }
-    if ($example_files_data->filetype == "X")
-    {
-      if (strlen($xcos1_file) <= 0)
-        $xcos1_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id);
-      else
-        $xcos2_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id);
-    }
-  }
+  // /* get examples files */
+  // $source_file = "";
+  // $result1_file = "";
+  // $result2_file = "";
+  // $xcos1_file = "";
+  // $xcos2_file = "";
+// 
+  // $example_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_id);
+  // while ($example_files_data = db_fetch_object($example_files_q))
+  // {
+    // if ($example_files_data->filetype == "S")
+      // $source_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id); 
+    // if ($example_files_data->filetype == "R")
+    // {
+      // if (strlen($result1_file) == 0)
+        // $result1_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id);
+      // else
+        // $result2_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id);
+    // }
+    // if ($example_files_data->filetype == "X")
+    // {
+      // if (strlen($xcos1_file) <= 0)
+        // $xcos1_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id);
+      // else
+        // $xcos2_file = l($example_files_data->filename, 'download/file/' . $example_files_data->id);
+    // }
+  // }
 
   /* get chapter details */
   $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d", $example_data->chapter_id);
@@ -80,7 +80,7 @@ function upload_examples_edit_form($form_state)
     return;
   }
 
-  /* get preference details */
+  /* get proposal details */
   $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d", $preference_data->proposal_id);
   $proposal_data = db_fetch_object($proposal_q);
   if (!$proposal_data)
@@ -124,6 +124,7 @@ function upload_examples_edit_form($form_state)
   });";
   drupal_add_js($chapter_name_js, 'inline', 'header');
 
+  $form['#redirect'] = 'textbook_companion/code';
   $form['#attributes'] = array('enctype' => "multipart/form-data");
 
   $form['book_details']['book'] = array(
@@ -142,11 +143,8 @@ function upload_examples_edit_form($form_state)
     '#value' => $chapter_data->number,
   );
   $form['name'] = array(
-    '#type' => 'textfield',
+    '#type' => 'item',
     '#title' => t('Title of the Chapter'),
-    '#size' => 40,
-    '#maxlength' => 100,
-    '#required' => TRUE,
     '#default_value' => $chapter_data->name,
   );
   $form['example_number'] = array(
@@ -162,233 +160,233 @@ function upload_examples_edit_form($form_state)
     '#required' => TRUE,
     '#default_value' => $example_data->caption,
   );
-  $form['example_warning'] = array(
-    '#type' => 'item',
-    '#title' => t('You should upload all the files (main or source files, result files, executable file if any)'),
-    '#prefix' => '<div style="color:red">',
-    '#suffix' => '</div>',
-  );
-
-  $form['sourcefile'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Main or Source Files'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-  );
-  if ($source_file)
-  {
-    $form['sourcefile']['cur_source'] = array(
-        '#type' => 'item',
-        '#title' => t('Existing Main or Source File'),
-        '#value' => $source_file,
-    );
-    $form['sourcefile']['cur_source_checkbox'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Delete Existing Main or Source File'),
-        '#description' => 'Check to delete the existing Main or Source file.',
-    );
-    $form['sourcefile']['sourcefile1'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New Main or Source File'),
-        '#size' => 48,
-        '#description' => t("Upload new Main or Source file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
-        t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
-    );
-  } else {
-    $form['sourcefile']['sourcefile1'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New Main or Source File'),
-        '#size' => 48,
-        '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
-    );
-  }
-
-  $form['dep_files'] = array(
-    '#type' => 'item',
-    '#title' => t('Dependency Files'),
-  );
-
-  /************ START OF EXISTING DEPENDENCIES **************/
-
-  $dependency_files = array();
-  $dependency_q = db_query("SELECT * FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_data->id);
-  while ($dependency_data = db_fetch_object($dependency_q))
-  {
-    $dependency_files[] = $dependency_data->dependency_id;
-  }
-
-  /* existing dependencies */
-  $form['existing_depfile'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Use Already Existing Dependency Files'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-    '#prefix' => '<div id="existing-depfile-wrapper">',
-    '#suffix' => '</div>',
-    '#tree' => TRUE,
-  );
-
-  /* existing dependencies */
-  $form['existing_depfile']['selected'] = array(
-    '#type' => 'item',
-    '#title' => t('Existing Dependency Files Selected'),
-    '#value' => '<div id="existing_depfile_selected"></div>',
-  );
-
-  $form['existing_depfile']['dep_book_title'] = array(
-      '#type' => 'select',
-      '#title' => t('Title of the Book'),
-      '#options' => _list_of_book_titles(),
-  );
-
-  list($files_options, $files_options_class) = _list_of_book_dependency_files();
-  $form['existing_depfile']['dep_chapter_example_files'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Dependency Files'),
-      '#options' => $files_options,
-      '#options_class' => $files_options_class,
-      '#multiple' => TRUE,
-      '#default_value' => $dependency_files,
-  );
-
-  $form['existing_depfile']['dep_upload'] = array(
-      '#type' => 'item',
-      '#value' => l('Upload New Depedency Files', 'textbook_companion/code/upload_dep'),
-  );
-  /************ END OF EXISTING DEPENDENCIES **************/
-
-  $form['result'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Result Files'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-  );
-  if ($result1_file)
-  {
-    $form['result']['cur_result1'] = array(
-        '#type' => 'item',
-        '#title' => t('Existing Result File 1'),
-        '#value' => $result1_file,
-    );
-    $form['result']['cur_result1_checkbox'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Delete Existing Result File 1'),
-        '#description' => 'Check to delete the existing Result file.',
-    );
-    $form['result']['result1'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New Result File 1'),
-        '#size' => 48,
-        '#description' => t("Upload new Result file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
-        t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
-    );
-  } else {
-    $form['result']['result1'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New Result File 1'),
-        '#size' => 48,
-        '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
-    );
-  }
-
-  $form['result']['br'] = array(
-      '#type' => 'item',
-      '#value' => "<br />",
-  );
-
-  if ($result2_file)
-  {
-    $form['result']['cur_result2'] = array(
-        '#type' => 'item',
-        '#title' => t('Existing Result File 2'),
-        '#value' => $result2_file,
-    );
-    $form['result']['cur_result2_checkbox'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Delete Existing Result File 2'),
-        '#description' => 'Check to delete the existing Result file.',
-    );
-    $form['result']['result2'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New Result file 2'),
-        '#size' => 48,
-        '#description' => t("Upload new Result file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") . 
-        t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
-    );
-  } else {
-    $form['result']['result2'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New Result file 2'),
-        '#size' => 48,
-        '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
-    );
-  }
-  $form['xcos'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('XCOS Files'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-  );
-  if ($xcos1_file)
-  {
-    $form['xcos']['cur_xcos1'] = array(
-        '#type' => 'item',
-        '#title' => t('Existing xcos File 1'),
-        '#value' => $xcos1_file,
-    );
-    $form['xcos']['cur_xcos1_checkbox'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Delete Existing xcos File 1'),
-        '#description' => 'Check to delete the existing xcos file.',
-    );
-    $form['xcos']['xcos1'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New xcos file 1'),
-        '#size' => 48,
-        '#description' => t("Upload new xcos file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
-        t('Allowed file extensions : ') . 'xcos,scicos',
-    );
-  } else {
-    $form['xcos']['xcos1'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New xcos file 1'),
-        '#size' => 48,
-        '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
-    );
-  }
-
-  $form['xcos']['br'] = array(
-      '#type' => 'item',
-      '#value' => "<br />",
-  );
-  
-  if ($xcos2_file)
-  {
-    $form['xcos']['cur_xcos2'] = array(
-        '#type' => 'item',
-        '#title' => t('Existing xcos File 2'),
-        '#value' => $xcos2_file,
-    );
-    $form['xcos']['cur_xcos2_checkbox'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Delete Existing xcos File 2'),
-        '#description' => 'Check to delete the existing xcos file.',
-    );
-    $form['xcos']['xcos2'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New xcos file 2'),
-        '#size' => 48,
-        '#description' =>  t("Upload new xcos file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") . 
-        t('Allowed file extensions : ') . 'xcos,scicos',
-    );
-  } else {
-    $form['xcos']['xcos2'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload New xcos file 2'),
-        '#size' => 48,
-        '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
-    );
-  }
+  // $form['example_warning'] = array(
+    // '#type' => 'item',
+    // '#title' => t('You should upload all the files (main or source files, result files, executable file if any)'),
+    // '#prefix' => '<div style="color:red">',
+    // '#suffix' => '</div>',
+  // );
+// 
+  // $form['sourcefile'] = array(
+    // '#type' => 'fieldset',
+    // '#title' => t('Main or Source Files'),
+    // '#collapsible' => FALSE,
+    // '#collapsed' => FALSE,
+  // );
+  // if ($source_file)
+  // {
+    // $form['sourcefile']['cur_source'] = array(
+        // '#type' => 'item',
+        // '#title' => t('Existing Main or Source File'),
+        // '#value' => $source_file,
+    // );
+    // $form['sourcefile']['cur_source_checkbox'] = array(
+        // '#type' => 'checkbox',
+        // '#title' => t('Delete Existing Main or Source File'),
+        // '#description' => 'Check to delete the existing Main or Source file.',
+    // );
+    // $form['sourcefile']['sourcefile1'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New Main or Source File'),
+        // '#size' => 48,
+        // '#description' => t("Upload new Main or Source file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
+        // t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    // );
+  // } else {
+    // $form['sourcefile']['sourcefile1'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New Main or Source File'),
+        // '#size' => 48,
+        // '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    // );
+  // }
+// 
+  // $form['dep_files'] = array(
+    // '#type' => 'item',
+    // '#title' => t('Dependency Files'),
+  // );
+// 
+  // /************ START OF EXISTING DEPENDENCIES **************/
+// 
+  // $dependency_files = array();
+  // $dependency_q = db_query("SELECT * FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_data->id);
+  // while ($dependency_data = db_fetch_object($dependency_q))
+  // {
+    // $dependency_files[] = $dependency_data->dependency_id;
+  // }
+// 
+  // /* existing dependencies */
+  // $form['existing_depfile'] = array(
+    // '#type' => 'fieldset',
+    // '#title' => t('Use Already Existing Dependency Files'),
+    // '#collapsible' => FALSE,
+    // '#collapsed' => FALSE,
+    // '#prefix' => '<div id="existing-depfile-wrapper">',
+    // '#suffix' => '</div>',
+    // '#tree' => TRUE,
+  // );
+// 
+  // /* existing dependencies */
+  // $form['existing_depfile']['selected'] = array(
+    // '#type' => 'item',
+    // '#title' => t('Existing Dependency Files Selected'),
+    // '#value' => '<div id="existing_depfile_selected"></div>',
+  // );
+// 
+  // $form['existing_depfile']['dep_book_title'] = array(
+      // '#type' => 'select',
+      // '#title' => t('Title of the Book'),
+      // '#options' => _list_of_book_titles(),
+  // );
+// 
+  // list($files_options, $files_options_class) = _list_of_book_dependency_files();
+  // $form['existing_depfile']['dep_chapter_example_files'] = array(
+      // '#type' => 'checkboxes',
+      // '#title' => t('Dependency Files'),
+      // '#options' => $files_options,
+      // '#options_class' => $files_options_class,
+      // '#multiple' => TRUE,
+      // '#default_value' => $dependency_files,
+  // );
+// 
+  // $form['existing_depfile']['dep_upload'] = array(
+      // '#type' => 'item',
+      // '#value' => l('Upload New Depedency Files', 'textbook_companion/code/upload_dep'),
+  // );
+  // /************ END OF EXISTING DEPENDENCIES **************/
+// 
+  // $form['result'] = array(
+    // '#type' => 'fieldset',
+    // '#title' => t('Result Files'),
+    // '#collapsible' => FALSE,
+    // '#collapsed' => FALSE,
+  // );
+  // if ($result1_file)
+  // {
+    // $form['result']['cur_result1'] = array(
+        // '#type' => 'item',
+        // '#title' => t('Existing Result File 1'),
+        // '#value' => $result1_file,
+    // );
+    // $form['result']['cur_result1_checkbox'] = array(
+        // '#type' => 'checkbox',
+        // '#title' => t('Delete Existing Result File 1'),
+        // '#description' => 'Check to delete the existing Result file.',
+    // );
+    // $form['result']['result1'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New Result File 1'),
+        // '#size' => 48,
+        // '#description' => t("Upload new Result file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
+        // t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    // );
+  // } else {
+    // $form['result']['result1'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New Result File 1'),
+        // '#size' => 48,
+        // '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    // );
+  // }
+// 
+  // $form['result']['br'] = array(
+      // '#type' => 'item',
+      // '#value' => "<br />",
+  // );
+// 
+  // if ($result2_file)
+  // {
+    // $form['result']['cur_result2'] = array(
+        // '#type' => 'item',
+        // '#title' => t('Existing Result File 2'),
+        // '#value' => $result2_file,
+    // );
+    // $form['result']['cur_result2_checkbox'] = array(
+        // '#type' => 'checkbox',
+        // '#title' => t('Delete Existing Result File 2'),
+        // '#description' => 'Check to delete the existing Result file.',
+    // );
+    // $form['result']['result2'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New Result file 2'),
+        // '#size' => 48,
+        // '#description' => t("Upload new Result file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") . 
+        // t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    // );
+  // } else {
+    // $form['result']['result2'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New Result file 2'),
+        // '#size' => 48,
+        // '#description' => t('Allowed file extensions : ') . variable_get('textbook_companion_extensions', ''),
+    // );
+  // }
+  // $form['xcos'] = array(
+    // '#type' => 'fieldset',
+    // '#title' => t('XCOS Files'),
+    // '#collapsible' => FALSE,
+    // '#collapsed' => FALSE,
+  // );
+  // if ($xcos1_file)
+  // {
+    // $form['xcos']['cur_xcos1'] = array(
+        // '#type' => 'item',
+        // '#title' => t('Existing xcos File 1'),
+        // '#value' => $xcos1_file,
+    // );
+    // $form['xcos']['cur_xcos1_checkbox'] = array(
+        // '#type' => 'checkbox',
+        // '#title' => t('Delete Existing xcos File 1'),
+        // '#description' => 'Check to delete the existing xcos file.',
+    // );
+    // $form['xcos']['xcos1'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New xcos file 1'),
+        // '#size' => 48,
+        // '#description' => t("Upload new xcos file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") .
+        // t('Allowed file extensions : ') . 'xcos,scicos',
+    // );
+  // } else {
+    // $form['xcos']['xcos1'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New xcos file 1'),
+        // '#size' => 48,
+        // '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
+    // );
+  // }
+// 
+  // $form['xcos']['br'] = array(
+      // '#type' => 'item',
+      // '#value' => "<br />",
+  // );
+  // 
+  // if ($xcos2_file)
+  // {
+    // $form['xcos']['cur_xcos2'] = array(
+        // '#type' => 'item',
+        // '#title' => t('Existing xcos File 2'),
+        // '#value' => $xcos2_file,
+    // );
+    // $form['xcos']['cur_xcos2_checkbox'] = array(
+        // '#type' => 'checkbox',
+        // '#title' => t('Delete Existing xcos File 2'),
+        // '#description' => 'Check to delete the existing xcos file.',
+    // );
+    // $form['xcos']['xcos2'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New xcos file 2'),
+        // '#size' => 48,
+        // '#description' =>  t("Upload new xcos file above if you want to replace the existing file, leave blank if you want to keep using the existing file. <br />") . 
+        // t('Allowed file extensions : ') . 'xcos,scicos',
+    // );
+  // } else {
+    // $form['xcos']['xcos2'] = array(
+        // '#type' => 'file',
+        // '#title' => t('Upload New xcos file 2'),
+        // '#size' => 48,
+        // '#description' => t('Allowed file extensions : ') . 'xcos,scicos',
+    // );
+  // }
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -402,6 +400,76 @@ function upload_examples_edit_form($form_state)
   return $form;
 }
 
+function upload_examples_edit_form_submit($form, &$form_state)
+{
+  global $user;
+  $example_id = arg(3);
+
+  /* get example details */
+  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $example_id);
+  $example_data = db_fetch_object($example_q);
+  if (!$example_q)
+  {
+    drupal_set_message(t("Invalid example selected."), 'error');
+    drupal_goto('');
+    return;
+  }
+  if ($example_data->approval_status != 0)
+  {
+    drupal_set_message(t("You cannot edit an example after it has been approved or dis-approved. Please contact site administrator if you want to edit this example."), 'error');
+    drupal_goto('');
+    return;
+  }
+
+  /* get chapter details */
+  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d", $example_data->chapter_id);
+  $chapter_data = db_fetch_object($chapter_q);
+  if (!$chapter_data)
+  {
+    drupal_set_message(t("Invalid chapter selected."), 'error');
+    drupal_goto('');
+    return;
+  }
+
+  /* get preference details */
+  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $chapter_data->preference_id);
+  $preference_data = db_fetch_object($preference_q);
+  if (!$preference_data)
+  {
+    drupal_set_message(t("Invalid book selected."), 'error');
+    drupal_goto('');
+    return;
+  }
+  if ($preference_data->approval_status != 1)
+  {
+    drupal_set_message(t("Cannot edit example. Either the book proposal has not been approved or it has been rejected."), 'error');
+    drupal_goto('');
+    return;
+  }
+
+  /* get proposal details */
+  $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d", $preference_data->proposal_id);
+  $proposal_data = db_fetch_object($proposal_q);
+  if (!$proposal_data)
+  {
+    drupal_set_message(t("Invalid proposal selected."), 'error');
+    drupal_goto('');
+    return;
+  }
+  if ($proposal_data->uid != $user->uid)
+  {
+    drupal_set_message(t("You do not have permissions to edit this example."), 'error');
+    drupal_goto('');
+    return;
+  }
+
+  db_query("UPDATE {textbook_companion_example} SET caption = '%s' WHERE id = %d", $form_state['values']['example_caption'], $example_id);
+
+  drupal_set_message(t("Example successfully udpated."), 'status');
+}
+
+
+/************************** EDIT CHAPTER TITLE ********************************/
 
 function edit_chapter_title_form($form_state)
 {
