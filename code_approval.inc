@@ -471,6 +471,12 @@ function bulk_approval_form_submit($form, &$form_state)
 
       } else if ($form_state['values']['run']['disapprove_book'] == "1") {
 
+        if (!user_access('bulk delete code'))
+        {
+          drupal_set_message(t('You do not have permission to Bulk Dis-Approved and Deleted Entire Book.'), 'error');
+          return;
+        }
+
         if (delete_book($form_state['values']['run']['book']))
         {
           drupal_set_message(t('Dis-Approved and Deleted Entire Book.'), 'status');
@@ -487,6 +493,12 @@ Reason for dis-approval:
 ' . $form_state['values']['run']['message']);
 
       } else if ($form_state['values']['run']['delete_book_including_proposal'] == "1") {
+
+        if (!user_access('bulk delete code'))
+        {
+          drupal_set_message(t('You do not have permission to Bulk Delete Entire Book Including Proposal.'), 'error');
+          return;
+        }
 
         /* check if dependency files are present */
         $dep_q = db_query("SELECT * FROM {textbook_companion_dependency_files} WHERE preference_id = %d", $form_state['values']['run']['book']);
@@ -550,6 +562,12 @@ Reason for dis-approval:
         $email_body = t('Your all the uploaded examples for the chapter have been marked as pending to be review.');
 
       } else if ($form_state['values']['run']['disapprove_chapter'] == "1") {
+
+        if (!user_access('bulk delete code'))
+        {
+          drupal_set_message(t('You do not have permission to Bulk Dis-Approved and Deleted Entire Chapter.'), 'error');
+          return;
+        }
 
         if (delete_chapter($form_state['values']['run']['chapter']))
         {
