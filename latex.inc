@@ -3,6 +3,7 @@
 function textbook_companion_download_book()
 {
   $preference_id = arg(2);
+  _latex_copy_script_file(); die();
   _latex_generate_files($preference_id);
 }
 
@@ -133,6 +134,8 @@ function _latex_generate_files($preference_id)
 
 function _latex_copy_script_file()
 {
+  $res = exec("cp ./sites/all/modules/textbook_companion/latex/* ./uploads/latex");
+  echo $res;
 }
 
 function _latex_run_script($book_filename, $contributor_filename, $latex_filename, $latex_dep_filename, $pdf_filename)

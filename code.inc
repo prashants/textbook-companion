@@ -136,6 +136,7 @@ function upload_examples_form($form_state)
     '#title' => t('Caption'),
     '#size' => 40,
     '#maxlength' => 50,
+    '#description' => t('Example caption should contain only alphabets, numbers and spaces.'),
     '#required' => TRUE,
   );
   $form['example_warning'] = array(
