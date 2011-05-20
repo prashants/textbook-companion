@@ -601,6 +601,23 @@ function upload_examples_edit_form_submit($form, &$form_state)
   /* updating example caption */
   db_query("UPDATE {textbook_companion_example} SET caption = '%s' WHERE id = %d", $form_state['values']['example_caption'], $example_id);
 
+  /* handling dependencies */
+  db_query("DELETE FROM {textbook_companion_example_dependency} WHERE example_id = %d", $example_data->id);
+  foreach ($form_state['values']['existing_depfile']['dep_chapter_example_files'] as $row)
+  {
+    if ($row > 0)
+    {
+      /* insterting into database */
+      db_query("INSERT INTO {textbook_companion_example_dependency} (example_id, dependency_id, approval_status, timestamp)
+        VALUES (%d, %d, %d, %d)",
+        $example_data->id,
+        $row,
+        0,
+        time()
+      );
+    }
+  }
+
   /* handle source file */
   $cur_file_id = $form_state['values']['cur_source_file_id'];
   if ($cur_file_id > 0)
