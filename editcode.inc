@@ -400,6 +400,13 @@ function upload_examples_edit_form($form_state)
   return $form;
 }
 
+
+function upload_examples_edit_form_validate($form, &$form_state)
+{
+  if (!check_name($form_state['values']['example_caption']))
+    form_set_error('example_caption', t('Example Caption can contain only alphabets, numbers and spaces.'));
+}
+
 function upload_examples_edit_form_submit($form, &$form_state)
 {
   global $user;

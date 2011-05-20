@@ -1090,7 +1090,7 @@ function textbook_companion_ajax()
 
 /*************************** VALIDATION FUNCTIONS *****************************/
 function textbook_companion_check_valid_filename($file_name) {
-  if (!preg_match('/^[0-9a-zA-Z\_\.\-]+$/', $file_name))
+  if (!preg_match('/^[0-9a-zA-Z\_\.]+$/', $file_name))
     return FALSE;
   else
     if (substr_count($file_name, ".") > 1)
