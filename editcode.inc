@@ -893,6 +893,13 @@ function upload_examples_edit_form_submit($form, &$form_state)
     }
   }
 
+  /* sending email */
+  $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');
+  $param['example_updated']['example_id'] = $example_id;
+  $param['example_updated']['user_id'] = $user->uid;
+  if (!drupal_mail('textbook_companion', 'example_updated', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+    drupal_set_message('Error sending email message.', 'error');
+
   drupal_set_message(t("Example successfully udpated."), 'status');
 }
 

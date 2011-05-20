@@ -945,6 +945,27 @@ Best Wishes,
 !site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
       break;
 
+    case 'example_updated':
+      $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $params['example_updated']['example_id']);
+      $example_data = db_fetch_object($example_q);
+      $user_data = user_load($params['example_updated']['user_id']);
+
+      $message['subject'] = t('[!site_name] You have updated example', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+You have updated the following example:
+
+Example number : ' . $example_data->number . '
+Caption : ' .  $example_data->caption . '
+
+The example is still under review. You will be notified when it has been approved.
+
+Best Wishes,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      break;
+
     case 'example_approved':
       $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $params['example_approved']['example_id']);
       $example_data = db_fetch_object($example_q);
