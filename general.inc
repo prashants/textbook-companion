@@ -134,7 +134,7 @@ function list_examples()
   {
     $return_html = '<br />';
     $return_html .= '<strong>Title of the Book:</strong><br />' . $preference_data->book . '<br /><br />';
-    $return_html .= '<strong>Contributor Name:</strong><br />' . $preference_data->full_name . '<br /><br />';
+    $return_html .= '<strong>Contributor Name:</strong><br />' . $proposal_data->full_name . '<br /><br />';
     $return_html .= '<strong>Chapter Number:</strong><br />' . $chapter_data->number . '<br /><br />';
     $return_html .= '<strong>Title of the Chapter:</strong><br />' . $chapter_data->name . '<br />';
   } else {
