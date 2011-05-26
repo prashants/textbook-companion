@@ -629,7 +629,7 @@ function upload_examples_edit_form_submit($form, &$form_state)
         drupal_set_message("Error deleting example source file. File not present in database.", 'error');
         return;
     }
-    if ($form_state['values']['cur_source_checkbox'] == 1)
+    if (($form_state['values']['cur_source_checkbox'] == 1) && (!$_FILES['files']['name']['sourcefile1']))
     {
       if (!delete_file($cur_file_id))
       {
@@ -684,7 +684,7 @@ function upload_examples_edit_form_submit($form, &$form_state)
         drupal_set_message("Error deleting example result 1 file. File not present in database.", 'error');
         return;
     }
-    if ($form_state['values']['cur_result1_checkbox'] == 1)
+    if (($form_state['values']['cur_result1_checkbox'] == 1) && (!$_FILES['files']['name']['result1']))
     {
       if (!delete_file($cur_file_id))
       {
@@ -739,7 +739,7 @@ function upload_examples_edit_form_submit($form, &$form_state)
         drupal_set_message("Error deleting example result 2 file. File not present in database.", 'error');
         return;
     }
-    if ($form_state['values']['cur_result2_checkbox'] == 1)
+    if (($form_state['values']['cur_result2_checkbox'] == 1) && (!$_FILES['files']['name']['result2']))
     {
       if (!delete_file($cur_file_id))
       {
@@ -794,7 +794,7 @@ function upload_examples_edit_form_submit($form, &$form_state)
         drupal_set_message("Error deleting example xcos 1 file. File not present in database.", 'error');
         return;
     }
-    if ($form_state['values']['cur_xcos1_checkbox'] == 1)
+    if (($form_state['values']['cur_xcos1_checkbox'] == 1) && (!$_FILES['files']['name']['xcos1']))
     {
       if (!delete_file($cur_file_id))
       {
@@ -849,7 +849,7 @@ function upload_examples_edit_form_submit($form, &$form_state)
         drupal_set_message("Error deleting example xcos 2 file. File not present in database.", 'error');
         return;
     }
-    if ($form_state['values']['cur_xcos2_checkbox'] == 1)
+    if (($form_state['values']['cur_xcos2_checkbox'] == 1) && (!$_FILES['files']['name']['xcos2']))
     {
       if (!delete_file($cur_file_id))
       {
