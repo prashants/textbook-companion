@@ -122,14 +122,22 @@ function _latex_generate_files($preference_id)
   fwrite($fd, $latex_dep_filedata);
   fclose($fd);
 
-  _latex_run_script($book_filename, $contributor_filename, $latex_filename, $latex_dep_filename, $pdf_filename);
+  if (_latex_run_script($book_filename, $contributor_filename, $latex_filename, $latex_dep_filename, $pdf_filename))
+  {
+		/* download zip file */
+		header('Content-Type: application/pdf');
+		header('Content-disposition: attachment; filename="' . $preference_data->book . '_' . $preference_data->author . '.pdf"');
+		header('Content-Length: ' . filesize($dir_path . "TEX_final.pdf"));
+		readfile($dir_path . "TEX_final.pdf");
+	} else {
+		drupal_set_message("Error occurred when generating the PDF version of the Book.", 'error');
+	}
 
   /*********************** DELETING TEMPORARY FILES ***************************/
   //unlink($dir_path . $book_filename);
   //unlink($dir_path . $contributor_filename);
   //unlink($dir_path . $latex_filename);
   //unlink($dir_path . $latex_dep_filename);
-  //unlink($dir_path . $pdf_filename);
 }
 
 function _latex_copy_script_file()

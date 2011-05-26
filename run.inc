@@ -115,6 +115,11 @@ function textbook_companion_run_form($form_state)
       '#value' => l('Download', 'download/book/' . $book_default_value) . ' ' . t('(Download all the examples of the entire book)'),
     );
 
+    $form['run']['download_book_pdf'] = array(
+      '#type' => 'item',
+      '#value' => l('Download PDF', 'textbook_companion/generate_book/' . $book_default_value) . ' ' . t('(Download PDF for all examples of the entire book)'),
+    );
+
     $form['run']['chapter'] = array(
       '#type' => 'select',
       '#title' => t('Title of the Chapter'),

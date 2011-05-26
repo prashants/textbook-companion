@@ -321,7 +321,7 @@ function textbook_companion_menu()
  * Implementation of hook_perm().
  */
 function textbook_companion_perm() {
-  return array('create book proposal', 'approve book proposal', 'approve code', 'upload code', 'edit uploaded code', 'download code', 'create feedback', 'bulk manage code', 'bulk delete code', 'edit book proposal', 'administer book companion');
+  return array('create book proposal', 'approve book proposal', 'approve code', 'upload code', 'edit uploaded code', 'download code', 'create feedback', 'bulk manage code', 'bulk delete code', 'edit book proposal', 'administer book companion', 'generate book');
 }
 
 function book_proposal_form($form_state)
