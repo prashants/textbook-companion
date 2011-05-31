@@ -522,8 +522,7 @@ Reason for dis-approval:
               return;
             }
           } else {
-            drupal_set_message(t("Invalid Book directory : " . $dir_path . ". Please contact administrator."), 'error');
-            return;
+            drupal_set_message(t("Book directory not present : " . $dir_path . ". Skipping deleting book directory."), 'status');
           }
 
           /* deleting preference and proposal */
