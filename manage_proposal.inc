@@ -456,7 +456,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Full Name'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
     '#default_value' => $proposal_data->full_name,
   );
@@ -464,7 +464,6 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Email'),
     '#size' => 30,
-    '#maxlength' => 64,
     '#value' => $user_data->mail,
     '#disabled' => TRUE,
   );
@@ -472,7 +471,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Mobile No.'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 15,
     '#required' => TRUE,
     '#default_value' => $proposal_data->mobile,
   );
@@ -492,7 +491,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Course'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
     '#default_value' => $proposal_data->course,
   );
@@ -516,7 +515,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('University/Institute'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
     '#default_value' => $proposal_data->university,
   );
@@ -524,7 +523,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('College Teacher/Professor'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
     '#default_value' => $proposal_data->faculty,
   );
@@ -532,7 +531,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Reviewer'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#default_value' => $proposal_data->reviewer,
   );
   $form['completion_date'] = array(
@@ -553,7 +552,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Title of the book'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
     '#default_value' => $preference1_data->book,
   );
@@ -561,7 +560,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Author Name'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
     '#default_value' => $preference1_data->author,
   );
@@ -569,7 +568,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('ISBN No'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 25,
     '#required' => TRUE,
     '#default_value' => $preference1_data->isbn,
   );
@@ -577,15 +576,15 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Publisher & Place'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
     '#default_value' => $preference1_data->publisher,
   );
   $form['preference1']['edition1'] = array(
     '#type' => 'textfield',
     '#title' => t('Edition'),
-    '#size' => 30,
-    '#maxlength' => 64,
+    '#size' => 4,
+    '#maxlength' => 2,
     '#required' => TRUE,
     '#default_value' => $preference1_data->edition,
   );
@@ -607,7 +606,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Title of the book'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
     '#default_value' => $preference2_data->book,
   );
@@ -615,7 +614,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Author Name'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
     '#default_value' => $preference2_data->author,
   );
@@ -623,7 +622,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('ISBN No'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 25,
     '#required' => TRUE,
     '#default_value' => $preference2_data->isbn,
   );
@@ -631,15 +630,15 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Publisher & Place'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
     '#default_value' => $preference2_data->publisher,
   );
   $form['preference2']['edition2'] = array(
     '#type' => 'textfield',
     '#title' => t('Edition'),
-    '#size' => 30,
-    '#maxlength' => 64,
+    '#size' => 4,
+    '#maxlength' => 2,
     '#required' => TRUE,
     '#default_value' => $preference2_data->edition,
   );
@@ -661,7 +660,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Title of the book'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
     '#default_value' => $preference3_data->book,
   );
@@ -669,7 +668,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Author Name'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
     '#default_value' => $preference3_data->author,
   );
@@ -677,7 +676,7 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('ISBN No'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 25,
     '#required' => TRUE,
     '#default_value' => $preference3_data->isbn,
   );
@@ -685,15 +684,15 @@ function proposal_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Publisher & Place'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
     '#default_value' => $preference3_data->publisher,
   );
   $form['preference3']['edition3'] = array(
     '#type' => 'textfield',
     '#title' => t('Edition'),
-    '#size' => 30,
-    '#maxlength' => 64,
+    '#size' => 4,
+    '#maxlength' => 2,
     '#required' => TRUE,
     '#default_value' => $preference3_data->edition,
   );
@@ -766,11 +765,11 @@ function proposal_edit_form_validate($form, &$form_state)
     form_set_error('year3', t('Year of pulication should be not in the future for Book Preference 3'));
   
   /* isbn */
-  if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn1']))
+  if (!preg_match('/^[0-9\-xX]+$/', $form_state['values']['isbn1']))
     form_set_error('isbn1', t('Invalid ISBN for Book Preference 1'));
-  if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn2']))
+  if (!preg_match('/^[0-9\-xX]+$/', $form_state['values']['isbn2']))
     form_set_error('isbn2', t('Invalid ISBN for Book Preference 2'));
-  if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn3']))
+  if (!preg_match('/^[0-9\-xX]+$/', $form_state['values']['isbn3']))
     form_set_error('isbn3', t('Invalid ISBN for Book Preference 3'));
   return;
 }

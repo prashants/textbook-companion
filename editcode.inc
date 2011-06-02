@@ -167,7 +167,7 @@ function upload_examples_edit_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Caption'),
     '#size' => 40,
-    '#maxlength' => 50,
+    '#maxlength' => 255,
     '#required' => TRUE,
     '#default_value' => $example_data->caption,
   );
@@ -989,6 +989,8 @@ function edit_chapter_title_form($form_state)
   $form['chapter_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title of the Chapter'),
+    '#size' => 40,
+    '#maxlength' => 255,
     '#required' => TRUE,
     '#default_value' => $chapter_data->name,
   );

@@ -120,7 +120,7 @@ function upload_examples_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Title of the Chapter'),
     '#size' => 40,
-    '#maxlength' => 100,
+    '#maxlength' => 255,
     '#required' => TRUE,
   );
   $form['example_number'] = array(
@@ -135,7 +135,7 @@ function upload_examples_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Caption'),
     '#size' => 40,
-    '#maxlength' => 50,
+    '#maxlength' => 255,
     '#description' => t('Example caption should contain only alphabets, numbers and spaces.'),
     '#required' => TRUE,
   );

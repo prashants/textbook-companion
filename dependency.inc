@@ -84,6 +84,7 @@ function upload_dependency_form($form_state)
       '#type' => 'textfield',
       '#title' => t('Caption for dependency file'),
       '#size' => 15,
+      '#maxlength' => 100,
       '#required' => TRUE,
   );
   $form['depfile']['depfile1_description'] = array(

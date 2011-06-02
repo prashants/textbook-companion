@@ -365,14 +365,13 @@ function book_proposal_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Full Name'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
   );
   $form['email_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Email'),
     '#size' => 30,
-    '#maxlength' => 64,
     '#value' => $user->mail,
     '#disabled' => TRUE,
   );
@@ -380,7 +379,7 @@ function book_proposal_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Mobile No.'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 15,
     '#required' => TRUE,
   );
   $form['how_project'] = array(
@@ -398,7 +397,7 @@ function book_proposal_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Course'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
   );
   $form['branch'] = array(
@@ -420,21 +419,21 @@ function book_proposal_form($form_state)
     '#type' => 'textfield',
     '#title' => t('University/Institute'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
   );
   $form['faculty'] = array(
     '#type' => 'textfield',
     '#title' => t('College Teacher/Professor'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
   );
   $form['reviewer'] = array(
     '#type' => 'textfield',
     '#title' => t('Reviewer'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
   );
   $form['completion_date'] = array(
     '#type' => 'textfield',
@@ -453,35 +452,35 @@ function book_proposal_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Title of the book'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
   );
   $form['preference1']['author1'] = array(
     '#type' => 'textfield',
     '#title' => t('Author Name'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
   );
   $form['preference1']['isbn1'] = array(
     '#type' => 'textfield',
     '#title' => t('ISBN No'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 25,
     '#required' => TRUE,
   );
   $form['preference1']['publisher1'] = array(
     '#type' => 'textfield',
     '#title' => t('Publisher & Place'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
   );
   $form['preference1']['edition1'] = array(
     '#type' => 'textfield',
     '#title' => t('Edition'),
-    '#size' => 30,
-    '#maxlength' => 64,
+    '#size' => 4,
+    '#maxlength' => 2,
     '#required' => TRUE,
   );
   $form['preference1']['year1'] = array(
@@ -501,35 +500,35 @@ function book_proposal_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Title of the book'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
   );
   $form['preference2']['author2'] = array(
     '#type' => 'textfield',
     '#title' => t('Author Name'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
   );
   $form['preference2']['isbn2'] = array(
     '#type' => 'textfield',
     '#title' => t('ISBN No'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 25,
     '#required' => TRUE,
   );
   $form['preference2']['publisher2'] = array(
     '#type' => 'textfield',
     '#title' => t('Publisher & Place'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
   );
   $form['preference2']['edition2'] = array(
     '#type' => 'textfield',
     '#title' => t('Edition'),
-    '#size' => 30,
-    '#maxlength' => 64,
+    '#size' => 4,
+    '#maxlength' => 2,
     '#required' => TRUE,
   );
   $form['preference2']['year2'] = array(
@@ -549,35 +548,35 @@ function book_proposal_form($form_state)
     '#type' => 'textfield',
     '#title' => t('Title of the book'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
   );
   $form['preference3']['author3'] = array(
     '#type' => 'textfield',
     '#title' => t('Author Name'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 100,
     '#required' => TRUE,
   );
   $form['preference3']['isbn3'] = array(
     '#type' => 'textfield',
     '#title' => t('ISBN No'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 25,
     '#required' => TRUE,
   );
   $form['preference3']['publisher3'] = array(
     '#type' => 'textfield',
     '#title' => t('Publisher & Place'),
     '#size' => 30,
-    '#maxlength' => 64,
+    '#maxlength' => 50,
     '#required' => TRUE,
   );
   $form['preference3']['edition3'] = array(
     '#type' => 'textfield',
     '#title' => t('Edition'),
-    '#size' => 30,
-    '#maxlength' => 64,
+    '#size' => 4,
+    '#maxlength' => 2,
     '#required' => TRUE,
   );
   $form['preference3']['year3'] = array(
@@ -635,13 +634,13 @@ function book_proposal_form_validate($form, &$form_state)
     form_set_error('year2', t('Year of pulication should be not in the future for Book Preference 2'));
   if ((int)$form_state['values']['year3'] > $cur_year)
     form_set_error('year3', t('Year of pulication should be not in the future for Book Preference 3'));
-  
+
   /* isbn */
-  if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn1']))
+  if (!preg_match('/^[0-9\-xX]+$/', $form_state['values']['isbn1']))
     form_set_error('isbn1', t('Invalid ISBN for Book Preference 1'));
-  if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn2']))
+  if (!preg_match('/^[0-9\-xX]+$/', $form_state['values']['isbn2']))
     form_set_error('isbn2', t('Invalid ISBN for Book Preference 2'));
-  if (!preg_match('/^[0-9\-]+$/', $form_state['values']['isbn3']))
+  if (!preg_match('/^[0-9\-xX]+$/', $form_state['values']['isbn3']))
     form_set_error('isbn3', t('Invalid ISBN for Book Preference 3'));
   return;
 }

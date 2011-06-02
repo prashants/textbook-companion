@@ -181,7 +181,7 @@ function textbook_companion_schema() {
       'edition' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'varchar',
-        'length' => '1',
+        'length' => '2',
         'not null' => TRUE,
       ),
       'year' => array(
