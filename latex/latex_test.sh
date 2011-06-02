@@ -107,9 +107,7 @@ fi
 if [ $col7 =  D ]
 then
 #echo check Appendix \\ref{AP:$col9} for dependency \$$col5\$ >> $CURDIR/TEX
-
-echo check Appendix \\ref{AP:$col9} for dependency: \{\\begin\{alltt\}  \> $col5 \\end\{alltt\}\} >> $CURDIR/TEX
-
+echo check Appendix \\ref{AP:$col9} for dependency:  {\\begin{alltt} \\hspace{2mm}  $col5 \\end{alltt}} >> $CURDIR/TEX
 echo  >> $CURDIR/TEX
 fi
 

@@ -797,38 +797,50 @@ function proposal_edit_form_submit($form, &$form_state)
 
   $preference1_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 1);
   $preference1_data = db_fetch_object($preference1_q);
-  $preference1_id = $preference1_data->id;
+  if ($preference1_data)
+  	$preference1_id = $preference1_data->id;
   $preference2_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 2);
   $preference2_data = db_fetch_object($preference2_q);
-  $preference2_id = $preference2_data->id;
+  if ($preference2_data)
+  	$preference2_id = $preference2_data->id;
   $preference3_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND pref_number = %d LIMIT 1", $proposal_id, 3);
   $preference3_data = db_fetch_object($preference3_q);
-  $preference3_id = $preference3_data->id;
+  if ($preference3_data)
+  	$preference3_id = $preference3_data->id;
 
-  db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
-    $form_state['values']['book1'],
-    $form_state['values']['author1'],
-    $form_state['values']['isbn1'],
-    $form_state['values']['publisher1'],
-    $form_state['values']['edition1'],
-    $form_state['values']['year1'],
-    $preference1_id);
-  db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
-    $form_state['values']['book2'],
-    $form_state['values']['author2'],
-    $form_state['values']['isbn2'],
-    $form_state['values']['publisher2'],
-    $form_state['values']['edition2'],
-    $form_state['values']['year2'],
-    $preference2_id);
-  db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
-    $form_state['values']['book3'],
-    $form_state['values']['author3'],
-    $form_state['values']['isbn3'],
-    $form_state['values']['publisher3'],
-    $form_state['values']['edition3'],
-    $form_state['values']['year3'],
-    $preference3_id);
+  if ($preference1_data)
+  {
+		db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
+			$form_state['values']['book1'],
+			$form_state['values']['author1'],
+			$form_state['values']['isbn1'],
+			$form_state['values']['publisher1'],
+			$form_state['values']['edition1'],
+			$form_state['values']['year1'],
+			$preference1_id);
+	}
+  if ($preference2_data)
+  {
+		db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
+			$form_state['values']['book2'],
+			$form_state['values']['author2'],
+			$form_state['values']['isbn2'],
+			$form_state['values']['publisher2'],
+			$form_state['values']['edition2'],
+			$form_state['values']['year2'],
+			$preference2_id);
+	}
+  if ($preference3_data)
+  {
+		db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
+			$form_state['values']['book3'],
+			$form_state['values']['author3'],
+			$form_state['values']['isbn3'],
+			$form_state['values']['publisher3'],
+			$form_state['values']['edition3'],
+			$form_state['values']['year3'],
+			$preference3_id);
+	}
   drupal_set_message(t('Proposal Updated'), 'status');
 }
 
