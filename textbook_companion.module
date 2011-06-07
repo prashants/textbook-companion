@@ -930,11 +930,11 @@ Best Wishes,
       $approved_preference_data = db_fetch_object($approved_preference_q);
       $user_data = user_load($params['proposal_completed']['user_id']);
 
-      $message['subject'] = t('[!site_name] Congrats! Your book proposal has been completed', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['subject'] = t('[!site_name] Congratulations for completion of the book.', array('!site_name' => variable_get('site_name', '')), $language->language);
       $message['body'] = t('
 Dear !user_name,
 
-Your following book proposal has been completed:
+Following book has been completed sucessfully by you:
 
 Full Name : ' . $proposal_data->full_name . '
 Email : ' . $user_data->mail . '
@@ -953,13 +953,11 @@ Publisher and Place : ' . $approved_preference_data->publisher . '
 Edition : ' . $approved_preference_data->edition . '
 Year of publication : ' . $approved_preference_data->year . '
 
-Your book is now available for download at http://scilab.in/textbook_run
+Your book is now available at following link to download.
 
-Go ahead and download the PDF of the book you uploaded and also download the examples file.
+http://scilab.in/textbook_run/' . $approved_preference_data->id . '
 
-You can now also create a new book proposal...
-
-If you face any problems please contact us.
+Now you should be able to propose a new book...
 
 Best Wishes,
 
