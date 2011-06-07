@@ -104,6 +104,16 @@ function textbook_companion_menu()
     'weight' => 2,
     'file' => 'code_approval.inc',
   );
+  $items['code_approval/editcode'] = array(
+    'title' => 'Admin Edit Example',
+    'description' => 'Admin Edit Example',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('upload_examples_admin_edit_form'),
+    'access arguments' => array('approve code'),
+    'type' => MENU_CALLBACK,
+    'weight' => 3,
+    'file' => 'editcodeadmin.inc',
+  );
 
   $items['textbook_companion/code'] = array(
     'title' => 'Code Submission',
@@ -1000,6 +1010,25 @@ Example number : ' . $example_data->number . '
 Caption : ' .  $example_data->caption . '
 
 The example is still under review. You will be notified when it has been approved.
+
+Best Wishes,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      break;
+
+    case 'example_updated_admin':
+      $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $params['example_updated_admin']['example_id']);
+      $example_data = db_fetch_object($example_q);
+      $user_data = user_load($params['example_updated_admin']['user_id']);
+
+      $message['subject'] = t('[!site_name] Reviewer have updated example', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+Reviewer have updated the following example:
+
+Example number : ' . $example_data->number . '
+Caption : ' .  $example_data->caption . '
 
 Best Wishes,
 

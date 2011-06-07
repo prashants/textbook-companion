@@ -390,6 +390,11 @@ function bulk_approval_form($form_state)
         '#type' => 'item',
         '#value' => l('Download Example', 'download/example/' . $example_default_value),
       );
+      $form['run']['edit_example'] = array(
+        '#type'  => 'item',
+        '#value' => l('Edit Example', 'code_approval/editcode/' . $example_default_value),
+      );
+
       $form['run']['example_files'] = array(
         '#type'  => 'item',
         '#title' => 'List of example files',

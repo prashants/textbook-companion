@@ -5,10 +5,10 @@
 /***************************** EDIT EXAMPLE ***********************************/
 /******************************************************************************/
 
-function upload_examples_edit_form($form_state)
+function upload_examples_admin_edit_form($form_state)
 {
   global $user;
-  $example_id = arg(3);
+  $example_id = arg(2);
 
   /* get example details */
   $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $example_id);
@@ -16,12 +16,6 @@ function upload_examples_edit_form($form_state)
   if (!$example_q)
   {
     drupal_set_message(t("Invalid example selected."), 'error');
-    drupal_goto('');
-    return;
-  }
-  if ($example_data->approval_status != 0)
-  {
-    drupal_set_message(t("You cannot edit an example after it has been approved or dis-approved. Please contact site administrator if you want to edit this example."), 'error');
     drupal_goto('');
     return;
   }
@@ -84,12 +78,6 @@ function upload_examples_edit_form($form_state)
     drupal_goto('');
     return;
   }
-  if ($preference_data->approval_status != 1)
-  {
-    drupal_set_message(t("Cannot edit example. Either the book proposal has not been approved or it has been rejected."), 'error');
-    drupal_goto('');
-    return;
-  }
 
   /* get proposal details */
   $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d", $preference_data->proposal_id);
@@ -97,12 +85,6 @@ function upload_examples_edit_form($form_state)
   if (!$proposal_data)
   {
     drupal_set_message(t("Invalid proposal selected."), 'error');
-    drupal_goto('');
-    return;
-  }
-  if ($proposal_data->uid != $user->uid)
-  {
-    drupal_set_message(t("You do not have permissions to edit this example."), 'error');
     drupal_goto('');
     return;
   }
@@ -135,7 +117,7 @@ function upload_examples_edit_form($form_state)
   });";
   drupal_add_js($chapter_name_js, 'inline', 'header');
 
-  $form['#redirect'] = 'textbook_companion/code';
+  $form['#redirect'] = 'code_approval/bulk';
   $form['#attributes'] = array('enctype' => "multipart/form-data");
 
   $form['book_details']['book'] = array(
@@ -431,7 +413,7 @@ function upload_examples_edit_form($form_state)
   return $form;
 }
 
-function upload_examples_edit_form_validate($form, &$form_state)
+function upload_examples_admin_edit_form_validate($form, &$form_state)
 {
   if (!check_name($form_state['values']['example_caption']))
     form_set_error('example_caption', t('Example Caption can contain only alphabets, numbers and spaces.'));
@@ -520,10 +502,10 @@ function upload_examples_edit_form_validate($form, &$form_state)
   drupal_add_js($chapter_name_js, 'inline', 'header');
 }
 
-function upload_examples_edit_form_submit($form, &$form_state)
+function upload_examples_admin_edit_form_submit($form, &$form_state)
 {
   global $user;
-  $example_id = arg(3);
+  $example_id = arg(2);
 
   /* get example details */
   $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE id = %d LIMIT 1", $example_id);
@@ -531,12 +513,6 @@ function upload_examples_edit_form_submit($form, &$form_state)
   if (!$example_q)
   {
     drupal_set_message(t("Invalid example selected."), 'error');
-    drupal_goto('');
-    return;
-  }
-  if ($example_data->approval_status != 0)
-  {
-    drupal_set_message(t("You cannot edit an example after it has been approved or dis-approved. Please contact site administrator if you want to edit this example."), 'error');
     drupal_goto('');
     return;
   }
@@ -560,12 +536,6 @@ function upload_examples_edit_form_submit($form, &$form_state)
     drupal_goto('');
     return;
   }
-  if ($preference_data->approval_status != 1)
-  {
-    drupal_set_message(t("Cannot edit example. Either the book proposal has not been approved or it has been rejected."), 'error');
-    drupal_goto('');
-    return;
-  }
 
   /* get proposal details */
   $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d", $preference_data->proposal_id);
@@ -576,12 +546,7 @@ function upload_examples_edit_form_submit($form, &$form_state)
     drupal_goto('');
     return;
   }
-  if ($proposal_data->uid != $user->uid)
-  {
-    drupal_set_message(t("You do not have permissions to edit this example."), 'error');
-    drupal_goto('');
-    return;
-  }
+  $user_data = user_load($proposal_data->uid);
 
   /* creating directories */
   $root_path = textbook_companion_path();
@@ -894,187 +859,14 @@ function upload_examples_edit_form_submit($form, &$form_state)
   }
 
   /* sending email */
-  $email_to = $user->mail . ', ' . variable_get('textbook_companion_emails', '');
-  $param['example_updated']['example_id'] = $example_id;
-  $param['example_updated']['user_id'] = $user->uid;
-  if (!drupal_mail('textbook_companion', 'example_updated', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+  $email_to = $user_data->mail . ', ' . variable_get('textbook_companion_emails', '');
+  $param['example_updated_admin']['example_id'] = $example_id;
+  $param['example_updated_admin']['user_id'] = $proposal_data->uid;
+  if (!drupal_mail('textbook_companion', 'example_updated_admin', $email_to, language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
     drupal_set_message('Error sending email message.', 'error');
 
   drupal_set_message(t("Example successfully udpated."), 'status');
 }
-
-
-/******************************************************************************/
-/**************************** EDIT CHAPTER TITLE ******************************/
-/******************************************************************************/
-
-function edit_chapter_title_form($form_state)
-{
-  global $user;
-
-  /************************ start approve book details ************************/
-  $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE uid = %d ORDER BY id DESC LIMIT 1", $user->uid);
-  $proposal_data = db_fetch_object($proposal_q);
-  if (!$proposal_data)
-  {
-    drupal_set_message("Please submit a " . l('proposal', 'proposal') . ".", 'error');
-    drupal_goto('textbook_companion/code');
-  }
-  if ($proposal_data->proposal_status  != 1)
-  {
-    switch ($proposal_data->proposal_status )
-    {
-    case 0:
-      drupal_set_message(t('We have already received your proposal. We will get back to you soon.'), 'status');
-      drupal_goto('textbook_companion/code');
-      return;
-      break;
-    case 2:
-      drupal_set_message(t('Your proposal has been dis-approved. Please create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'error');
-      drupal_goto('textbook_companion/code');
-      return;
-      break;
-    case 3:
-      drupal_set_message(t('Congratulations! You have completed your last book proposal. You have to create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'status');
-      drupal_goto('textbook_companion/code');
-      return;
-      break;
-    default:
-       drupal_set_message(t('Invalid proposal state. Please contact site administrator for further information.'), 'error');
-       drupal_goto('textbook_companion/code');
-       return;
-       break;
-    }
-  }
-
-  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND approval_status = 1 LIMIT 1", $proposal_data->id);
-  $preference_data = db_fetch_object($preference_q);
-  if (!$preference_data)
-  {
-    drupal_set_message(t('Invalid Book Preference status. Please contact site administrator for further information.'), 'error');
-    drupal_goto('textbook_companion/code');
-    return;
-  }
-  /************************ end approve book details **************************/
-
-  $chapter_id = arg(4);
-
-  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d AND preference_id = %d", $chapter_id, $preference_data->id);
-  $chapter_data = db_fetch_object($chapter_q);
-  if (!$chapter_data)
-  {
-    drupal_set_message(t('Invalid chapter.'), 'error');
-    drupal_goto('textbook_companion/code');
-    return;
-  }
-
-  $form['#redirect'] = 'textbook_companion/code';
-
-  $form['book_details']['book'] = array(
-    '#type' => 'item',
-    '#value' => $preference_data->book,
-    '#title' => t('Title of the Book'),
-  );
-  $form['contributor_name'] = array(
-    '#type' => 'item',
-    '#value' => $proposal_data->full_name,
-    '#title' => t('Contributor Name'),
-  );
-  $form['number'] = array(
-    '#type' => 'item',
-    '#title' => t('Chapter No'),
-    '#value' => $chapter_data->number,
-  );
-
-  $form['chapter_title'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Title of the Chapter'),
-    '#size' => 40,
-    '#maxlength' => 255,
-    '#required' => TRUE,
-    '#default_value' => $chapter_data->name,
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit')
-  );
-  $form['cancel'] = array(
-    '#type' => 'markup',
-    '#value' => l(t('Cancel'), 'textbook_companion/code'),
-  );
-  return $form;
-}
-
-function edit_chapter_title_form_validate($form, &$form_state)
-{
-  if (!check_name($form_state['values']['chapter_title']))
-    form_set_error('chapter_title', t('Title of the Chapter can contain only alphabets, numbers and spaces.'));
-}
-
-function edit_chapter_title_form_submit($form, &$form_state)
-{
-  global $user;
-
-  /************************ start approve book details ************************/
-  $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE uid = %d ORDER BY id DESC LIMIT 1", $user->uid);
-  $proposal_data = db_fetch_object($proposal_q);
-  if (!$proposal_data)
-  {
-    drupal_set_message("Please submit a " . l('proposal', 'proposal') . ".", 'error');
-    drupal_goto('textbook_companion/code');
-  }
-  if ($proposal_data->proposal_status  != 1)
-  {
-    switch ($proposal_data->proposal_status )
-    {
-    case 0:
-      drupal_set_message(t('We have already received your proposal. We will get back to you soon.'), 'status');
-      drupal_goto('textbook_companion/code');
-      return;
-      break;
-    case 2:
-      drupal_set_message(t('Your proposal has been dis-approved. Please create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'error');
-      drupal_goto('textbook_companion/code');
-      return;
-      break;
-    case 3:
-      drupal_set_message(t('Congratulations! You have completed your last book proposal. You have to create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'status');
-      drupal_goto('textbook_companion/code');
-      return;
-      break;
-    default:
-       drupal_set_message(t('Invalid proposal state. Please contact site administrator for further information.'), 'error');
-       drupal_goto('textbook_companion/code');
-       return;
-       break;
-    }
-  }
-
-  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND approval_status = 1 LIMIT 1", $proposal_data->id);
-  $preference_data = db_fetch_object($preference_q);
-  if (!$preference_data)
-  {
-    drupal_set_message(t('Invalid Book Preference status. Please contact site administrator for further information.'), 'error');
-    drupal_goto('textbook_companion/code');
-    return;
-  }
-  /************************ end approve book details **************************/
-
-  $chapter_id = arg(4);
-
-  $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE id = %d AND preference_id = %d", $chapter_id, $preference_data->id);
-  $chapter_data = db_fetch_object($chapter_q);
-  if (!$chapter_data)
-  {
-    drupal_set_message(t('Invalid chapter.'), 'error');
-    drupal_goto('textbook_companion/code');
-    return;
-  }
-  db_query("UPDATE {textbook_companion_chapter} SET name = '%s' WHERE id = %d", $form_state['values']['chapter_title'], $chapter_id);
-  drupal_set_message(t('Title of the Chapter updated.'), 'status');
-}
-
 
 /******************************************************************************/
 /************************** GENERAL FUNCTIONS *********************************/
