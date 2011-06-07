@@ -70,7 +70,7 @@ echo>> $CURDIR/TEX
 j=0;
 k=1;
 #sort -t '#' -k 3,3 -k 1,1 -g $Data_all > database_sort
-sort -t '.' -k 1,1n -k 2,2n $Data_all > database_sort
+sort -t '.' -k 1,1n -k 2,2n -k 3,3n  -k 4,4n $Data_all > database_sort
 
 while IFS=# read col1 col2 col3 col4 col5 col6 col7 col8 col9; do
 
