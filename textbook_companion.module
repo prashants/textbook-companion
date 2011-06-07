@@ -843,7 +843,7 @@ Best Wishes,
       $message['body'] = t('
 Dear !user_name,
 
-Your following book proposal as been disapproved:
+Your following book proposal has been disapproved:
 
 Reason for disapproval: ' . $proposal_data->message . '
 
@@ -899,7 +899,7 @@ Best Wishes,
       $message['body'] = t('
 Dear !user_name,
 
-Your following book proposal as been approved:
+Your following book proposal has been approved:
 
 Full Name : ' . $proposal_data->full_name . '
 Email : ' . $user_data->mail . '
@@ -917,6 +917,49 @@ ISBN No. : ' . $approved_preference_data->isbn . '
 Publisher and Place : ' . $approved_preference_data->publisher . '
 Edition : ' . $approved_preference_data->edition . '
 Year of publication : ' . $approved_preference_data->year . '
+
+Best Wishes,
+
+!site_name', array('!site_name' => variable_get('site_name', ''), '!user_name' => $user_data->name), $language->language);
+      break;
+
+    case 'proposal_completed':
+      $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d LIMIT 1", $params['proposal_completed']['proposal_id']);
+      $proposal_data = db_fetch_object($proposal_q);
+      $approved_preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE proposal_id = %d AND approval_status = 1 LIMIT 1", $params['proposal_completed']['proposal_id']);
+      $approved_preference_data = db_fetch_object($approved_preference_q);
+      $user_data = user_load($params['proposal_completed']['user_id']);
+
+      $message['subject'] = t('[!site_name] Congrats! Your book proposal has been completed', array('!site_name' => variable_get('site_name', '')), $language->language);
+      $message['body'] = t('
+Dear !user_name,
+
+Your following book proposal has been completed:
+
+Full Name : ' . $proposal_data->full_name . '
+Email : ' . $user_data->mail . '
+Mobile : ' .  $proposal_data->mobile . '
+Course : ' . $proposal_data->course . '
+Department/Branch : ' . $proposal_data->branch . '
+University/Institute : ' .  $proposal_data->university . '
+College Teacher / Professor : ' . $proposal_data->faculty . '
+Reviewer : ' .  $proposal_data->reviewer . '
+Expected date of completion : ' .  date('d-m-Y', $proposal_data->completion_date) . '
+
+Title of the book : ' . $approved_preference_data->book . '
+Author name : ' . $approved_preference_data->author . '
+ISBN No. : ' . $approved_preference_data->isbn . '
+Publisher and Place : ' . $approved_preference_data->publisher . '
+Edition : ' . $approved_preference_data->edition . '
+Year of publication : ' . $approved_preference_data->year . '
+
+Your book is now available for download at http://scilab.in/textbook_run
+
+Go ahead and download the PDF of the book you uploaded and also download the examples file.
+
+You can now also create a new book proposal...
+
+If you face any problems please contact us.
 
 Best Wishes,
 

@@ -403,11 +403,11 @@ function proposal_status_form_submit($form, &$form_state)
     db_query("UPDATE {textbook_companion_proposal} SET proposal_status = 3 WHERE id = %d", $proposal_id);
 
     /* sending email */
-    $book_user = user_load($row->uid);
-    $param['proposal_approved']['proposal_id'] = $proposal_id;
-    $param['proposal_approved']['user_id'] = $row->uid;
+    $book_user = user_load($proposal_data->uid);
+    $param['proposal_completed']['proposal_id'] = $proposal_id;
+    $param['proposal_completed']['user_id'] = $proposal_data->uid;
     $email_to = $book_user->mail . ', ' . variable_get('textbook_companion_emails', '');
-    if (!drupal_mail('textbook_companion', 'proposal_approved', $email_to , language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+    if (!drupal_mail('textbook_companion', 'proposal_completed', $email_to , language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
       drupal_set_message('Error sending email message.', 'error');
   
     drupal_set_message('Congratulations! Book proposal has been marked as completed. User has been notified of the completion.', 'status');
