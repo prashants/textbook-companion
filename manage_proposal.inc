@@ -407,7 +407,7 @@ function proposal_status_form_submit($form, &$form_state)
     $param['proposal_approved']['proposal_id'] = $proposal_id;
     $param['proposal_approved']['user_id'] = $row->uid;
     $email_to = $book_user->mail . ', ' . variable_get('textbook_companion_emails', '');
-    if (!drupal_mail('textbook_companion', 'proposal_completed', $email_to , language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
+    if (!drupal_mail('textbook_companion', 'proposal_approved', $email_to , language_default(), $param, variable_get('textbook_companion_from_email', NULL), TRUE))
       drupal_set_message('Error sending email message.', 'error');
   
     drupal_set_message('Congratulations! Book proposal has been marked as completed. User has been notified of the completion.', 'status');
