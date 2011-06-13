@@ -24,10 +24,10 @@ function textbook_companion_uninstall() {
   // Remove variables
   variable_del('textbook_companion_emails');
   variable_del('textbook_companion_from_email');
-  variable_del('textbook_companion_source_extensions', '');
-  variable_del('textbook_companion_dependency_extensions', '');
-  variable_del('textbook_companion_result_extensions', '');
-  variable_del('textbook_companion_xcos_extensions', '');
+  variable_del('textbook_companion_source_extensions');
+  variable_del('textbook_companion_dependency_extensions');
+  variable_del('textbook_companion_result_extensions');
+  variable_del('textbook_companion_xcos_extensions');
 }
 
 /**

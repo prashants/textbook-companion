@@ -4,7 +4,10 @@ $ cat changedir.sh
 
 if [ -f TEX_final.pdf ]
 then
-	rm TEX_final.pdf
+	rm TEX_final.*
+	rm database_sort
+	rm database_sort.csv
+        rm TEX
 fi
 
 ./latex_test.sh $1 $2 $3 $4

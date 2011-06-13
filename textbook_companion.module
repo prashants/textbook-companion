@@ -429,21 +429,21 @@ function book_proposal_form($form_state)
     '#type' => 'textfield',
     '#title' => t('University/Institute'),
     '#size' => 30,
-    '#maxlength' => 100,
+    '#maxlength' => 50,
     '#required' => TRUE,
   );
   $form['faculty'] = array(
     '#type' => 'textfield',
     '#title' => t('College Teacher/Professor'),
     '#size' => 30,
-    '#maxlength' => 100,
+    '#maxlength' => 50,
     '#required' => TRUE,
   );
   $form['reviewer'] = array(
     '#type' => 'textfield',
     '#title' => t('Reviewer'),
     '#size' => 30,
-    '#maxlength' => 100,
+    '#maxlength' => 50,
   );
   $form['completion_date'] = array(
     '#type' => 'textfield',
