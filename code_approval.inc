@@ -265,6 +265,10 @@ function bulk_approval_form($form_state)
       '#type' => 'item',
       '#value' => l('Download', 'full_download/book/' . $book_default_value) . ' ' . t('(Download all the approved and unapproved examples of the entire book)'),
     );
+    $form['run']['download_pdf'] = array(
+      '#type' => 'item',
+      '#value' => l('Download PDF', 'textbook_companion/generate_book/' . $book_default_value . '/1') . ' ' . t('(Download PDF of all the approved and unapproved examples of the entire book)'),
+    );
 
     $form['run']['approve_book'] = array(
       '#type'  => 'checkbox',

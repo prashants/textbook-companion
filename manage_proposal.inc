@@ -68,16 +68,13 @@ function _category_all()
   	switch ($preference_data->category)
   	{
     case 0: $category_data = 'Not Selected'; break;
-    case 1: $category_data = 'Electrical Engineering'; break;
-    case 2: $category_data = 'Electronics Engineering'; break;
-    case 3: $category_data = 'Computer Engineering'; break;
+    case 1: $category_data = 'Computer Science and Information Technology'; break;
+    case 2: $category_data = 'Electrical and Electronics Engineering'; break;
+    case 3: $category_data = 'Mechanical Engineering'; break;
     case 4: $category_data = 'Chemical Engineering'; break;
-    case 5: $category_data = 'Instrumentation Engineering'; break;
-    case 6: $category_data = 'Mechanical Engineering'; break;
-    case 7: $category_data = 'Civil Engineering'; break;
-    case 8: $category_data = 'Physics'; break;
-    case 9: $category_data = 'Mathematics'; break;
-    case 10: $category_data = 'Others'; break;
+    case 5: $category_data = 'Civil Engineering'; break;
+    case 6: $category_data = 'Physics'; break;
+    case 7: $category_data = 'Mathematics'; break;
     default: $category_data = 'Unknown'; break;
   	}
     $preference_rows[] = array($preference_data->book, $preference_data->author, $preference_data->isbn, $preference_data->publisher, $preference_data->edition, $preference_data->year, $category_data, l('Edit', 'manage_proposal/category/edit/' . $preference_data->id));
@@ -927,16 +924,14 @@ function category_edit_form($form_state)
     '#type' => 'select',
     '#title' => t('Category'),
     '#options' => array(0 => 'Please select',
-    										1 => 'Electrical Engineering',
-                        2 => 'Electronics Engineering',
-                        3 => 'Computer Engineering',
+                        1 => 'Computer Science and Information Technology',
+    										2 => 'Electrical and Electronics Engineering',
+                        3 => 'Mechanical Engineering',
                         4 => 'Chemical Engineering',
-                        5 => 'Instrumentation Engineering',
-                        6 => 'Mechanical Engineering',
-                        7 => 'Civil Engineering',
-                        8 => 'Physics',
-                        9 => 'Mathematics',
-                        10 => 'Others'),
+                        5 => 'Civil Engineering',
+                        6 => 'Physics',
+                        7 => 'Mathematics',
+                        8 => 'Others'),
     '#required' => TRUE,
     '#default_value' => $preference_data->category,
   );

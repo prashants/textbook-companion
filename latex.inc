@@ -4,10 +4,14 @@ function textbook_companion_download_book()
 {
   $preference_id = arg(2);
   _latex_copy_script_file();
-  _latex_generate_files($preference_id);
+  $full_book = arg(3);
+  if ($full_book == "1")
+  	_latex_generate_files($preference_id, TRUE);
+  else
+  	_latex_generate_files($preference_id, FALSE);
 }
 
-function _latex_generate_files($preference_id)
+function _latex_generate_files($preference_id, $full_book = FALSE)
 {
   $book_filedata = "";
   $contributor_filedata = "";
@@ -44,7 +48,10 @@ function _latex_generate_files($preference_id)
   $chapter_q = db_query("SELECT * FROM {textbook_companion_chapter} WHERE preference_id = %d ORDER BY number DESC", $preference_data->id);
   while ($chapter_data = db_fetch_object($chapter_q))
   {
-    $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d AND approval_status = 1 ORDER BY number DESC", $chapter_data->id);
+  	if ($full_book)
+  		$example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d ORDER BY number DESC", $chapter_data->id);
+  	else
+    	$example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d AND approval_status = 1 ORDER BY number DESC", $chapter_data->id);
     while ($example_data = db_fetch_object($example_q))
     {
       $example_files_q = db_query("SELECT * FROM {textbook_companion_example_files} WHERE example_id = %d", $example_data->id);
