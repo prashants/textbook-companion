@@ -58,6 +58,36 @@ function _proposal_all()
   return $output; 
 }
 
+function _category_all()
+{
+  /* get pending proposals to be approved */
+  $preference_rows = array();
+  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE approval_status = 1 ORDER BY id DESC");
+  while ($preference_data = db_fetch_object($preference_q))
+  {
+  	switch ($preference_data->category)
+  	{
+    case 0: $category_data = 'Not Selected'; break;
+    case 1: $category_data = 'Electrical Engineering'; break;
+    case 2: $category_data = 'Electronics Engineering'; break;
+    case 3: $category_data = 'Computer Engineering'; break;
+    case 4: $category_data = 'Chemical Engineering'; break;
+    case 5: $category_data = 'Instrumentation Engineering'; break;
+    case 6: $category_data = 'Mechanical Engineering'; break;
+    case 7: $category_data = 'Civil Engineering'; break;
+    case 8: $category_data = 'Physics'; break;
+    case 9: $category_data = 'Mathematics'; break;
+    case 10: $category_data = 'Others'; break;
+    default: $category_data = 'Unknown'; break;
+  	}
+    $preference_rows[] = array($preference_data->book, $preference_data->author, $preference_data->isbn, $preference_data->publisher, $preference_data->edition, $preference_data->year, $category_data, l('Edit', 'manage_proposal/category/edit/' . $preference_data->id));
+  }
+
+  $preference_header = array('Book', 'Author', 'ISBN', 'Publisher', 'Edition', 'Year', 'Category', 'Status');
+  $output = theme_table($preference_header, $preference_rows);
+  return $output; 
+}
+
 /******************************************************************************/
 /************************** PROPOSAL APPROVAL FORM ****************************/
 /******************************************************************************/
@@ -841,5 +871,103 @@ function proposal_edit_form_submit($form, &$form_state)
 			$preference3_id);
 	}
   drupal_set_message(t('Proposal Updated'), 'status');
+}
+
+
+
+/******************************************************************************/
+/**************************** CATEGORY EDIT FORM ******************************/
+/******************************************************************************/
+
+function category_edit_form($form_state)
+{
+  /* get current proposal */
+  $preference_id = arg(3);
+  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $preference_id);
+  $preference_data = db_fetch_object($preference_q);
+	if (!$preference_data)
+	{
+		drupal_set_message(t('Invalid book selected. Please try again.'), 'error');
+		drupal_goto('manage_proposal/category');
+		return;
+	}
+
+  $form['book'] = array(
+    '#type' => 'item',
+    '#title' => t('Title of the book'),
+    '#value' => $preference_data->book,
+  );
+  $form['author'] = array(
+    '#type' => 'item',
+    '#title' => t('Author Name'),
+    '#value' => $preference_data->author,
+  );
+  $form['isbn'] = array(
+    '#type' => 'item',
+    '#title' => t('ISBN No'),
+    '#value' => $preference_data->isbn,
+  );
+  $form['publisher'] = array(
+    '#type' => 'item',
+    '#title' => t('Publisher & Place'),
+    '#value' => $preference_data->publisher,
+  );
+  $form['edition'] = array(
+    '#type' => 'item',
+    '#title' => t('Edition'),
+    '#value' => $preference_data->edition,
+  );
+  $form['year'] = array(
+    '#type' => 'item',
+    '#title' => t('Year of pulication'),
+    '#value' => $preference_data->year,
+  );
+
+  $form['category'] = array(
+    '#type' => 'select',
+    '#title' => t('Category'),
+    '#options' => array(0 => 'Please select',
+    										1 => 'Electrical Engineering',
+                        2 => 'Electronics Engineering',
+                        3 => 'Computer Engineering',
+                        4 => 'Chemical Engineering',
+                        5 => 'Instrumentation Engineering',
+                        6 => 'Mechanical Engineering',
+                        7 => 'Civil Engineering',
+                        8 => 'Physics',
+                        9 => 'Mathematics',
+                        10 => 'Others'),
+    '#required' => TRUE,
+    '#default_value' => $preference_data->category,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit')
+  );
+  $form['cancel'] = array(
+    '#type' => 'markup',
+    '#value' => l(t('Cancel'), 'manage_proposal/category'),
+  );
+  return $form;
+}
+
+function category_edit_form_submit($form, &$form_state)
+{
+  /* get current proposal */
+  $preference_id = (int)arg(3);
+  $preference_q = db_query("SELECT * FROM {textbook_companion_preference} WHERE id = %d", $preference_id);
+  $preference_data = db_fetch_object($preference_q);
+	if (!$preference_data)
+	{
+		drupal_set_message(t('Invalid book selected. Please try again.'), 'error');
+		drupal_goto('manage_proposal/category');
+		return;
+	}
+
+  db_query("UPDATE {textbook_companion_preference} SET category = %d WHERE id = %d", $form_state['values']['category'], $preference_data->id);
+
+  drupal_set_message(t('Book Category Updated'), 'status');
+  drupal_goto('manage_proposal/category');
 }
 

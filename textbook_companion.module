@@ -48,6 +48,16 @@ function textbook_companion_menu()
     'weight' => 2,
     'file' => 'manage_proposal.inc',
   );
+  $items['manage_proposal/category'] = array(
+    'title' => 'Categorize',
+    'description' => 'Categorize Books',
+    'page callback' => '_category_all',
+    'access callback' => 'user_access',
+    'access arguments' => array('approve book proposal'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'manage_proposal.inc',
+  );
   $items['manage_proposal/approve'] = array(
     'title' => 'Proposal Approval',
     'description' => 'Proposal Approval',
@@ -71,6 +81,15 @@ function textbook_companion_menu()
     'description' => 'Edit Proposal',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('proposal_edit_form'),
+    'access arguments' => array('edit book proposal'),
+    'type' => MENU_CALLBACK,
+    'file' => 'manage_proposal.inc',
+  );
+  $items['manage_proposal/category/edit'] = array(
+    'title' => 'Edit Category',
+    'description' => 'Edit category',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('category_edit_form'),
     'access arguments' => array('edit book proposal'),
     'type' => MENU_CALLBACK,
     'file' => 'manage_proposal.inc',
