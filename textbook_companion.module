@@ -669,14 +669,14 @@ function book_proposal_form_submit($form, &$form_state)
     (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d)",
     $user->uid,
     0,
-    $form_state['values']['full_name'],
+    ucwords(strtolower($form_state['values']['full_name'])),
     $form_state['values']['mobile'],
     $form_state['values']['how_project'],
     $form_state['values']['course'],
     $form_state['values']['branch'],
     $form_state['values']['university'],
-    $form_state['values']['faculty'],
-    $form_state['values']['reviewer'],
+    ucwords(strtolower($form_state['values']['faculty'])),
+    ucwords(strtolower($form_state['values']['reviewer'])),
     $completion_date_timestamp,
     time(),
     0,
@@ -694,16 +694,17 @@ function book_proposal_form_submit($form, &$form_state)
   if ($form_state['values']['book1'])
   {
     $result = db_query("INSERT INTO {textbook_companion_preference}
-      (proposal_id, pref_number, book, author, isbn, publisher, edition, year, approval_status) VALUES
-      (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+      (proposal_id, pref_number, book, author, isbn, publisher, edition, year, category, approval_status) VALUES
+      (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d)",
       $proposal_id,
       1,
-      $form_state['values']['book1'],
-      $form_state['values']['author1'],
+      ucwords(strtolower($form_state['values']['book1'])),
+      ucwords(strtolower($form_state['values']['author1'])),
       $form_state['values']['isbn1'],
-      $form_state['values']['publisher1'],
+      ucwords(strtolower($form_state['values']['publisher1'])),
       $form_state['values']['edition1'],
       $form_state['values']['year1'],
+      0,
       0
     );
     if (!$result)
@@ -716,16 +717,17 @@ function book_proposal_form_submit($form, &$form_state)
   if ($form_state['values']['book2'])
   {
     $result = db_query("INSERT INTO {textbook_companion_preference}
-      (proposal_id, pref_number, book, author, isbn, publisher, edition, year, approval_status) VALUES
-      (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+      (proposal_id, pref_number, book, author, isbn, publisher, edition, year, category, approval_status) VALUES
+      (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d)",
       $proposal_id,
       2,
-      $form_state['values']['book2'],
-      $form_state['values']['author2'],
+      ucwords(strtolower($form_state['values']['book2'])),
+      ucwords(strtolower($form_state['values']['author2'])),
       $form_state['values']['isbn2'],
-      $form_state['values']['publisher2'],
+      ucwords(strtolower($form_state['values']['publisher2'])),
       $form_state['values']['edition2'],
       $form_state['values']['year2'],
+      0,
       0
     );
     if (!$result)
@@ -738,16 +740,17 @@ function book_proposal_form_submit($form, &$form_state)
   if ($form_state['values']['book3'])
   {
     $result = db_query("INSERT INTO {textbook_companion_preference}
-      (proposal_id, pref_number, book, author, isbn, publisher, edition, year, approval_status) VALUES
-      (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+      (proposal_id, pref_number, book, author, isbn, publisher, edition, year, category, approval_status) VALUES
+      (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d)",
       $proposal_id,
       3,
-      $form_state['values']['book3'],
-      $form_state['values']['author3'],
+      ucwords(strtolower($form_state['values']['book3'])),
+      ucwords(strtolower($form_state['values']['author3'])),
       $form_state['values']['isbn3'],
-      $form_state['values']['publisher3'],
+      ucwords(strtolower($form_state['values']['publisher3'])),
       $form_state['values']['edition3'],
       $form_state['values']['year3'],
+      0,
       0
     );
     if (!$result)
