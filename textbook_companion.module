@@ -390,6 +390,11 @@ function book_proposal_form($form_state)
     }
   }
 
+  $form['imp_notice'] = array(
+    '#type' => 'item',
+    '#value' => '<font color="red"><b>Please fill up this form carefully as the details entered here will be exactly written in the Textbook Companion</b></font>',
+  );
+
   $form['full_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Full Name'),
