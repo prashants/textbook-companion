@@ -123,8 +123,8 @@ echo $col6 > $CURDIR/Figure_files
 	if  grep -c ".jpg\|.JPEG\|.png\|.jpeg\|.JPG" $CURDIR/Figure_files 
 	then
 		 echo \\curlable{Fig~$col3} >> $CURDIR/TEX
-		 echo \\begin{figure}[h] >> $CURDIR/TEX
-		 echo \\includegraphics[width=6in]{../$col6}  >> $CURDIR/TEX
+		 echo \\begin{figure} >> $CURDIR/TEX
+		 echo \\includegraphics[width=5in]{../$col6}  >> $CURDIR/TEX
 		 echo \\caption{$col4} >> $CURDIR/TEX
 		 echo \\end{figure} >> $CURDIR/TEX
 		 echo >> $CURDIR/TEX

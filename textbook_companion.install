@@ -189,6 +189,11 @@ function textbook_companion_schema() {
         'type' => 'int',
         'not null' => TRUE,
       ),
+			'category' => array(
+				'description' => t('TODO: please describe this field!'),
+				'type' => 'int',
+				'not null' => TRUE,
+			),
       'approval_status' => array(
         'description' => t('TODO: please describe this field!'),
         'type' => 'int',
