@@ -13,6 +13,9 @@ function textbook_companion_download_book()
 
 function _latex_generate_files($preference_id, $full_book = FALSE)
 {
+  $root_path = textbook_companion_path();
+  $dir_path = $root_path . "latex/";
+
   $book_filedata = "";
   $contributor_filedata = "";
   $latex_filedata = "";
@@ -36,6 +39,21 @@ function _latex_generate_files($preference_id, $full_book = FALSE)
     drupal_goto('');
   }
   $book_filedata = $preference_data->book . $sep . $preference_data->author . $sep . $preference_data->isbn . $sep . $preference_data->publisher . $sep . $preference_data->edition . $sep . $preference_data->year . $eol;
+
+  /* regenerate book if full book selected */
+  if ($full_book)
+  	del_book_pdf($preference_data->id);
+
+  /* check if book already generated */
+  if (file_exists($dir_path . "book_" . $preference_data->id . ".pdf"))
+  {
+		/* download zip file */
+		header('Content-Type: application/pdf');
+		header('Content-disposition: attachment; filename="' . $preference_data->book . '_' . $preference_data->author . '.pdf"');
+		header('Content-Length: ' . filesize($dir_path . "book_" . $preference_data->id . ".pdf"));
+		readfile($dir_path . "book_" . $preference_data->id . ".pdf");
+		return;
+  }
 
   $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d", $preference_data->proposal_id);
   $proposal_data = db_fetch_object($proposal_q);
@@ -104,14 +122,12 @@ function _latex_generate_files($preference_id, $full_book = FALSE)
   }
 
   /**************************** WRITE TO FILES ********************************/
-  $root_path = textbook_companion_path();
-  $dir_path = $root_path . "latex/";
   $download_filename = $preference_data->book . "_" . $preference_data->author;
   $book_filename = "tmp_" . $preference_data->id . "_book.txt";
   $contributor_filename = "tmp_" . $preference_data->id . "_contributor.txt";
   $latex_filename = "tmp_" . $preference_data->id . "_data.txt";
   $latex_dep_filename = "tmp_" . $preference_data->id . "_dep_data.txt";
-  $pdf_filename = "tmp_" . $preference_data->id . ".pdf";
+  $pdf_filename = "book_" . $preference_data->id . ".pdf";
 
   $fb = fopen($dir_path . $book_filename, 'w');
   fwrite($fb, $book_filedata);
@@ -134,17 +150,16 @@ function _latex_generate_files($preference_id, $full_book = FALSE)
 		/* download zip file */
 		header('Content-Type: application/pdf');
 		header('Content-disposition: attachment; filename="' . $preference_data->book . '_' . $preference_data->author . '.pdf"');
-		header('Content-Length: ' . filesize($dir_path . "TEX_final.pdf"));
-		readfile($dir_path . "TEX_final.pdf");
+		header('Content-Length: ' . filesize($dir_path . $pdf_filename));
+		readfile($dir_path . $pdf_filename);
 	} else {
 		drupal_set_message("Error occurred when generating the PDF version of the Book.", 'error');
 	}
 
   /*********************** DELETING TEMPORARY FILES ***************************/
-  //unlink($dir_path . $book_filename);
-  //unlink($dir_path . $contributor_filename);
-  //unlink($dir_path . $latex_filename);
-  //unlink($dir_path . $latex_dep_filename);
+  /* regenerate book if full book selected */
+  if ($full_book)
+  	del_book_pdf($preference_data->id);
 }
 
 function _latex_copy_script_file()
@@ -162,12 +177,21 @@ function _latex_run_script($book_filename, $contributor_filename, $latex_filenam
   chdir("latex");
 
   $sh_command = "./pdf_creator.sh " . $book_filename . " " . $contributor_filename . " " . $latex_filename . " " . $latex_dep_filename;
-  //$script_output = system($sh_command, $ret);
   exec($sh_command);
+  exec("mv TEX_final.pdf " . $pdf_filename);
 
   if ($ret == 0)
     return TRUE;
   else
     return FALSE;
+}
+
+function textbook_companion_delete_book()
+{
+	$book_id = arg(2);
+	del_book_pdf($book_id);
+	drupal_set_message(t('Book schedule for regeneration.'), 'status');
+	drupal_goto('code_approval/bulk');
+	return;
 }
 

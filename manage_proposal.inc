@@ -836,6 +836,7 @@ function proposal_edit_form_submit($form, &$form_state)
 
   if ($preference1_data)
   {
+    del_book_pdf($preference1_data->id);
 		db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
 			$form_state['values']['book1'],
 			$form_state['values']['author1'],
@@ -847,6 +848,7 @@ function proposal_edit_form_submit($form, &$form_state)
 	}
   if ($preference2_data)
   {
+    del_book_pdf($preference2_data->id);
 		db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
 			$form_state['values']['book2'],
 			$form_state['values']['author2'],
@@ -858,6 +860,7 @@ function proposal_edit_form_submit($form, &$form_state)
 	}
   if ($preference3_data)
   {
+    del_book_pdf($preference3_data->id);
 		db_query("UPDATE {textbook_companion_preference} SET book = '%s', author = '%s', isbn = '%s', publisher = '%s', edition = %d, year = %d WHERE id = %d",
 			$form_state['values']['book3'],
 			$form_state['values']['author3'],

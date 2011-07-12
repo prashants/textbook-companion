@@ -147,6 +147,8 @@ function code_approval_form_submit($form, &$form_state)
     $proposal_data = db_fetch_object(db_query("SELECT * FROM {textbook_companion_proposal} WHERE id = %d LIMIT 1", $preference_data->proposal_id));
     $user_data = user_load($proposal_data->uid);
 
+    del_book_pdf($preference_data->id);
+
     if ($ex_data['approved'] == "0")
     {
       db_query("UPDATE {textbook_companion_example} SET approval_status = 1, approver_uid = %d, approval_date = %d WHERE id = %d", $user->uid, time(), $ex_data['example_id']);
@@ -268,6 +270,10 @@ function bulk_approval_form($form_state)
     $form['run']['download_pdf'] = array(
       '#type' => 'item',
       '#value' => l('Download PDF', 'textbook_companion/generate_book/' . $book_default_value . '/1') . ' ' . t('(Download PDF of all the approved and unapproved examples of the entire book)'),
+    );
+    $form['run']['regenrate_book'] = array(
+      '#type' => 'item',
+      '#value' => l('Regenerate PDF', 'textbook_companion/delete_book/' . $book_default_value) . ' ' . t('(Manually Regenerate PDF of the entire book)'),
     );
 
     $form['run']['approve_book'] = array(
@@ -447,6 +453,9 @@ function bulk_approval_form_submit($form, &$form_state)
 
 	if ($form_state['clicked_button']['#value'] == 'Submit')
 	{
+		if ($form_state['values']['run']['book'])
+			del_book_pdf($form_state['values']['run']['book']);
+
 	  if (user_access('bulk manage code'))
     {
       if ($form_state['values']['run']['approve_book'] == "1")

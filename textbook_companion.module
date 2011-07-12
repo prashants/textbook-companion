@@ -322,6 +322,14 @@ function textbook_companion_menu()
     'type' => MENU_CALLBACK,
     'file' => 'latex.inc',
   );
+  $items['textbook_companion/delete_book'] = array(
+    'title' => 'Delete Book PDF',
+    'description' => 'Delete Book PDF', 
+    'page callback' => 'textbook_companion_delete_book',
+    'access arguments' => array('approve code'),
+    'type' => MENU_CALLBACK,
+    'file' => 'latex.inc',
+  );
 
   /* general purpose callbacks */
   $items['textbook_companion/ajax'] = array(
@@ -1436,4 +1444,13 @@ function delete_file($file_id)
     db_query("DELETE FROM {textbook_companion_example_files} WHERE id = %d", $file_id);
     return TRUE;
   }
+}
+
+function del_book_pdf($book_id)
+{
+  $root_path = textbook_companion_path();
+  $dir_path = $root_path . "latex/";
+  $pdf_filename = "book_" . $book_id . ".pdf";
+  if (file_exists($dir_path . $pdf_filename))
+    unlink($dir_path . $pdf_filename);
 }
