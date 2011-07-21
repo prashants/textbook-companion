@@ -147,7 +147,10 @@ function list_examples()
 
   /* get example list */
   $example_rows = array();
-  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d", $chapter_id);
+  $example_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d ORDER BY
+    CAST(SUBSTRING_INDEX(number, '.', 1) AS BINARY) ASC,
+    CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(number , '.', 2), '.', -1) AS UNSIGNED) ASC,
+    CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(number , '.', -1), '.', 1) AS UNSIGNED) ASC", $chapter_id);
   while ($example_data = db_fetch_object($example_q))
   {
     /* approval status */

@@ -679,7 +679,10 @@ function _list_of_chapters($preference_id = 0)
 function _list_of_examples($chapter_id = 0)
 {
   $book_examples = array('0' => 'Please select...');
-  $book_examples_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d ORDER BY number ASC", $chapter_id);
+  $book_examples_q = db_query("SELECT * FROM {textbook_companion_example} WHERE chapter_id = %d ORDER BY
+    CAST(SUBSTRING_INDEX(number, '.', 1) AS BINARY) ASC,
+    CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(number , '.', 2), '.', -1) AS UNSIGNED) ASC,
+    CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(number , '.', -1), '.', 1) AS UNSIGNED) ASC", $chapter_id);
   while ($book_examples_data = db_fetch_object($book_examples_q))
   {
     $book_examples[$book_examples_data->id] = $book_examples_data->number . ' (' . $book_examples_data->caption . ')';
