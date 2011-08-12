@@ -365,6 +365,11 @@ function book_proposal_form($form_state)
 {
   global $user;
 
+  if (!$user->uid) {
+		drupal_set_message('It is mandatory to login on this website to access the proposal form', 'error');
+		return;
+  }
+
   /* check if user has already submitted a proposal */
   $proposal_q = db_query("SELECT * FROM {textbook_companion_proposal} WHERE uid = %d ORDER BY id DESC LIMIT 1", $user->uid);
   if ($proposal_q)
@@ -690,6 +695,11 @@ function book_proposal_form_validate($form, &$form_state)
 function book_proposal_form_submit($form, &$form_state)
 {
   global $user;
+
+  if (!$user->uid) {
+		drupal_set_message('It is mandatory to login on this website to access the proposal form', 'error');
+		return;
+  }
 
   /* completion date to timestamp */
   list($d, $m, $y) = explode('-', $form_state['values']['completion_date']);
