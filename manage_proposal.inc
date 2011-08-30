@@ -68,13 +68,17 @@ function _category_all()
   	switch ($preference_data->category)
   	{
     case 0: $category_data = 'Not Selected'; break;
-    case 1: $category_data = 'Computer Science and Information Technology'; break;
-    case 2: $category_data = 'Electrical and Electronics Engineering'; break;
-    case 3: $category_data = 'Mechanical Engineering'; break;
-    case 4: $category_data = 'Chemical Engineering'; break;
-    case 5: $category_data = 'Civil Engineering'; break;
-    case 6: $category_data = 'Physics'; break;
-    case 7: $category_data = 'Mathematics'; break;
+    case 1: $category_data = 'Fluid Mechanics'; break;
+    case 2: $category_data = 'Control Systems'; break;
+    case 3: $category_data = 'Chemical Engineering'; break;
+    case 4: $category_data = 'Signal Processing'; break;
+    case 5: $category_data = 'Digital Communications'; break;
+    case 6: $category_data = 'Electrical Technology'; break;
+    case 7: $category_data = 'Mathematics & Pure Science'; break;
+    case 8: $category_data = 'Analogue Electronics'; break;
+    case 9: $category_data = 'Digital Electronics'; break;
+    case 10: $category_data = 'Computer Programming'; break;
+    case 11: $category_data = 'Others'; break;
     default: $category_data = 'Unknown'; break;
   	}
     $preference_rows[] = array($preference_data->book, $preference_data->author, $preference_data->isbn, $preference_data->publisher, $preference_data->edition, $preference_data->year, $category_data, l('Edit', 'manage_proposal/category/edit/' . $preference_data->id));
@@ -927,14 +931,17 @@ function category_edit_form($form_state)
     '#type' => 'select',
     '#title' => t('Category'),
     '#options' => array(0 => 'Please select',
-                        1 => 'Computer Science and Information Technology',
-    										2 => 'Electrical and Electronics Engineering',
-                        3 => 'Mechanical Engineering',
-                        4 => 'Chemical Engineering',
-                        5 => 'Civil Engineering',
-                        6 => 'Physics',
-                        7 => 'Mathematics',
-                        8 => 'Others'),
+                        1 => 'Fluid Mechanics',
+                        2 => 'Control Systems',
+                        3 => 'Chemical Engineering',
+                        4 => 'Signal Processing',
+                        5 => 'Digital Communications',
+                        6 => 'Electrical Technology',
+                        7 => 'Mathematics & Pure Science',
+                        8 => 'Analogue Electronics',
+                        9 => 'Digital Electronics',
+                        10 => 'Computer Programming',
+                        11 => 'Others'),
     '#required' => TRUE,
     '#default_value' => $preference_data->category,
   );
