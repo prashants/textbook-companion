@@ -69,16 +69,18 @@ function _category_all()
   	{
     case 0: $category_data = 'Not Selected'; break;
     case 1: $category_data = 'Fluid Mechanics'; break;
-    case 2: $category_data = 'Control Systems'; break;
+    case 2: $category_data = 'Control Theory & Control Systems'; break;
     case 3: $category_data = 'Chemical Engineering'; break;
-    case 4: $category_data = 'Signal Processing'; break;
-    case 5: $category_data = 'Digital Communications'; break;
-    case 6: $category_data = 'Electrical Technology'; break;
-    case 7: $category_data = 'Mathematics & Pure Science'; break;
-    case 8: $category_data = 'Analogue Electronics'; break;
-    case 9: $category_data = 'Digital Electronics'; break;
-    case 10: $category_data = 'Computer Programming'; break;
-    case 11: $category_data = 'Others'; break;
+    case 4: $category_data = 'Thermodynamics'; break;
+    case 5: $category_data = 'Mechanical Engineering'; break;
+    case 6: $category_data = 'Signal Processing'; break;
+    case 7: $category_data = 'Digital Communications'; break;
+    case 8: $category_data = 'Electrical Technology'; break;
+    case 9: $category_data = 'Mathematics & Pure Science'; break;
+    case 10: $category_data = 'Analog Electronics'; break;
+    case 11: $category_data = 'Digital Electronics'; break;
+    case 12: $category_data = 'Computer Programming'; break;
+    case 13: $category_data = 'Others'; break;
     default: $category_data = 'Unknown'; break;
   	}
     $preference_rows[] = array($preference_data->book, $preference_data->author, $preference_data->isbn, $preference_data->publisher, $preference_data->edition, $preference_data->year, $category_data, l('Edit', 'manage_proposal/category/edit/' . $preference_data->id));
@@ -932,16 +934,18 @@ function category_edit_form($form_state)
     '#title' => t('Category'),
     '#options' => array(0 => 'Please select',
                         1 => 'Fluid Mechanics',
-                        2 => 'Control Systems',
+                        2 => 'Control Theory & Control Systems',
                         3 => 'Chemical Engineering',
-                        4 => 'Signal Processing',
-                        5 => 'Digital Communications',
-                        6 => 'Electrical Technology',
-                        7 => 'Mathematics & Pure Science',
-                        8 => 'Analogue Electronics',
-                        9 => 'Digital Electronics',
-                        10 => 'Computer Programming',
-                        11 => 'Others'),
+                        4 => 'Thermodynamics',
+                        5 => 'Mechanical Engineering',
+                        6 => 'Signal Processing',
+                        7 => 'Digital Communications',
+                        8 => 'Electrical Technology',
+                        9 => 'Mathematics & Pure Science',
+                        10 => 'Analog Electronics',
+                        11 => 'Digital Electronics',
+                        12 => 'Computer Programming',
+                        13 => 'Others'),
     '#required' => TRUE,
     '#default_value' => $preference_data->category,
   );
