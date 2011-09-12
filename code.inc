@@ -28,12 +28,12 @@ function upload_examples_form($form_state)
       return;
       break;
     case 2:
-      drupal_set_message(t('Your proposal has been dis-approved. Please create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'error');
+      drupal_set_message(t('Your proposal has been dis-approved. Please create another proposal ' . l('here', 'proposal') . '.'), 'error');
       drupal_goto('');
       return;
       break;
     case 3:
-      drupal_set_message(t('Congratulations! You have completed your last book proposal. You have to create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'status');
+      drupal_set_message(t('Congratulations! You have completed your last book proposal. You have to create another proposal ' . l('here', 'proposal') . '.'), 'status');
       drupal_goto('');
       return;
       break;
@@ -112,7 +112,8 @@ function upload_examples_form($form_state)
     '#options' => array('' => '(Select)', '1' => '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
                         '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
                         '21', '22', '23', '24', '25', '26', '27', '28', '29', '30',
-                        '31', '32', '33', '34', '35', '36', '37', '38', '39', '40'),
+                        '31', '32', '33', '34', '35', '36', '37', '38', '39', '40',
+                        '41', '42', '43', '44', '45', '46', '47', '48', '49', '50'),
     '#multiple' => FALSE,
     '#size' => 1,
     '#required' => TRUE,
@@ -383,7 +384,7 @@ function upload_examples_form_submit($form, &$form_state) {
       return;
       break;
     case 2:
-      drupal_set_message(t('Your proposal has been dis-approved. Please create another proposal ' . l('here', 'textbook_companion/proposal') . '.'), 'error');
+      drupal_set_message(t('Your proposal has been dis-approved. Please create another proposal ' . l('here', 'proposal') . '.'), 'error');
       drupal_goto('');
       return;
       break;
