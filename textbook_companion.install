@@ -434,6 +434,29 @@ function textbook_companion_schema() {
     'primary key' => array('id'),
   );
 
+  $schema['textbook_companion_notes'] = array(
+    'description' => t('TODO: please describe this table!'),
+    'fields' => array(
+      'id' => array(
+        'description' => t('TODO: please describe this field!'),
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'preference_id' => array(
+        'description' => t('TODO: please describe this field!'),
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'notes' => array(
+        'description' => t('TODO: please describe this field!'),
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
   $schema['textbook_companion_feedback'] = array(
     'description' => t('TODO: please describe this table!'),
     'fields' => array(

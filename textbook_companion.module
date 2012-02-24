@@ -133,6 +133,16 @@ function textbook_companion_menu()
     'weight' => 3,
     'file' => 'editcodeadmin.inc',
   );
+  $items['code_approval/notes'] = array(
+    'title' => 'Notes for Reviewers',
+    'description' => 'Notes for Reviewers',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('book_notes_form'),
+    'access arguments' => array('bulk manage code'),
+    'type' => MENU_CALLBACK,
+    'weight' => 4,
+    'file' => 'notes.inc',
+  );
 
   $items['textbook_companion/code'] = array(
     'title' => 'Code Submission',

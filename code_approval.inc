@@ -275,6 +275,10 @@ function bulk_approval_form($form_state)
       '#type' => 'item',
       '#value' => l('Regenerate PDF', 'textbook_companion/delete_book/' . $book_default_value) . ' ' . t('(Manually Regenerate PDF of the entire book)'),
     );
+    $form['run']['notes_book'] = array(
+      '#type' => 'item',
+      '#value' => l('Notes for Reviewers', 'code_approval/notes/' . $book_default_value),
+    );
 
     $form['run']['approve_book'] = array(
       '#type'  => 'checkbox',
