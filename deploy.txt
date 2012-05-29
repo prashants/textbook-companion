@@ -1,0 +1,22 @@
+How to deploy Textbook Companion for Drupal
+
+1. Create following folders in the drupal root directory where all
+the code will be uploaded. Make sure the folders have the right permissions
+for the www-data user to read and write to it.
+
+$sudo mkdir uploads
+$sudo mkdir uploads/latex
+$sudo chown www-data:www-data ./uploads - R
+$sudo chmod 755 ./uploads - R
+
+2. Upload the module to sites/all/modules folder
+
+3. Enable the module
+
+4. Setup the module parameters by going to
+
+Administer > Site configuration > Book Companion Settings 
+
+5. Make sure to install the texlive package for book generation
+$sudo apt-get install texlive-full
+
