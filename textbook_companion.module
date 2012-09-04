@@ -143,6 +143,16 @@ function textbook_companion_menu()
     'weight' => 4,
     'file' => 'notes.inc',
   );
+  $items['code_approval/dependency'] = array(
+    'title' => 'Dependency',
+    'description' => 'Dependency',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('textbook_companion_dependency_approval_form'),
+    'access arguments' => array('bulk manage code'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+    'file' => 'dependency_approval.inc',
+  );
 
   $items['textbook_companion/code'] = array(
     'title' => 'Code Submission',
